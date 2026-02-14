@@ -6,7 +6,7 @@ import Report from "./pages/Report";
 import CheckIn from "./pages/CheckIn";
 import TrackSyms from "./pages/TrackSyms";
 import Settings from "./pages/Settings";
-
+import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GetStarted from "./pages/GetStarted";
@@ -19,6 +19,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/get-started" element={<GetStarted />} />
+        <Route path="/Terms" element={<Terms />} />
 
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>
