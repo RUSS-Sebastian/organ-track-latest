@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import ConditionBadge from "../components/ConditionBadge";
 import organImages from "../data/organImages";
+import { useUser } from "../context/UserContext";
 
 export default function Home() {
   const [user, setUser] = useState(null);
+  const user1 = useUser();
 
   useEffect(() => {
     // Simulate fetching user data from backend
@@ -13,7 +15,6 @@ export default function Home() {
 
       const data = {
         userId: "u_001",
-        username: "Yoon Yoon",
         gender: "male",
         timezone: "Asia/Yangon",
         organHealth: {
@@ -108,7 +109,7 @@ export default function Home() {
           {/* Dynamic Greeting */}
           <p className="text-left text-[20px] md:text-3xl font-roboto font-semibold">
             {getGreeting()}!{" "}
-            <span className="font-bold text-[#4DD880]">{user.username}</span>
+            <span className="font-bold text-[#4DD880]">{user1.name}</span>
           </p>
 
           {/* Subtitle */}

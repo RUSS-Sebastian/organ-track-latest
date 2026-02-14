@@ -1,0 +1,20 @@
+export const organs = {
+  common: [
+    "Brain",
+    "Heart",
+    "Lungs",
+    "Liver",
+    "Kidney",
+    "Stomach",
+    "Muscles",
+    "Intestine",
+    "Gall Bladder",
+    "Pancreas",
+    "Skin",
+    "Bladder",
+    "Blood Vessels",
+    "Bone",
+  ],
+  male: ["Male Organ"],
+  female: ["Female Organ"],
+};
