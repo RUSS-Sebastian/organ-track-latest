@@ -10,6 +10,7 @@ import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GetStarted from "./pages/GetStarted";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/Terms" element={<Terms />} />
+        <Route path="/Landing" element={<LandingPage />} />
 
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>

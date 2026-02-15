@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { useUser } from "../context/UserContext";
 import { organs } from "../data/organ";
+import { useNavigate } from "react-router-dom";
+import { useOrgan } from "../context/OrganContext";
 
 export default function OrganSelectOverlay({ onClose }) {
   const user = useUser();
   const [selectedOrgan, setSelectedOrgan] = useState("");
+
+  const navigate = useNavigate();
+  const { setOrgan } = useOrgan();
 
   // --- Build gender-based organ list ---
   const organList = [
