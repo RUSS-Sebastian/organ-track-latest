@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { Home, FileText, CheckCircle, Activity, Settings } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 export default function BottomNav() {
   const navItems = [
@@ -9,6 +10,8 @@ export default function BottomNav() {
     { to: "/track", label: "Track-Syms", icon: Activity },
     { to: "/settings", label: "Settings", icon: Settings },
   ];
+
+  const location = useLocation();
 
   return (
     <div className="fixed bottom-0 left-0 w-full flex justify-center bg-white">
@@ -20,21 +23,53 @@ export default function BottomNav() {
             <NavLink
               key={index}
               to={item.to}
-              className={({ isActive }) =>
-                `flex flex-col items-center justify-center flex-1 h-full relative ${
-                  isActive ? "text-[#539DF3]" : "text-gray-700"
-                }`
-              }
+              className="flex-1 flex flex-col items-center justify-center h-full relative"
             >
-              {({ isActive }) => (
-                <>
-                  {isActive && (
-                    <div className="absolute top-0 w-full h-[3px] bg-[#539DF3]" />
-                  )}
-                  <Icon size={20} />
-                  <span className="text-xs mt-1">{item.label}</span>
-                </>
-              )}
+              {() => {
+                const path = location.pathname;
+
+                const isQuestions = path.startsWith("/questions");
+                const questionParam = path.split("/")[2];
+
+                let isActive = false;
+
+                if (item.to === "/track") {
+                  isActive =
+                    path.startsWith("/track") ||
+                    (isQuestions && questionParam !== "daily");
+                }
+
+                if (item.to === "/checkin") {
+                  isActive =
+                    path.startsWith("/checkin") ||
+                    (isQuestions && questionParam === "daily");
+                }
+
+                if (item.to !== "/track" && item.to !== "/checkin") {
+                  isActive = path === item.to;
+                }
+
+                return (
+                  <>
+                    {isActive && (
+                      <div className="absolute top-0 w-full h-[3px] bg-[#539DF3]" />
+                    )}
+
+                    <Icon
+                      size={20}
+                      className={isActive ? "text-[#539DF3]" : "text-gray-700"}
+                    />
+
+                    <span
+                      className={`text-xs mt-1 ${
+                        isActive ? "text-[#539DF3]" : "text-gray-700"
+                      }`}
+                    >
+                      {item.label}
+                    </span>
+                  </>
+                );
+              }}
             </NavLink>
           );
         })}

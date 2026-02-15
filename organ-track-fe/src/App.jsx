@@ -10,6 +10,7 @@ import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GetStarted from "./pages/GetStarted";
+import Questions from "./pages/Questions";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/track" element={<TrackSyms />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/questions/:organId?" element={<Questions />} />
         </Route>
       </Routes>
     </BrowserRouter>

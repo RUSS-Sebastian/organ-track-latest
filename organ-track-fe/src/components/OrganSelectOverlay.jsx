@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { useUser } from "../context/UserContext";
 import { organs } from "../data/organ";
+import { useNavigate } from "react-router-dom";
+import { useOrgan } from "../context/OrganContext";
 
 export default function OrganSelectOverlay({ onClose }) {
   const user = useUser();
   const [selectedOrgan, setSelectedOrgan] = useState("");
+  const navigate = useNavigate();
+  const { setOrgan } = useOrgan();
 
   // --- Build gender-based organ list ---
   const organList = [
@@ -17,8 +21,15 @@ export default function OrganSelectOverlay({ onClose }) {
       alert("Please select an organ first.");
       return;
     }
-    alert(`Selected organ: ${selectedOrgan}`);
-    onClose(); // close overlay after answer
+    // Save globally
+    setOrgan(selectedOrgan);
+
+    // Navigate safely with URL param
+    navigate(`/questions/${encodeURIComponent(selectedOrgan)}`, {
+      state: { type: "organ", organId: selectedOrgan },
+    });
+
+    onClose();
   };
 
   return (
