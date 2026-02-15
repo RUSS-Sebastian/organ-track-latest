@@ -1,0 +1,146 @@
+/* Navbar.css - CLEAN VERSION WITHOUT ICONS */
+.navbar {
+  background: linear-gradient(135deg, #00a86b 0%, #0d98ba 100%);
+  padding: 1.2rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 2px solid white;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-logo h2 {
+  color: white;
+  font-size: 1.8rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.logo-subtitle {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #e8f5e9;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: white;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-link.register-btn {
+  background: white;
+  color: #00a86b;
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-weight: 600;
+  border: 2px solid white;
+  transition: all 0.3s ease;
+}
+
+.nav-link.register-btn:hover {
+  background: transparent;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.nav-link.register-btn::after {
+  display: none;
+}
+
+/* Mobile menu styles */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.mobile-menu-btn .bar {
+  width: 25px;
+  height: 3px;
+  background: white;
+  margin: 4px 0;
+  transition: 0.3s;
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: linear-gradient(135deg, #00a86b 0%, #0d98ba 100%);
+  padding: 1rem;
+}
+
+.mobile-menu.active {
+  display: flex;
+}
+
+.mobile-nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+  
+  .mobile-menu-btn {
+    display: block;
+  }
+}
+/* DELETE LINES LIKE THESE: */
+.nav-link::before {
+  content: "\f005"; /* FontAwesome icon code */
+  font-family: "Font Awesome 5 Free";
+  margin-right: 8px;
+}
+
+.nav-link::after {
+  content: "\f0e0"; /* Another icon code */
+}
+
+/* OR any rules with "content:" value that's not empty */
+.nav-link:before {
+  content: "★"; /* Star icon */
+}
