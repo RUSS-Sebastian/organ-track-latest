@@ -25,9 +25,7 @@ export default function OrganSelectOverlay({ onClose }) {
     setOrgan(selectedOrgan);
 
     // Navigate safely with URL param
-    navigate(`/questions/${encodeURIComponent(selectedOrgan)}`, {
-      state: { type: "organ", organId: selectedOrgan },
-    });
+    navigate(`/questions/${selectedOrgan}`);
 
     onClose();
   };

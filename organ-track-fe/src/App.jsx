@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GetStarted from "./pages/GetStarted";
 import Questions from "./pages/Questions";
+import Thanks from "./pages/Thanks";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/track" element={<TrackSyms />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/questions/:organId?" element={<Questions />} />
+          <Route path="/thanks/:type" element={<Thanks />} />
         </Route>
       </Routes>
     </BrowserRouter>

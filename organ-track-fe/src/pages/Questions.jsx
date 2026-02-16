@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useOrgan } from "../context/OrganContext";
 import { useEffect, useState } from "react";
 
@@ -7,12 +7,15 @@ export default function Questions() {
   const { organ, setOrgan } = useOrgan();
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const location = useLocation();
   const navigate = useNavigate();
-  const { type, organId: organFromState } = location.state || {};
+  // URL is now the source of truth
+  const isDaily = organId === "daily";
+  const isOrgan = organId && organId !== "daily";
+  const [answers, setAnswers] = useState({});
   const currentQuestion = questions[currentIndex];
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === questions.length - 1;
+  const isLastQuestion = currentIndex === questions.length - 1;
 
   const goNext = () => {
     if (currentIndex < questions.length - 1) {
@@ -33,64 +36,100 @@ export default function Questions() {
     }
   }, []);
 
-  // Simulated backend
   useEffect(() => {
-    // Scenario: Organ symptom tracking
-    if (type === "organ") {
-      const id = organFromState || organId;
-      if (!id) return;
+    // Simulated backend
+    const fakeDB = {
+      Heart: [
+        {
+          id: 1,
+          question: "Do you feel chest pain?",
+          options: ["Never", "Sometimes", "Often"],
+        },
+        {
+          id: 2,
+          question: "Do you feel shortness of breath?",
+          options: ["No", "Mild", "Severe"],
+        },
+        {
+          id: 3,
+          question: "Do you feel heart palpitations?",
+          options: ["No", "Rarely", "Frequently"],
+        },
+        {
+          id: 4,
+          question: "Do you feel dizziness after activity?",
+          options: ["Never", "Sometimes", "Often"],
+        },
+        {
+          id: 5,
+          question: "Do you feel tired easily?",
+          options: ["No", "Sometimes", "Very often"],
+        },
+      ],
+      Brain: [
+        {
+          id: 1,
+          question: "Do you get headaches?",
+          options: ["Rarely", "Sometimes", "Often"],
+        },
+      ],
+    };
 
-      // restore context if refresh
-      if (!organ) setOrgan(id);
+    const dailyDB = [
+      { id: 1, question: "Did you sleep 7-8 hours?", options: ["Yes", "No"] },
+      { id: 2, question: "Did you drink water today?", options: ["Yes", "No"] },
+      { id: 3, question: "Did you exercise today?", options: ["Yes", "No"] },
+    ];
 
-      // Simulated backend
-      const fakeDB = {
-        Heart: [
-          {
-            id: 1,
-            question: "Do you feel chest pain?",
-            options: ["Never", "Sometimes", "Often"],
-          },
-          {
-            id: 2,
-            question: "Do you feel shortness of breath?",
-            options: ["No", "Mild", "Severe"],
-          },
-          {
-            id: 3,
-            question: "Do you feel heart palpitations?",
-            options: ["No", "Rarely", "Frequently"],
-          },
-          {
-            id: 4,
-            question: "Do you feel dizziness after activity?",
-            options: ["Never", "Sometimes", "Often"],
-          },
-          {
-            id: 5,
-            question: "Do you feel tired easily?",
-            options: ["No", "Sometimes", "Very often"],
-          },
-        ],
-        Brain: [{ q: "Headache?", options: ["Mild", "Severe"] }],
-      };
-      setQuestions(fakeDB[id] || []);
+    // ---------------- ORGAN FLOW ----------------
+    if (isOrgan) {
+      if (!fakeDB[organId]) {
+        navigate("/track"); // invalid organ fallback
+        return;
+      }
+
+      setQuestions(fakeDB[organId]);
+      return;
     }
 
-    // Scenario: Daily habit check-in
-    if (type === "daily") {
-      const dailyDB = [
-        { q: "Did you sleep 7-8 hours?", options: ["Yes", "No"] },
-        { q: "Did you drink water today?", options: ["Yes", "No"] },
-        { q: "Did you exercise today?", options: ["Yes", "No"] },
-      ];
+    // ---------------- DAILY FLOW ----------------
+    if (isDaily) {
       setQuestions(dailyDB);
+      return;
     }
-  }, [type, organFromState, organId]);
 
-  useEffect(() => {
-    setCurrentIndex(0);
-  }, [questions]);
+    // fallback safety
+    navigate("/track");
+  }, [organId]);
+
+  const handleSelect = (questionId, option) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: option,
+    }));
+  };
+
+  const handleSubmit = () => {
+    // Find first unanswered question
+    const firstUnansweredIndex = questions.findIndex((q) => !answers[q.id]);
+
+    if (firstUnansweredIndex !== -1) {
+      alert("Please complete all questions first!");
+      setCurrentIndex(firstUnansweredIndex);
+      return;
+    }
+
+    // All answered
+    console.log("Submitted answers:", answers);
+    alert("Submitted successfully!"); // wait for user to click OK
+
+    // Redirect after alert
+    if (isDaily) {
+      navigate("/thanks/daily");
+    } else {
+      navigate("/thanks/syms");
+    }
+  };
 
   return (
     <div className="w-full min-h-screen flex justify-center items-center bg-gray-50">
@@ -127,16 +166,44 @@ export default function Questions() {
                 </h1>
 
                 {/* Question text */}
-                <h2 className="text-lg font-semibold mb-4">
-                  {currentQuestion.question || currentQuestion.q}
+                <h2 className="text-lg font-semibold text-left mb-4">
+                  {currentQuestion?.question}
                 </h2>
 
-                {/* Options */}
-                <div className="space-y-3">
-                  {(currentQuestion.options || []).map((opt, idx) => (
+                {/* ================= QUESTION BLOCK INDICATOR ================= */}
+                <div className="flex gap-2 mb-4 flex-wrap">
+                  {questions.map((q, index) => {
+                    const isCurrent = currentIndex === index;
+
+                    // 🔥 FIX: use question.id instead of index
+                    const isAnswered = answers[q.id] !== undefined;
+
+                    return (
+                      <button
+                        key={q.id}
+                        onClick={() => setCurrentIndex(index)}
+                        className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                          isCurrent ? "w-10" : "w-6"
+                        }`}
+                        style={{
+                          backgroundColor: isAnswered ? "#14AE5C" : "#FDE31E",
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  {currentQuestion?.options.map((opt, idx) => (
                     <button
                       key={idx}
-                      className="w-full p-3 bg-white rounded-lg border border-gray-200 text-left"
+                      onClick={() => handleSelect(currentQuestion.id, opt)}
+                      className={`py-3 rounded-lg border transition 
+                        ${
+                          answers[currentQuestion.id] === opt
+                            ? "bg-green-500 text-white border-green-500"
+                            : "bg-white border-gray-300"
+                        }`}
                     >
                       {opt}
                     </button>
@@ -170,6 +237,16 @@ export default function Questions() {
                 Next
               </button>
             </div>
+
+            <button
+              disabled={!isLastQuestion}
+              onClick={handleSubmit}
+              className={`mt-4 w-full py-3 rounded-lg text-white
+                ${isLastQuestion ? "bg-green-600" : "bg-gray-400 cursor-not-allowed"}
+              `}
+            >
+              Submit
+            </button>
           </div>
         </div>
       </div>

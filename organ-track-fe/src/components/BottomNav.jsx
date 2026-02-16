@@ -27,25 +27,28 @@ export default function BottomNav() {
             >
               {() => {
                 const path = location.pathname;
-
-                const isQuestions = path.startsWith("/questions");
-                const questionParam = path.split("/")[2];
+                const organId = path.split("/")[2]; // Heart or daily
 
                 let isActive = false;
 
+                // TRACK ACTIVE
                 if (item.to === "/track") {
                   isActive =
                     path.startsWith("/track") ||
-                    (isQuestions && questionParam !== "daily");
+                    (path.startsWith("/questions") && organId !== "daily") ||
+                    (path.startsWith("/thanks") && organId !== "daily");
                 }
 
-                if (item.to === "/checkin") {
+                // CHECK-IN ACTIVE
+                else if (item.to === "/checkin") {
                   isActive =
                     path.startsWith("/checkin") ||
-                    (isQuestions && questionParam === "daily");
+                    (path.startsWith("/questions") && organId === "daily") ||
+                    (path.startsWith("/thanks") && organId !== "organ");
                 }
 
-                if (item.to !== "/track" && item.to !== "/checkin") {
+                // OTHER ROUTES
+                else {
                   isActive = path === item.to;
                 }
 
