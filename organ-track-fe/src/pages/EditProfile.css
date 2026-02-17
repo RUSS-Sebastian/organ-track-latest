@@ -1,20 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, rgba(67, 160, 71, 0.3) 0%, rgba(27, 94, 32, 0.3) 100%);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
 .edit-profile-wrapper {
   width: 100%;
@@ -229,7 +213,7 @@ body {
   border: 2px solid rgba(67, 160, 71, 0.15);
   border-radius: 12px;
   font-size: 15px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   transition: all 0.3s ease;
   background: white;
 }
@@ -251,7 +235,7 @@ body {
   border: 2px solid rgba(67, 160, 71, 0.15);
   border-radius: 12px;
   font-size: 15px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   background: white;
   cursor: pointer;
   transition: all 0.3s ease;
