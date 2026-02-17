@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GetStarted from "./pages/GetStarted";
 import LandingPage from "./pages/LandingPage";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/track" element={<TrackSyms />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/EditProfile" element={<EditProfile />} />
         </Route>
       </Routes>
     </BrowserRouter>
