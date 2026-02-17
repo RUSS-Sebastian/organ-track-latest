@@ -26,7 +26,7 @@ export default function TrackSyms() {
   return (
     <div className="min-h-[982px] w-full flex justify-center bg-white border border-red-500">
       {/* Mobile container */}
-      <div className="w-full max-w-[402px] px-4 pt-6 pb-10 border border-blue-500">
+      <div className="w-full max-w-[402px] px-1 pt-6 pb-10 border border-blue-500">
         {/* Header */}
         <h1
           className="
