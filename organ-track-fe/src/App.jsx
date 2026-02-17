@@ -23,7 +23,7 @@ function App() {
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/Terms" element={<Terms />} />
         <Route path="/Landing" element={<LandingPage />} />
-        <Route path="/EditProfile" element={<EditProfile />} />
+
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
@@ -31,6 +31,7 @@ function App() {
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/track" element={<TrackSyms />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/EditProfile" element={<EditProfile />} />
         </Route>
       </Routes>
     </BrowserRouter>

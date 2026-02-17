@@ -233,11 +233,13 @@ const EditProfile = () => {
   return (
     <div className="min-h-[874px] w-full flex justify-center bg-white">
       {/* Mobile container */}
-      <div className="w-full max-w-[402px] px-4 pt-6 pb-10 border border-red-500">
-        <div className="edit-profile-header">
+      <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
+        <div className="relative flex items-center justify-center h-[56px]">
+          {/* Back Button (left aligned) */}
           <button
             onClick={() => navigate("/settings")}
             className="
+              absolute left-0
               text-[22px]
               font-semibold
               text-black
@@ -250,7 +252,10 @@ const EditProfile = () => {
             ←
           </button>
 
-          <h1>Edit Profile</h1>
+          {/* Centered Title */}
+          <h1 className="text-[20px] font-bold font-['Roboto'] text-black">
+            Edit Profile
+          </h1>
         </div>
 
         <div className="profile-content">
