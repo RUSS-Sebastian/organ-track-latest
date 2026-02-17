@@ -10,6 +10,8 @@ import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GetStarted from "./pages/GetStarted";
+import Questions from "./pages/Questions";
+import Thanks from "./pages/Thanks";
 import LandingPage from "./pages/LandingPage";
 import EditProfile from "./pages/EditProfile";
 
@@ -31,6 +33,8 @@ function App() {
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/track" element={<TrackSyms />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/questions/:organId?" element={<Questions />} />
+          <Route path="/thanks/:type" element={<Thanks />} />
           <Route path="/EditProfile" element={<EditProfile />} />
         </Route>
       </Routes>
