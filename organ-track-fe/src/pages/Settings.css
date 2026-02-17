@@ -1,0 +1,280 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.settings-page {
+  max-width: 5000px;  /* INCREASED from 700px to 1000px for wider container */
+  width: 101%;  /* Added for responsiveness */
+  margin: 40px auto;  /* Added top/bottom margin */
+  padding: 40px 65px;  /* Increased padding */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 40px;  /* Added border radius for modern look */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);  /* Added shadow for depth */
+  position: relative;
+  min-height: auto;  /* Changed from 100vh */
+}
+
+/* Background with soft green gradient */
+body {
+  margin: 0;
+  background: linear-gradient(145deg, #e8f3e9 0%, #d4e8d6 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.settings-header {
+  margin-bottom: 48px;  /* Increased margin */
+  padding-bottom: 24px;  /* Increased padding */
+  border-bottom: 2px solid rgba(76, 175, 80, 0.15);
+  position: relative;
+}
+
+.settings-header h1 {
+  font-size: 42px;  /* Increased font size */
+  font-weight: 700;  /* Increased weight */
+  color: #2c5e2e;
+  margin: 0;
+  letter-spacing: -0.5px;
+  text-shadow: 2px 2px 4px rgba(76, 175, 80, 0.1);
+}
+
+.settings-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 80px;  /* Increased width */
+  height: 4px;
+  background: linear-gradient(90deg, #4CAF50, #81C784);
+  border-radius: 4px;
+}
+
+.settings-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;  /* Increased gap */
+}
+
+.settings-section {
+  background: rgba(255, 255, 255, 0.8);  /* More opaque */
+  backdrop-filter: blur(8px);
+  border-radius: 32px;  /* Larger border radius */
+  padding: 32px;  /* Increased padding */
+  box-shadow: 
+    0 12px 40px rgba(76, 175, 80, 0.12),
+    0 2px 8px rgba(255, 255, 255, 0.8) inset,
+    0 -2px 4px rgba(76, 175, 80, 0.05) inset;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+}
+
+.settings-section:hover {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 16px 48px rgba(76, 175, 80, 0.2),
+    0 2px 12px rgba(255, 255, 255, 0.9) inset;
+  transform: translateY(-4px);
+}
+
+.section-title {
+  font-size: 16px;  /* Increased font size */
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #4CAF50;
+  margin-bottom: 20px;  /* Increased margin */
+  letter-spacing: 1px;
+  padding-left: 12px;  /* Increased padding */
+  position: relative;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;  /* Increased width */
+  height: 20px;  /* Increased height */
+  background: linear-gradient(180deg, #4CAF50, #81C784);
+  border-radius: 6px;
+}
+
+.settings-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.6);  /* Slightly more opaque */
+  border-radius: 24px;  /* Larger border radius */
+  overflow: hidden;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px;  /* Increased padding */
+  border-bottom: 1px solid rgba(76, 175, 80, 0.15);  /* Slightly darker border */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 18px;  /* Increased font size */
+  font-weight: 500;
+  color: #1a3b1c;
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-item:last-child {
+  border-bottom: none;
+}
+
+.settings-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, rgba(76, 175, 80, 0.12), transparent);
+  transition: width 0.3s ease;
+  z-index: 0;
+}
+
+.settings-item:hover::before {
+  width: 100%;
+}
+
+.settings-item:hover {
+  padding-left: 36px;  /* Increased on hover */
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.settings-item span:first-child {
+  position: relative;
+  z-index: 1;
+  font-size: 18px;  /* Explicit font size */
+}
+
+.settings-item.logout {
+  color: #c44545;
+}
+
+.settings-item.logout:hover {
+  background: rgba(196, 69, 69, 0.05);
+}
+
+.settings-item.logout::before {
+  background: linear-gradient(90deg, rgba(196, 69, 69, 0.1), transparent);
+}
+
+.chevron {
+  font-size: 28px;  /* Increased size */
+  color: #4CAF50;
+  font-weight: 300;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.settings-item:hover .chevron {
+  opacity: 1;
+  transform: translateX(6px);  /* Increased movement */
+  color: #2e7d32;
+}
+
+/* Floating decoration elements - adjusted for new size */
+.settings-page::before {
+  content: '';
+  position: fixed;
+  top: -50px;
+  right: -50px;
+  width: 250px;  /* Increased size */
+  height: 250px;
+  background: radial-gradient(circle, rgba(129, 199, 132, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.settings-page::after {
+  content: '';
+  position: fixed;
+  bottom: -50px;
+  left: -50px;
+  width: 300px;  /* Increased size */
+  height: 300px;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Responsive Design - updated for larger screens */
+@media (min-width: 1400px) {
+  .settings-page {
+    max-width: 1200px;  /* Even wider for large screens */
+    padding: 48px 60px;
+  }
+}
+
+@media (max-width: 900px) {
+  .settings-page {
+    max-width: 95%;
+    padding: 30px 32px;
+  }
+}
+
+@media (max-width: 600px) {
+  .settings-page {
+    padding: 24px 20px;
+    margin: 20px auto;
+  }
+  
+  .settings-header h1 {
+    font-size: 32px;
+  }
+  
+  .settings-section {
+    padding: 24px;
+  }
+  
+  .settings-item {
+    padding: 18px 20px;
+    font-size: 16px;
+  }
+  
+  .settings-item:hover {
+    padding-left: 24px;
+  }
+  
+  .chevron {
+    font-size: 24px;
+  }
+}
+
+/* Animation for items */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-section {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.settings-section:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.settings-section:nth-child(3) {
+  animation-delay: 0.2s;
+}
