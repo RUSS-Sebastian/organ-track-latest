@@ -12,6 +12,8 @@ import Register from "./pages/Register";
 import GetStarted from "./pages/GetStarted";
 import Questions from "./pages/Questions";
 import Thanks from "./pages/Thanks";
+import LandingPage from "./pages/LandingPage";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/Terms" element={<Terms />} />
+        <Route path="/Landing" element={<LandingPage />} />
 
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>
@@ -32,6 +35,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/questions/:organId?" element={<Questions />} />
           <Route path="/thanks/:type" element={<Thanks />} />
+          <Route path="/EditProfile" element={<EditProfile />} />
         </Route>
       </Routes>
     </BrowserRouter>

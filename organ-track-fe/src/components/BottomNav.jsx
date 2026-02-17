@@ -45,6 +45,10 @@ export default function BottomNav() {
                     path.startsWith("/checkin") ||
                     (path.startsWith("/questions") && organId === "daily") ||
                     (path.startsWith("/thanks") && organId !== "syms");
+                } else if (item.to === "/settings") {
+                  isActive =
+                    path.startsWith("/settings") ||
+                    path.startsWith("/EditProfile");
                 }
 
                 // OTHER ROUTES
