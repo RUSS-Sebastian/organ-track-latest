@@ -4,7 +4,6 @@ import "./index.css";
 import App from "./App.jsx";
 import { UserProvider } from "./context/UserContext";
 import { OrganProvider } from "./context/OrganContext.jsx";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
