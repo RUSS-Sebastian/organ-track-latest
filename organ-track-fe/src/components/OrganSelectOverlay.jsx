@@ -10,9 +10,6 @@ export default function OrganSelectOverlay({ onClose }) {
   const navigate = useNavigate();
   const { setOrgan } = useOrgan();
 
-  const navigate = useNavigate();
-  const { setOrgan } = useOrgan();
-
   // --- Build gender-based organ list ---
   const organList = [
     ...organs.common,

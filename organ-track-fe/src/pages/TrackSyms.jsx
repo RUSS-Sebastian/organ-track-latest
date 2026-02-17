@@ -24,9 +24,9 @@ export default function TrackSyms() {
   };
 
   return (
-    <div className="min-h-[982px] w-full flex justify-center bg-white border border-red-500">
+    <div className="min-h-[982px] w-full flex justify-center bg-white">
       {/* Mobile container */}
-      <div className="w-full max-w-[402px] px-1 pt-6 pb-10 border border-blue-500">
+      <div className="w-full max-w-[402px] px-1 pt-6 pb-10">
         {/* Header */}
         <h1
           className="
@@ -136,7 +136,7 @@ export default function TrackSyms() {
           Track History
         </h2>
 
-        <div className="w-full max-w-[402px] rounded-lg mx-auto">
+        <div className="w-full max-w-[402px] rounded-lg ">
           <TrackHistory />
         </div>
       </div>

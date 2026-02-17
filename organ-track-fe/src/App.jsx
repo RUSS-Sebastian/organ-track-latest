@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Report from "./pages/Report";
 import CheckIn from "./pages/CheckIn";
 import TrackSyms from "./pages/TrackSyms";
-import Settings from "./pages/Settings";
+import Settings from "./pages/Settings1";
 import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import Register from "./pages/Register";

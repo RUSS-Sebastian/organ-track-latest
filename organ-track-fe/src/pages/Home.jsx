@@ -102,9 +102,9 @@ export default function Home() {
   if (!user) return <div>Loading...</div>;
 
   return (
-    <div className="w-full min-h-screen flex flex-col border border-red-500">
+    <div className="w-full min-h-screen flex flex-col">
       {/* Scrollable content */}
-      <div className="flex-1 overflow-auto border border-blue-500">
+      <div className="flex-1 overflow-auto ">
         <div className="max-w-[402px] md:max-w-3xl mx-auto px-4 py-4  space-y-6">
           {/* Dynamic Greeting */}
           <p className="text-left text-[20px] md:text-3xl font-roboto font-semibold">

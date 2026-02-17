@@ -2,9 +2,9 @@ import ReportHistory from "../components/TrackReport";
 
 export default function Report() {
   return (
-    <div className="min-h-[982px] w-full flex justify-center bg-white border border-red-500">
+    <div className="min-h-[982px] w-full flex justify-center bg-white">
       {/* Mobile container */}
-      <div className="w-full max-w-[402px] px-4 pt-6 pb-10 border border-blue-500">
+      <div className="w-full max-w-[402px] px-1 pt-6 pb-10">
         {/* Header + Button Row */}
         <div className="flex justify-between items-center">
           <h1 className="text-[#14AE5C] font-bold text-[24px] font-['Roboto']">
@@ -19,7 +19,7 @@ export default function Report() {
           </button>
         </div>
 
-        <div className="w-full max-w-[402px] rounded-lg mx-auto mt-8">
+        <div className="w-full max-w-[402px] rounded-lg mt-8">
           <ReportHistory />
         </div>
 
