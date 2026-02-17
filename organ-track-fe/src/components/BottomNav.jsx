@@ -44,7 +44,7 @@ export default function BottomNav() {
                   isActive =
                     path.startsWith("/checkin") ||
                     (path.startsWith("/questions") && organId === "daily") ||
-                    (path.startsWith("/thanks") && organId !== "organ");
+                    (path.startsWith("/thanks") && organId !== "syms");
                 }
 
                 // OTHER ROUTES
