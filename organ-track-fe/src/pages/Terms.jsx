@@ -1,12 +1,12 @@
 export default function Terms() {
   return (
     <div
-      className="w-full max-w-[402px] mx-auto border border-red-500 px-4 py-6"
+      className="w-full max-w-[402px] mx-auto  px-4 py-6"
       style={{ minHeight: "2490px" }}
     >
       {/* AGREEMENT */}
       <p
-        className="text-left border border-blue-500 text-[#9F9F9F] font-sans"
+        className="text-left  text-[#9F9F9F] font-sans"
         style={{ fontFamily: "Montserrat", fontWeight: "400" }}
       >
         AGREEMENT
@@ -14,7 +14,7 @@ export default function Terms() {
 
       {/* Header */}
       <h1
-        className="text-left mt-4 border border-green-500 text-[#14AE5C] font-bold text-2xl"
+        className="text-left mt-4  text-[#14AE5C] font-bold text-2xl"
         style={{ fontFamily: "Montserrat" }}
       >
         Terms of Service
@@ -287,7 +287,7 @@ export default function Terms() {
           Conditions, please contact the Organ Track development team.
         </p>
       </div>
-      <div className="w-full max-w-[402px] mx-auto mt-6 flex justify-between border border-red-500 gap-4 px-4 md:max-w-3xl">
+      <div className="w-full max-w-[402px] mx-auto mt-6 flex justify-between gap-4 px-4 md:max-w-3xl">
         {/* Decline Button */}
         <button
           className="w-[154px] h-[52px] md:w-48 md:h-14 border-2 border-[#2DF251] rounded-[8px] bg-white text-[#2DF251] font-sans font-semibold text-base md:text-lg"

@@ -19,7 +19,8 @@ Route::put('/tracks/{id}', [TrackController::class, 'update']);
 Route::delete('/tracks/{id}', [TrackController::class, 'destroy']);
 
 
-Route::post('/logout', [AuthController::class, 'logout']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
 
 Route::get('/test', function() {
     return response()->json(['message' => 'API is working!']);
