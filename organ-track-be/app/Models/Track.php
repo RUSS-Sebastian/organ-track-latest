@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Track extends Model
 {
     use HasFactory; 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'user_id', 'organ_id', 'status', 'notes'];
 }
