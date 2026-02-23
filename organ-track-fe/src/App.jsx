@@ -15,6 +15,7 @@ import Thanks from "./pages/Thanks";
 import LandingPage from "./pages/LandingPage";
 import EditProfile from "./pages/EditProfile";
 import TestAPI from "./components/TestAPI";
+import Countdown from "./pages/Countdown";
 function App() {
   return (
     <BrowserRouter>
@@ -36,6 +37,7 @@ function App() {
           <Route path="/questions/:organId?" element={<Questions />} />
           <Route path="/thanks/:type" element={<Thanks />} />
           <Route path="/EditProfile" element={<EditProfile />} />
+          <Route path="/Countdown" element={<Countdown />} />
         </Route>
       </Routes>
     </BrowserRouter>
