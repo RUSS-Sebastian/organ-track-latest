@@ -11,6 +11,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GetStarted from "./pages/GetStarted";
 import LandingPage from "./pages/LandingPage";
+import ReportInput from "./pages/reportinput";
+
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/Terms" element={<Terms />} />
         <Route path="/Landing" element={<LandingPage />} />
+        <Route path="/ReportInput" element={<ReportInput/>} />
+
 
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>
@@ -30,6 +34,7 @@ function App() {
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/track" element={<TrackSyms />} />
           <Route path="/settings" element={<Settings />} />
+
         </Route>
       </Routes>
     </BrowserRouter>
