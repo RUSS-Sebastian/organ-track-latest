@@ -11,8 +11,10 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->enum('gender', ['male', 'female']);
             $table->string('password');
-            $table->string('image'); // image path only
+            $table->rememberToken();
+            $table->string('image')->nullable(); // image path only
             $table->timestamps();
         });
     }

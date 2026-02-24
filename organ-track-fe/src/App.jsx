@@ -5,15 +5,18 @@ import Home from "./pages/Home";
 import Report from "./pages/Report";
 import CheckIn from "./pages/CheckIn";
 import TrackSyms from "./pages/TrackSyms";
-import Settings from "./pages/Settings";
+import Settings from "./pages/Settings1";
 import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import GetStarted from "./pages/GetStarted";
+import Questions from "./pages/Questions";
+import Thanks from "./pages/Thanks";
 import LandingPage from "./pages/LandingPage";
 import ReportInput from "./pages/reportinput";
-
-
+import EditProfile from "./pages/EditProfile";
+import TestAPI from "./components/TestAPI";
+import Countdown from "./pages/Countdown";
 function App() {
   return (
     <BrowserRouter>
@@ -34,7 +37,10 @@ function App() {
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/track" element={<TrackSyms />} />
           <Route path="/settings" element={<Settings />} />
-
+          <Route path="/questions/:organId?" element={<Questions />} />
+          <Route path="/thanks/:type" element={<Thanks />} />
+          <Route path="/EditProfile" element={<EditProfile />} />
+          <Route path="/Countdown" element={<Countdown />} />
         </Route>
       </Routes>
     </BrowserRouter>
@@ -42,3 +48,5 @@ function App() {
 }
 
 export default App;
+
+/* */
