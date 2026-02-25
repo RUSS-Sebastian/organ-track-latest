@@ -11,7 +11,7 @@ export default function Login() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState(""); // to show API error
-
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -112,22 +112,25 @@ export default function Login() {
             </div>
 
             {/* Password */}
-            <div className="mb-12">
-              <div className="relative">
-                <i className="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full bg-gray-100 pl-12 pr-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500"
-                  required
-                />
-              </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-              )}
+            <div className="relative mb-12">
+              <i className="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
+
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full bg-gray-100 pl-12 pr-12 py-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500"
+                required
+              />
+
+              <i
+                className={`fa-solid absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 ${
+                  showPassword ? "fa-eye-slash" : "fa-eye"
+                }`}
+                onClick={() => setShowPassword(!showPassword)}
+              ></i>
             </div>
 
             <button

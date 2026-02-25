@@ -1,19 +1,59 @@
 import { useNavigate } from "react-router-dom";
-
+import { useState } from "react";
+import ConfirmModal from "../components/ConfirmModal";
+import api from "../api/axios";
 const Settings = () => {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleNavigation = (path) => {
     if (path === "logout") {
       // Handle logout logic here
-      console.log("Logging out...");
-      navigate("/login");
+      setIsModalOpen(true);
     } else if (path === "edit-profile") {
       navigate("/EditProfile");
     } else if (path === "terms") {
       navigate("/Terms");
     } else {
       console.log(`Navigating to: ${path}`);
+    }
+  };
+
+  const handleLogout = async () => {
+    setLoading(true); // disable buttons
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.post(
+        "/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // send token to backend
+          },
+        },
+      );
+
+      localStorage.removeItem("token"); // remove token
+      alert("Logged out successfully");
+      navigate("/login"); // redirect
+    } catch (error) {
+      console.error("Logout failed:", error);
+
+      // Extract message from backend
+      let msg = "Logout failed. Please try again.";
+      if (error.response) {
+        // Laravel usually returns error.response.data.message
+        msg = error.response.data?.message || msg;
+      } else if (error.message) {
+        msg = error.message;
+      }
+
+      alert(msg); // show exact error message
+    } finally {
+      setLoading(false);
+      setIsModalOpen(false);
     }
   };
 
@@ -113,6 +153,15 @@ const Settings = () => {
             </span>
             <span className="text-red-400 text-lg">›</span>
           </div>
+
+          <ConfirmModal
+            isOpen={isModalOpen}
+            title="Confirm Logout"
+            message="Are you sure you want to log out?"
+            onCancel={() => setIsModalOpen(false)}
+            onConfirm={handleLogout}
+            loading={loading} // pass loading state to modal
+          />
         </div>
       </div>
     </div>

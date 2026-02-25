@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import systemLogo from "../assets/images/systemLogo.png";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -146,15 +147,16 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-[982px] w-full flex justify-center bg-white">
+    <div className="min-h-[874px] w-full flex justify-center bg-white">
       <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
         <div className="w-full flex flex-col items-center mb-6">
-          <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center">
-            <span className="text-gray-500 text-sm">Big Logo</span>
+          <div className="w-50 h-50 bg-white-200 rounded-full flex items-center justify-center overflow-hidden">
+            <img
+              src={systemLogo}
+              alt="Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
-          <h2 className="text-2xl font-semibold text-green-600 mt-4">
-            Organ Track
-          </h2>
         </div>
 
         <div className="bg-green-500 rounded-3xl px-6 py-8 shadow-md">
