@@ -14,7 +14,6 @@ import Questions from "./pages/Questions";
 import Thanks from "./pages/Thanks";
 import LandingPage from "./pages/LandingPage";
 import EditProfile from "./pages/EditProfile";
-import TestAPI from "./components/TestAPI";
 import Countdown from "./pages/Countdown";
 function App() {
   return (
