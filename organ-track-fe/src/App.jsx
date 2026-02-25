@@ -13,6 +13,7 @@ import GetStarted from "./pages/GetStarted";
 import Questions from "./pages/Questions";
 import Thanks from "./pages/Thanks";
 import LandingPage from "./pages/LandingPage";
+import ReportInput from "./pages/reportinput";
 import EditProfile from "./pages/EditProfile";
 import Countdown from "./pages/Countdown";
 function App() {
@@ -25,6 +26,8 @@ function App() {
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/Terms" element={<Terms />} />
         <Route path="/Landing" element={<LandingPage />} />
+        <Route path="/ReportInput" element={<ReportInput/>} />
+
 
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>
