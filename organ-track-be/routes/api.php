@@ -2,24 +2,31 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MeController;
 use App\Http\Controllers\Api\OrganController;
 use App\Http\Controllers\Api\TrackController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/profile', [AuthController::class, 'profile']);
-Route::put('/profile', [AuthController::class, 'updateProfile']);
-Route::post('/profile/image', [AuthController::class, 'updateImage']);
+Route::middleware('auth:sanctum')->group(function () {
 
-Route::get('/organs', [OrganController::class, 'index']);
+    Route::get('/me/organs', [MeController::class, 'organs']);
+    Route::get('/me', [MeController::class, 'me']);
 
-Route::get('/{user_id}/tracks', [TrackController::class, 'index']);
-Route::put('/tracks/{id}', [TrackController::class, 'update']);
-Route::delete('/tracks/{id}', [TrackController::class, 'destroy']);
+    Route::get('/profile', [AuthController::class, 'profile']);
+    Route::put('/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/profile/image', [AuthController::class, 'updateImage']);
 
+    Route::get('/organs', [OrganController::class, 'index']);
 
-Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+    Route::get('/{user_id}/tracks', [TrackController::class, 'index']);
+    Route::put('/tracks/{id}', [TrackController::class, 'update']);
+    Route::delete('/tracks/{id}', [TrackController::class, 'destroy']);
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
 
 
 Route::get('/test', function() {
