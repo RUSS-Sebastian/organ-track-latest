@@ -49,6 +49,10 @@ export default function BottomNav() {
                   isActive =
                     path.startsWith("/settings") ||
                     path.startsWith("/EditProfile");
+                } else if (item.to === "/report") {
+                  isActive =
+                    path.startsWith("/report") ||
+                    path.startsWith("/reportinput");
                 }
 
                 // OTHER ROUTES

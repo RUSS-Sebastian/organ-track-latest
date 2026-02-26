@@ -1,6 +1,8 @@
 import ReportHistory from "../components/TrackReport";
+import { useNavigate } from "react-router-dom";
 
 export default function Report() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-[982px] w-full flex justify-center bg-white">
       {/* Mobile container */}
@@ -12,6 +14,7 @@ export default function Report() {
           </h1>
 
           <button
+            onClick={() => navigate("/reportinput")}
             className="bg-[#14AE5C] text-white font-bold text-[12px] font-['Montserrat'] px-4 py-2 rounded-[8px]"
             style={{ width: "123px", height: "32px" }}
           >

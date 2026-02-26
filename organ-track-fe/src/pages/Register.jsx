@@ -315,11 +315,11 @@ export default function Register() {
           </form>
 
           {/* Bottom Link */}
-          <div className="mt-6 text-center text-sm text-white-700">
+          <div className="mt-6 text-center text-sm" style={{ color: "#fff" }}>
             Already have an account?{" "}
             <span
               onClick={() => navigate("/login")}
-              className="text-green-600 font-medium cursor-pointer"
+              style={{ color: "#fff", fontWeight: 500, cursor: "pointer" }}
             >
               Sign in
             </span>

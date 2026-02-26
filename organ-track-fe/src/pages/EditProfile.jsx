@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./EditProfile.css";
+import axios from "../api/axios";
 
 const MOCK_USER_ID = "user_123456";
 const MASKED_PASSWORD = "••••••••";
@@ -15,7 +16,6 @@ const EditProfile = () => {
   const [userData, setUserData] = useState({
     name: "Melissa Peters",
     email: "melpeters@gmail.com",
-    dateOfBirth: "1995-05-23",
     gender: "Male",
   });
 
@@ -34,6 +34,64 @@ const EditProfile = () => {
   const [reenterPassword, setReenterPassword] = useState("");
   const [confirmError, setConfirmError] = useState("");
   const [pendingChanges, setPendingChanges] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file); // save real file for backend
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result); // show preview
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      setIsLoading(true); // show spinner while loading
+      setError(null);
+
+      try {
+        // Get token from localStorage (replace with your actual storage method)
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          throw new Error("User not authenticated");
+        }
+
+        // Call backend with Authorization header
+        const response = await axios.get("/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const user = response.data;
+        // Update frontend state with backend data
+        setUserData({
+          name: user.name || "",
+          email: user.email || "",
+          gender: user.gender || "",
+        });
+
+        setProfileImage(user.image || "https://via.placeholder.com/150");
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Failed to load profile.",
+        );
+      } finally {
+        setIsLoading(false); // hide spinner
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleEdit = () => {
     setTempData({ ...userData });
@@ -55,43 +113,6 @@ const EditProfile = () => {
         [name]: value,
       }));
     }
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // 📋 Prepare JSON data for backend
-  const prepareBackendJSON = () => {
-    const backendJSON = {
-      userId: MOCK_USER_ID,
-      profileData: {
-        name: tempData.name,
-        email: tempData.email,
-        dateOfBirth: tempData.dateOfBirth,
-        gender: tempData.gender,
-        profileImage: profileImage,
-        updatedAt: new Date().toISOString(),
-      },
-    };
-
-    // Only include password if it was changed
-    if (
-      isPasswordChanged &&
-      tempPassword !== MASKED_PASSWORD &&
-      tempPassword.trim() !== ""
-    ) {
-      backendJSON.profileData.password = tempPassword;
-    }
-
-    return backendJSON;
   };
 
   // Verify that re-entered password matches the new password
@@ -125,35 +146,43 @@ const EditProfile = () => {
     return response;
   };
 
-  const handleSaveClick = () => {
-    // Validate required fields
-    if (!tempData.name || !tempData.email) {
-      setError("Name and email are required");
+  const handleSaveClick = async () => {
+    if (!selectedFile) {
+      alert("No changes to save");
       return;
     }
 
-    // Check if password was changed
-    if (
-      isPasswordChanged &&
-      tempPassword !== MASKED_PASSWORD &&
-      tempPassword.trim() !== ""
-    ) {
-      // Validate new password length
-      if (tempPassword.length < 6) {
-        setError("New password must be at least 6 characters long");
-        return;
-      }
+    setIsLoading(true);
+    setError(null);
 
-      // Show confirmation modal to re-enter new password
-      const changes = prepareBackendJSON();
-      setPendingChanges(changes);
-      setShowConfirmModal(true);
-      setReenterPassword("");
-      setConfirmError("");
-    } else {
-      // No password change, proceed directly to save
-      const changes = prepareBackendJSON();
-      proceedWithSave(changes); // Pass changes directly
+    try {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+
+      const response = await axios.post("/profile/image", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Success
+      alert("Image uploaded successfully!");
+
+      // Reload profile / route (here just reload state)
+      const user = response.data.user;
+      setProfileImage(user.image); // backend path
+      setSelectedFile(null);
+      setIsEditing(false);
+
+      // Optionally refresh entire profile data
+      window.location.reload(); // or call fetchUserProfile()
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.error || "Failed to upload image.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -196,7 +225,6 @@ const EditProfile = () => {
         setUserData({
           name: response.data.user.name,
           email: response.data.user.email,
-          dateOfBirth: response.data.user.dateOfBirth,
           gender: response.data.user.gender,
         });
 
@@ -232,6 +260,12 @@ const EditProfile = () => {
 
   return (
     <div className="min-h-[874px] w-full flex justify-center bg-white">
+      {/* ⚡ Loading overlay at the very top */}
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="spinner">Processing...</div>
+        </div>
+      )}
       {/* Mobile container */}
       <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
         <div className="relative flex items-center justify-center h-[56px]">
@@ -258,181 +292,163 @@ const EditProfile = () => {
           </h1>
         </div>
 
-        <div className="profile-content">
-          {/* Profile Picture Section */}
-          <div className="profile-picture-section">
-            <div className="profile-image-wrapper">
-              <div className="profile-image-container">
-                <img src={profileImage} className="profile-image" />
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="spinner">Loading profile...</div>
+          </div>
+        ) : (
+          <div className="profile-content">
+            {/* Profile Picture Section */}
+            <div className="profile-picture-section">
+              <div className="profile-image-wrapper">
+                <div className="profile-image-container">
+                  <img src={profileImage} className="profile-image" />
+                  {isEditing && (
+                    <div className="image-overlay">
+                      <span className="camera-icon">📷</span>
+                    </div>
+                  )}
+                </div>
                 {isEditing && (
-                  <div className="image-overlay">
-                    <span className="camera-icon">📷</span>
+                  <>
+                    <input
+                      type="file"
+                      id="profile-image-input"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="profile-image-input"
+                    />
+                    <label
+                      htmlFor="profile-image-input"
+                      className="change-photo-link"
+                    >
+                      Change Photo
+                    </label>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Profile Info Table */}
+            {/* Profile Info Section */}
+            <div className="w-full mt-6 px-1">
+              {/* Name */}
+              <div className="mb-5">
+                <div className="text-[14px] font-semibold text-black mb-2">
+                  Name
+                </div>
+
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="name"
+                    value={tempData.name}
+                    onChange={handleChange}
+                    placeholder="Enter your name"
+                    className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
+                  />
+                ) : (
+                  <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
+                    {userData.name}
                   </div>
                 )}
               </div>
-              {isEditing && (
-                <>
+
+              {/* Email */}
+              <div className="mb-5">
+                <div className="text-[14px] font-semibold text-black mb-2">
+                  Email
+                </div>
+
+                {isEditing ? (
                   <input
-                    type="file"
-                    id="profile-image-input"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="profile-image-input"
+                    type="email"
+                    name="email"
+                    value={tempData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email"
+                    className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
                   />
-                  <label
-                    htmlFor="profile-image-input"
-                    className="change-photo-link"
+                ) : (
+                  <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
+                    {userData.email}
+                  </div>
+                )}
+              </div>
+
+              {/* Password */}
+              {/* Password */}
+              {isEditing && (
+                <div className="mb-5">
+                  <div className="text-[14px] font-semibold text-black mb-2">
+                    Password
+                  </div>
+
+                  <input
+                    type="password"
+                    name="password"
+                    value={tempPassword}
+                    onChange={handleChange}
+                    placeholder="Enter new password"
+                    className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
+                  />
+                </div>
+              )}
+
+              {/* Gender */}
+              <div className="mb-6">
+                <div className="text-[14px] font-semibold text-black mb-2">
+                  Gender
+                </div>
+
+                {isEditing ? (
+                  <select
+                    name="gender"
+                    value={tempData.gender}
+                    onChange={handleChange}
+                    className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
                   >
-                    Change Photo
-                  </label>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                ) : (
+                  <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
+                    {userData.gender}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {error && <div className="error-message">{error}</div>}
+
+            <div className="action-buttons">
+              {isEditing ? (
+                <>
+                  <button
+                    className="save-btn"
+                    onClick={handleSaveClick}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Saving..." : "Save Changes"}
+                  </button>
+                  <button
+                    className="cancel-btn"
+                    onClick={handleCancel}
+                    disabled={isLoading}
+                  >
+                    Cancel
+                  </button>
                 </>
-              )}
-            </div>
-          </div>
-
-          {/* Profile Info Table */}
-          {/* Profile Info Section */}
-          <div className="w-full mt-6 px-1">
-            {/* Name */}
-            <div className="mb-5">
-              <div className="text-[14px] font-semibold text-black mb-2">
-                Name
-              </div>
-
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="name"
-                  value={tempData.name}
-                  onChange={handleChange}
-                  placeholder="Enter your name"
-                  className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                />
               ) : (
-                <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
-                  {userData.name}
-                </div>
-              )}
-            </div>
-
-            {/* Email */}
-            <div className="mb-5">
-              <div className="text-[14px] font-semibold text-black mb-2">
-                Email
-              </div>
-
-              {isEditing ? (
-                <input
-                  type="email"
-                  name="email"
-                  value={tempData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                />
-              ) : (
-                <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
-                  {userData.email}
-                </div>
-              )}
-            </div>
-
-            {/* Password */}
-            <div className="mb-5">
-              <div className="text-[14px] font-semibold text-black mb-2">
-                Password
-              </div>
-
-              {isEditing ? (
-                <input
-                  type="password"
-                  name="password"
-                  value={tempPassword}
-                  onChange={handleChange}
-                  placeholder="Enter new password"
-                  className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                />
-              ) : (
-                <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
-                  {MASKED_PASSWORD}
-                </div>
-              )}
-            </div>
-
-            {/* Date of Birth */}
-            <div className="mb-5">
-              <div className="text-[14px] font-semibold text-black mb-2">
-                Date of Birth
-              </div>
-
-              {isEditing ? (
-                <input
-                  type="date"
-                  name="dateOfBirth"
-                  value={tempData.dateOfBirth}
-                  onChange={handleChange}
-                  className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                />
-              ) : (
-                <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
-                  {formatDisplayDate(userData.dateOfBirth)}
-                </div>
-              )}
-            </div>
-
-            {/* Gender */}
-            <div className="mb-6">
-              <div className="text-[14px] font-semibold text-black mb-2">
-                Gender
-              </div>
-
-              {isEditing ? (
-                <select
-                  name="gender"
-                  value={tempData.gender}
-                  onChange={handleChange}
-                  className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                  <option value="Prefer not to say">Prefer not to say</option>
-                </select>
-              ) : (
-                <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
-                  {userData.gender}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {error && <div className="error-message">{error}</div>}
-
-          <div className="action-buttons">
-            {isEditing ? (
-              <>
-                <button
-                  className="save-btn"
-                  onClick={handleSaveClick}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Saving..." : "Save Changes"}
+                <button className="edit-profile-btn" onClick={handleEdit}>
+                  Edit Profile
                 </button>
-                <button
-                  className="cancel-btn"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <button className="edit-profile-btn" onClick={handleEdit}>
-                Edit Profile
-              </button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* 🔐 PASSWORD CONFIRMATION MODAL - Re-enter new password */}

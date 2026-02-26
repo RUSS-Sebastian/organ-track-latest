@@ -160,9 +160,17 @@ public function logout(Request $request)
 
     // PROFILE (Protected)
     public function profile(Request $request)
-    {
-        return response()->json($request->user());
-    }
+{
+    $user = $request->user();
+
+    return response()->json([
+        'id' => $user->id,
+        'name' => $user->name,
+        'email' => $user->email,
+        'gender' => $user->gender,
+        'image' => $user->image ? asset('storage/' . $user->image) : null,
+    ]);
+}
 
     // UPDATE PROFILE
     public function updateProfile(Request $request)
@@ -216,7 +224,7 @@ public function logout(Request $request)
             $user = $request->user();
 
             $request->validate([
-                'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048',
+                'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:10240',
             ]);
 
             // Delete old image if exists

@@ -3,7 +3,6 @@ import Layout from "./Layout";
 
 import Home from "./pages/Home";
 import Report from "./pages/Report";
-import CheckIn from "./pages/CheckIn";
 import TrackSyms from "./pages/TrackSyms";
 import Settings from "./pages/Settings1";
 import Terms from "./pages/Terms";
@@ -27,7 +26,6 @@ function App() {
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/Terms" element={<Terms />} />
         <Route path="/Landing" element={<LandingPage />} />
-        <Route path="/ReportInput" element={<ReportInput />} />
 
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>
@@ -47,13 +45,27 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/checkin"
+            element={
+              <PrivateRoute>
+                <Countdown />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/EditProfile"
+            element={
+              <PrivateRoute>
+                <EditProfile />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/ReportInput" element={<ReportInput />} />
           <Route path="/report" element={<Report />} />
-          <Route path="/checkin" element={<CheckIn />} />
           <Route path="/track" element={<TrackSyms />} />
           <Route path="/questions/:organId?" element={<Questions />} />
           <Route path="/thanks/:type" element={<Thanks />} />
-          <Route path="/EditProfile" element={<EditProfile />} />
-          <Route path="/Countdown" element={<Countdown />} />
         </Route>
       </Routes>
     </BrowserRouter>

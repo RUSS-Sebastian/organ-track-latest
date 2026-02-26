@@ -177,7 +177,7 @@ const DailyHabitCheckin = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
       {/* Test Mode Toggle Button */}
       <button
         onClick={toggleTestMode}
@@ -323,7 +323,7 @@ const DailyHabitCheckin = () => {
       {/* Main Card */}
       <div className="w-full max-w-[420px] relative z-10">
         {/* Glass Card with Green Theme */}
-        <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/50 overflow-hidden">
+        <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl  p-8 border border-white/50 overflow-hidden">
           {/* Top Decorative Gradient */}
           <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-green-100/30 to-transparent"></div>
 
