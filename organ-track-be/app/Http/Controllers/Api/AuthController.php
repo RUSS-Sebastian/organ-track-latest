@@ -138,12 +138,22 @@ class AuthController extends Controller
 
 
     // LOGOUT
-    public function logout(Request $request)
+public function logout(Request $request)
 {
-    $request->user()->currentAccessToken()->delete();
+    $user = $request->user();
+
+    if (!$user) {
+        return response()->json([
+            'message' => 'Unauthenticated'
+        ], 401);
+    }
+
+    if ($user->currentAccessToken()) {
+        $user->currentAccessToken()->delete();
+    }
 
     return response()->json([
-        'message' => 'Logged out'
+        'message' => 'Logged out successfully'
     ]);
 }
 
