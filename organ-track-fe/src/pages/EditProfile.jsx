@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import "./EditProfile.css";
 import axios from "../api/axios";
 
-const MOCK_USER_ID = "user_123456";
 const MASKED_PASSWORD = "••••••••";
 
 const EditProfile = () => {
@@ -19,10 +18,10 @@ const EditProfile = () => {
     gender: "Male",
   });
 
-  // 🔐 STORED PASSWORD (simulates backend password)
-  const [storedPassword, setStoredPassword] = useState("mypassword");
+  const [passwordError, setPasswordError] = useState("");
   const [tempPassword, setTempPassword] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPasswordChanged, setIsPasswordChanged] = useState(false);
   const [tempData, setTempData] = useState({ ...userData });
 
@@ -33,7 +32,6 @@ const EditProfile = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [reenterPassword, setReenterPassword] = useState("");
   const [confirmError, setConfirmError] = useState("");
-  const [pendingChanges, setPendingChanges] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleImageChange = (e) => {
@@ -99,6 +97,7 @@ const EditProfile = () => {
     setIsPasswordChanged(false);
     setIsEditing(true);
     setError(null);
+    setPasswordError("");
   };
 
   const handleChange = (e) => {
@@ -115,72 +114,107 @@ const EditProfile = () => {
     }
   };
 
-  // Verify that re-entered password matches the new password
-  const verifyPasswordMatch = () => {
-    return reenterPassword === tempPassword;
+  const validatePassword = (password) => {
+    if (!password) return ""; // empty password is allowed (nullable)
+    if (password.length < 8) return "Password must be at least 8 characters";
+    if (!/[A-Z]/.test(password))
+      return "Password must contain an uppercase letter";
+    if (!/[a-z]/.test(password))
+      return "Password must contain a lowercase letter";
+    if (!/[0-9]/.test(password)) return "Password must contain a number";
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password))
+      return "Password must contain a special character";
+    return ""; // no error
   };
 
-  // Mock API call to update profile
-  const updateProfileInBackend = async (profileJSON) => {
-    setIsLoading(true);
-    setError(null);
+  const hasTextChanges = () => {
+    return (
+      tempData.name !== userData.name ||
+      tempData.email !== userData.email ||
+      tempData.gender !== userData.gender
+    );
+  };
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Mock successful response
-    const response = {
-      success: true,
-      data: {
-        user: {
-          id: profileJSON.userId,
-          ...profileJSON.profileData,
-          updatedAt: new Date().toISOString(),
-        },
-      },
-      message: "Profile updated successfully",
-      timestamp: new Date().toISOString(),
-    };
-
-    setIsLoading(false);
-    return response;
+  const hasPasswordChange = () => {
+    return (
+      isPasswordChanged &&
+      tempPassword !== MASKED_PASSWORD &&
+      tempPassword.trim() !== ""
+    );
   };
 
   const handleSaveClick = async () => {
-    if (!selectedFile) {
+    const textChanged = hasTextChanges();
+    const passwordChanged = hasPasswordChange();
+    const imageChanged = !!selectedFile;
+
+    if (!textChanged && !passwordChanged && !imageChanged) {
       alert("No changes to save");
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
+    // 🔹 Password validation before confirm modal
+    if (passwordChanged) {
+      const pwError = validatePassword(tempPassword);
+      if (pwError) {
+        setPasswordError(pwError); // show inline error below password input
+        return; // stop here, don't open confirm modal
+      }
+    }
 
+    // 🔹 If password valid or not changed, proceed
+    if (passwordChanged) {
+      setShowConfirmModal(true); // only now show confirmation modal
+    } else {
+      // normal save for text fields / image
+      await performSave({ textChanged, passwordChanged, imageChanged });
+    }
+  };
+
+  const performSave = async (textChanged, passwordChanged, imageChanged) => {
     try {
+      setIsLoading(true);
+      setError(null);
+
       const token = localStorage.getItem("token");
-      const formData = new FormData();
-      formData.append("image", selectedFile);
 
-      const response = await axios.post("/profile/image", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // 1️⃣ Upload image
+      if (imageChanged) {
+        const formData = new FormData();
+        formData.append("image", selectedFile);
 
-      // Success
-      alert("Image uploaded successfully!");
+        await axios.post("/profile/image", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
 
-      // Reload profile / route (here just reload state)
-      const user = response.data.user;
-      setProfileImage(user.image); // backend path
-      setSelectedFile(null);
-      setIsEditing(false);
+      // 2️⃣ Update profile
+      if (textChanged || passwordChanged) {
+        await axios.put(
+          "/profile",
+          {
+            name: tempData.name,
+            email: tempData.email,
+            gender: tempData.gender,
+            ...(passwordChanged && {
+              password: tempPassword,
+              password_confirmation: tempPassword,
+            }),
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+      }
 
-      // Optionally refresh entire profile data
-      window.location.reload(); // or call fetchUserProfile()
+      alert("Profile updated successfully");
+      window.location.reload();
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.error || "Failed to upload image.");
+      setError(err.response?.data?.error || "Update failed");
     } finally {
       setIsLoading(false);
     }
@@ -192,58 +226,18 @@ const EditProfile = () => {
       return;
     }
 
-    const isMatch = verifyPasswordMatch();
-
-    if (!isMatch) {
-      setConfirmError("Passwords do not match. Please try again.");
+    if (reenterPassword !== tempPassword) {
+      setConfirmError("Passwords do not match");
       return;
     }
 
-    // Close modal and proceed with save
     setShowConfirmModal(false);
 
-    // Use pendingChanges that was set when opening modal
-    if (pendingChanges) {
-      proceedWithSave(pendingChanges);
-    } else {
-      setError("No changes to save");
-    }
-  };
+    const textChanged = hasTextChanges();
+    const passwordChanged = hasPasswordChange();
+    const imageChanged = !!selectedFile;
 
-  const proceedWithSave = async (changes) => {
-    // Make sure changes exist
-    if (!changes) {
-      setError("No changes to save");
-      return;
-    }
-
-    try {
-      const response = await updateProfileInBackend(changes);
-
-      if (response.success) {
-        // Update local state with new data
-        setUserData({
-          name: response.data.user.name,
-          email: response.data.user.email,
-          gender: response.data.user.gender,
-        });
-
-        // Update stored password if it was changed
-        if (changes.profileData.password) {
-          setStoredPassword(changes.profileData.password);
-        }
-
-        setIsEditing(false);
-        setTempPassword(MASKED_PASSWORD);
-        setIsPasswordChanged(false);
-        setPendingChanges(null);
-
-        // Show success message
-        alert(response.message);
-      }
-    } catch (err) {
-      setError(err.message);
-    }
+    performSave(textChanged, passwordChanged, imageChanged);
   };
 
   const handleCancel = () => {
@@ -251,11 +245,7 @@ const EditProfile = () => {
     setTempPassword(MASKED_PASSWORD);
     setIsPasswordChanged(false);
     setPendingChanges(null);
-  };
-
-  const formatDisplayDate = (dateString) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString("en-GB");
+    setPasswordError("");
   };
 
   return (
@@ -377,21 +367,38 @@ const EditProfile = () => {
               </div>
 
               {/* Password */}
-              {/* Password */}
               {isEditing && (
                 <div className="mb-5">
                   <div className="text-[14px] font-semibold text-black mb-2">
                     Password
                   </div>
 
-                  <input
-                    type="password"
-                    name="password"
-                    value={tempPassword}
-                    onChange={handleChange}
-                    placeholder="Enter new password"
-                    className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={tempPassword}
+                      onChange={handleChange}
+                      placeholder="Enter new password"
+                      className="w-full h-[44px] px-4 pr-10 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
+                    />
+
+                    <span
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <i className="fa-solid fa-eye-slash"></i>
+                      ) : (
+                        <i className="fa-solid fa-eye"></i>
+                      )}
+                    </span>
+                  </div>
+                  {passwordError && (
+                    <div className="text-red-500 text-[12px] mt-1">
+                      {passwordError}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -408,10 +415,8 @@ const EditProfile = () => {
                     onChange={handleChange}
                     className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
                   >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                    <option value="Prefer not to say">Prefer not to say</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
                   </select>
                 ) : (
                   <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
@@ -461,17 +466,29 @@ const EditProfile = () => {
             </p>
 
             <div className="modal-input-wrapper">
-              <input
-                type="password"
-                value={reenterPassword}
-                onChange={(e) => {
-                  setReenterPassword(e.target.value);
-                  setConfirmError("");
-                }}
-                className={`modal-input ${confirmError ? "error" : ""}`}
-                placeholder="Re-enter your password"
-                autoFocus
-              />
+              <div className="relative w-full">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={reenterPassword}
+                  onChange={(e) => {
+                    setReenterPassword(e.target.value);
+                    setConfirmError("");
+                  }}
+                  className={`w-full h-[44px] px-4 pr-10 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition ${confirmError ? "border-red-500" : ""}`}
+                  placeholder="Re-enter your password"
+                />
+
+                <span
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <i className="fa-solid fa-eye-slash"></i>
+                  ) : (
+                    <i className="fa-solid fa-eye"></i>
+                  )}
+                </span>
+              </div>
               {confirmError && (
                 <div className="modal-error">
                   <span className="error-icon">⚠️</span>
@@ -485,7 +502,8 @@ const EditProfile = () => {
                 className="modal-cancel-btn"
                 onClick={() => {
                   setShowConfirmModal(false);
-                  setPendingChanges(null);
+                  setReenterPassword("");
+                  setConfirmError("");
                 }}
               >
                 Cancel

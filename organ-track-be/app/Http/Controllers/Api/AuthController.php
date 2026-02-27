@@ -181,7 +181,7 @@ public function logout(Request $request)
             $request->validate([
                 'name' => 'sometimes|string|max:255',
                 'gender' => 'sometimes|in:male,female',
-                'password' => 'nullable|string|min:6|confirmed',
+                'password' => 'nullable|string|min:8|confirmed',
             ]);
 
             if ($request->has('name')) {
