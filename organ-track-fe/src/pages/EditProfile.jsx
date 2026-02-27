@@ -129,9 +129,7 @@ const EditProfile = () => {
 
   const hasTextChanges = () => {
     return (
-      tempData.name !== userData.name ||
-      tempData.email !== userData.email ||
-      tempData.gender !== userData.gender
+      tempData.name !== userData.name || tempData.gender !== userData.gender
     );
   };
 
@@ -197,7 +195,6 @@ const EditProfile = () => {
           "/profile",
           {
             name: tempData.name,
-            email: tempData.email,
             gender: tempData.gender,
             ...(passwordChanged && {
               password: tempPassword,
@@ -345,26 +342,16 @@ const EditProfile = () => {
               </div>
 
               {/* Email */}
-              <div className="mb-5">
-                <div className="text-[14px] font-semibold text-black mb-2">
-                  Email
-                </div>
-
-                {isEditing ? (
-                  <input
-                    type="email"
-                    name="email"
-                    value={tempData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email"
-                    className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                  />
-                ) : (
+              {!isEditing && (
+                <div className="mb-5">
+                  <div className="text-[14px] font-semibold text-black mb-2">
+                    Email
+                  </div>
                   <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
                     {userData.email}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Password */}
               {isEditing && (
