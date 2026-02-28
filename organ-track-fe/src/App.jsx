@@ -16,6 +16,7 @@ import ReportInput from "./pages/reportinput";
 import EditProfile from "./pages/EditProfile";
 import Countdown from "./pages/Countdown";
 import PrivateRoute from "./components/PrivateRoute";
+import AiTest from "./pages/AiTest";
 function App() {
   return (
     <BrowserRouter>
@@ -26,6 +27,7 @@ function App() {
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/Terms" element={<Terms />} />
         <Route path="/Landing" element={<LandingPage />} />
+        <Route path="/ai" element={<AiTest />} />
 
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>
@@ -61,10 +63,24 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/track"
+            element={
+              <PrivateRoute>
+                <TrackSyms />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/questions/:organId"
+            element={
+              <PrivateRoute>
+                <Questions />
+              </PrivateRoute>
+            }
+          />
           <Route path="/ReportInput" element={<ReportInput />} />
           <Route path="/report" element={<Report />} />
-          <Route path="/track" element={<TrackSyms />} />
-          <Route path="/questions/:organId?" element={<Questions />} />
           <Route path="/thanks/:type" element={<Thanks />} />
         </Route>
       </Routes>

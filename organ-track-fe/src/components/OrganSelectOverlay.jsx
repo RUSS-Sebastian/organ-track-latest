@@ -48,8 +48,8 @@ export default function OrganSelectOverlay({ onClose }) {
         >
           <option value="">Choose an organ</option>
           {organList.map((organ) => (
-            <option key={organ} value={organ}>
-              {organ}
+            <option key={organ.id} value={organ.id}>
+              {organ.name}
             </option>
           ))}
         </select>
