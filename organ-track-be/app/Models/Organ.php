@@ -21,4 +21,6 @@ class Organ extends Model
     {
         return $this->hasMany(Question::class, 'organ_id', 'id');
     }
+
+    
 }
