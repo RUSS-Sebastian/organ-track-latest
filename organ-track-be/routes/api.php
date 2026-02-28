@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/image', [AuthController::class, 'updateImage']);
 
     Route::get('/organs', [OrganController::class, 'index']);
+    Route::get('/organs/{id}', [OrganController::class, 'showOrganQuestions']);
 
     Route::get('/{user_id}/tracks', [TrackController::class, 'index']);
     Route::put('/tracks/{id}', [TrackController::class, 'update']);

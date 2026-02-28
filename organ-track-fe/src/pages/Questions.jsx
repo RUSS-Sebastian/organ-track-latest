@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useOrgan } from "../context/OrganContext";
 import { useEffect, useState } from "react";
+import axios from "../api/axios";
 // ================= DRAFT EXPIRY CONFIG =================
 const DAILY_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -11,11 +12,13 @@ const isDraftExpired = (draft) => {
 };
 
 export default function Questions() {
+  const [lang, setLang] = useState("en"); // "en" for English, "mm" for Myanmar
   const { organId } = useParams();
   const { organ, setOrgan } = useOrgan();
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
+  const [organName, setOrganName] = useState("");
   // URL is now the source of truth
   const isDaily = organId === "daily";
   const isOrgan = organId && organId !== "daily";
@@ -27,6 +30,7 @@ export default function Questions() {
   const [restored, setRestored] = useState(false);
   const [showResumeOverlay, setShowResumeOverlay] = useState(false);
   const [pendingDraft, setPendingDraft] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const goNext = () => {
     if (currentIndex < questions.length - 1) {
@@ -43,55 +47,14 @@ export default function Questions() {
   // Restore organ if refreshed
   useEffect(() => {
     if (!organ && organId) {
-      setOrgan(organId);
+      const numericId = Number(organId); // convert string from URL to number
+      if (!isNaN(numericId)) {
+        setOrgan(numericId);
+      }
     }
-  }, []);
+  }, [organ, organId]);
 
   useEffect(() => {
-    // Simulated backend
-    const fakeDB = {
-      Heart: [
-        {
-          id: 1,
-          question: "Do you feel chest pain?",
-          options: ["Never", "Sometimes", "Often"],
-          multi: false,
-        },
-        {
-          id: 2,
-          question: "Do you feel shortness of breath?",
-          options: ["No", "Mild", "Severe"],
-          multi: false,
-        },
-        {
-          id: 3,
-          question: "Do you feel heart palpitations?",
-          options: ["No", "Rarely", "Frequently"],
-          multi: false,
-        },
-        {
-          id: 4,
-          question: "Do you feel dizziness after activity?",
-          options: ["Never", "Sometimes", "Often"],
-          multi: true,
-        },
-        {
-          id: 5,
-          question: "Do you feel tired easily?",
-          options: ["No", "Sometimes", "Very often"],
-          multi: false,
-        },
-      ],
-      Brain: [
-        {
-          id: 1,
-          question: "Do you get headaches?",
-          options: ["Rarely", "Sometimes", "Often"],
-          multi: true,
-        },
-      ],
-    };
-
     const dailyDB = [
       {
         id: 1,
@@ -115,12 +78,26 @@ export default function Questions() {
 
     // ---------------- ORGAN FLOW ----------------
     if (isOrgan) {
-      if (!fakeDB[organId]) {
-        navigate("/track"); // invalid organ fallback
-        return;
-      }
+      const fetchQuestions = async () => {
+        try {
+          const response = await axios.get(`/organs/${organId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Accept: "application/json",
+            },
+          });
 
-      setQuestions(fakeDB[organId] || []);
+          setQuestions(response.data.questions); // 👈 store raw backend format
+          setOrganName(response.data.organ_name);
+        } catch (error) {
+          console.error("Fetch failed", error);
+          navigate("/track");
+        } finally {
+          setLoading(false); // ✅ stop loading after fetch
+        }
+      };
+
+      fetchQuestions();
       return;
     }
 
@@ -134,40 +111,42 @@ export default function Questions() {
     navigate("/track");
   }, [organId]);
 
-  const handleSelect = (question, option) => {
+  const handleSelect = (question, optionId) => {
     setAnswers((prev) => {
       const currentAnswer = prev[question.id];
 
-      // MULTI SELECT QUESTION
-      if (question.multi) {
+      if (question.question_type === "multiple") {
         const arr = Array.isArray(currentAnswer) ? currentAnswer : [];
 
-        if (arr.includes(option)) {
-          // remove option
+        if (arr.includes(optionId)) {
           return {
             ...prev,
-            [question.id]: arr.filter((o) => o !== option),
+            [question.id]: arr.filter((id) => id !== optionId),
           };
         } else {
-          // add option
           return {
             ...prev,
-            [question.id]: [...arr, option],
+            [question.id]: [...arr, optionId],
           };
         }
       }
 
-      // SINGLE SELECT QUESTION
       return {
         ...prev,
-        [question.id]: option,
+        [question.id]: optionId,
       };
     });
   };
 
   const handleSubmit = () => {
     // Find first unanswered question
-    const firstUnansweredIndex = questions.findIndex((q) => !answers[q.id]);
+    //const firstUnansweredIndex = questions.findIndex((q) => !answers[q.id]);
+    const firstUnansweredIndex = questions.findIndex((q) => {
+      const ans = answers[q.id];
+      if (!ans) return true; // nothing selected
+      if (q.question_type === "multiple" && ans.length === 0) return true; // empty array
+      return false; // answered
+    });
 
     if (firstUnansweredIndex !== -1) {
       alert("Please complete all questions first!");
@@ -219,7 +198,7 @@ export default function Questions() {
   };
 
   useEffect(() => {
-    if (questions.length === 0) return;
+    if (loading || questions.length === 0) return;
 
     const draftKey = getDraftKey(organId);
     if (!draftKey) return;
@@ -242,24 +221,40 @@ export default function Questions() {
         }
       }
 
-      // ✅ Only show overlay if valid draft
-      setPendingDraft(parsed);
-      setShowResumeOverlay(true);
+      // ✅ Only show overlay if parsed draft has answers or a valid index
+      if (parsed.answers && Object.keys(parsed.answers).length > 0) {
+        setPendingDraft(parsed);
+        setShowResumeOverlay(true);
+      }
     } catch (e) {
       console.warn("Draft parse failed", e);
     }
-  }, [questions, organId]);
+  }, [loading, questions, organId]);
 
   // ================= AUTO SAVE DRAFT =================
   useEffect(() => {
-    if (!organId || questions.length === 0) return; // must have organ and questions
+    if (!organId || questions.length === 0) return;
 
     const draftKey = getDraftKey(organId);
     if (!draftKey) return;
 
-    // Only restore draft if exists, but always save current progress
+    // Only save draft if user answered at least one question
+    const hasAnswers =
+      answers &&
+      Object.keys(answers).length > 0 &&
+      Object.values(answers).some((val) => {
+        if (Array.isArray(val)) return val.length > 0; // multiple choice
+        return val !== null && val !== undefined; // single choice
+      });
+
+    if (!hasAnswers) {
+      localStorage.removeItem(draftKey); // clear empty draft
+      return;
+    }
+
     const draft = {
       organId,
+      organName,
       answers,
       currentIndex,
       version: 1,
@@ -267,8 +262,15 @@ export default function Questions() {
     };
 
     localStorage.setItem(draftKey, JSON.stringify(draft));
-    console.log("Draft saved:", draft);
-  }, [answers, currentIndex, organId, questions]);
+  }, [answers, currentIndex, organId, questions, organName]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <p>Loading questions...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen flex justify-center items-center bg-gray-50">
@@ -323,7 +325,7 @@ export default function Questions() {
 
             {/* Header Text */}
             <h1 className="absolute top-6 left-1/2 -translate-x-1/2 text-white font-['Roboto'] font-bold text-[24px] text-center">
-              {organId}
+              {organName}
             </h1>
           </div>
         </div>
@@ -336,15 +338,52 @@ export default function Questions() {
             {currentQuestion && (
               <div>
                 <h1 className="text-xl font-bold mb-4">
-                  Question {currentQuestion.id}
+                  Question {currentIndex + 1} {/* Using index for numbering */}
                 </h1>
 
+                {/* ================= LANGUAGE TOGGLE ================= */}
+                <div className="flex items-center gap-3 mb-4 justify-start">
+                  {/* EN Label */}
+                  <span
+                    className={`font-semibold ${
+                      lang === "en" ? "text-white" : "text-gray-500"
+                    }`}
+                  >
+                    EN
+                  </span>
+
+                  {/* Switch */}
+                  <button
+                    onClick={() => setLang(lang === "en" ? "mm" : "en")}
+                    className={`relative w-16 h-8 rounded-full transition-colors duration-300 focus:outline-none ${
+                      lang === "en" ? "bg-green-500" : "bg-gray-300"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-7 h-7 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                        lang === "mm" ? "translate-x-8" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* MM Label */}
+                  <span
+                    className={`font-semibold ${
+                      lang === "mm" ? "text-white" : "text-gray-500"
+                    }`}
+                  >
+                    MM
+                  </span>
+                </div>
+
                 {/* Question text */}
-                <h2 className="text-lg font-semibold text-left mb-4">
-                  {currentQuestion?.question}
+                <h2 className="text-md font-semibold text-left mb-4">
+                  {lang === "en"
+                    ? currentQuestion.question_text_en
+                    : currentQuestion.question_text_mm}
                 </h2>
 
-                {currentQuestion.multi && (
+                {currentQuestion.question_type === "multiple" && (
                   <p className="text-sm text-gray-500 mb-2">
                     You can select multiple options
                   </p>
@@ -352,15 +391,14 @@ export default function Questions() {
 
                 {/* ================= QUESTION BLOCK INDICATOR ================= */}
                 <div className="flex gap-2 mb-4 flex-wrap">
-                  {questions.map((q, index) => {
+                  {questions.map((question, index) => {
                     const isCurrent = currentIndex === index;
 
-                    // 🔥 FIX: use question.id instead of index
-                    const isAnswered = answers[q.id] !== undefined;
+                    const isAnswered = answers[question.id] !== undefined;
 
                     return (
                       <button
-                        key={q.id}
+                        key={question.id}
                         onClick={() => setCurrentIndex(index)}
                         className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
                           isCurrent ? "w-10" : "w-6"
@@ -374,22 +412,27 @@ export default function Questions() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  {currentQuestion.options.map((opt, idx) => {
-                    const isSelected = currentQuestion.multi
-                      ? answers[currentQuestion.id]?.includes(opt)
-                      : answers[currentQuestion.id] === opt;
+                  {currentQuestion.options.map((opt) => {
+                    const isMultiple =
+                      currentQuestion.question_type === "multiple";
+                    const isSelected = isMultiple
+                      ? Array.isArray(answers[currentQuestion.id]) &&
+                        answers[currentQuestion.id].includes(opt.id)
+                      : answers[currentQuestion.id] === opt.id;
 
                     return (
                       <button
-                        key={idx}
-                        onClick={() => handleSelect(currentQuestion, opt)}
+                        key={opt.id}
+                        onClick={() => handleSelect(currentQuestion, opt.id)}
                         className={`py-3 rounded-lg border transition ${
                           isSelected
                             ? "bg-green-500 text-white border-green-500"
                             : "bg-white border-gray-300"
                         }`}
                       >
-                        {opt}
+                        {lang === "en"
+                          ? opt.option_text_en
+                          : opt.option_text_mm}
                       </button>
                     );
                   })}

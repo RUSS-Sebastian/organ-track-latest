@@ -100,7 +100,7 @@ export default function TrackSyms() {
                   key={draft.organId}
                   className="bg-white rounded-xl shadow p-4 w-40 flex-shrink-0"
                 >
-                  <h3 className="font-semibold mb-2">{draft.organId}</h3>
+                  <h3 className="font-semibold mb-2">{draft.organName}</h3>
 
                   <div className="flex flex-col gap-2">
                     <button
