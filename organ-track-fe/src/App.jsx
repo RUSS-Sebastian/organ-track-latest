@@ -17,6 +17,7 @@ import EditProfile from "./pages/EditProfile";
 import Countdown from "./pages/Countdown";
 import PrivateRoute from "./components/PrivateRoute";
 import AiTest from "./pages/AiTest";
+import TrackAnalysisPage from "./pages/Track";
 function App() {
   return (
     <BrowserRouter>
@@ -79,6 +80,7 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/trackResult" element={<TrackAnalysisPage />} />
           <Route path="/ReportInput" element={<ReportInput />} />
           <Route path="/report" element={<Report />} />
           <Route path="/thanks/:type" element={<Thanks />} />

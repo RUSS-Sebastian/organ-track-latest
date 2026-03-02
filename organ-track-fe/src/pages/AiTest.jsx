@@ -27,39 +27,30 @@ IMPORTANT RULES:
 - Do not explain anything outside the format.
 - Keep language simple and easy to read.
 
-STRICT OUTPUT FORMAT:
-You MUST follow this exact structure and section titles.
-Do not add extra sections.
-Do not remove sections.
-Number of items in each section can vary.
+IMPORTANT OUTPUT RULES:
+You MUST return ONLY valid JSON.
+Do NOT include markdown.
+Do NOT include explanations.
+Do NOT include text before or after JSON.
 
-OUTPUT FORMAT:
+Return JSON in this exact structure:
 
-Possible Indicators:
-- Short possible condition or interpretation
-- Short possible condition or interpretation
-- Short possible condition or interpretation
-
-Immediate Recommendations:
-- Short, clear action the user can do now
-- Short, clear action the user can do now
-- Short, clear action the user can do now
-
-Lifestyle Adjustments:
-- Long-term healthy habit suggestion
-- Long-term healthy habit suggestion
-- Long-term healthy habit suggestion
-
-Seek Medical Help If You Experience:
-- Clear red flag symptom
-- Clear red flag symptom
-- Clear red flag symptom
+{
+  "risk_level": "Good | Moderate | High",
+  "possible_indicators": ["short phrase"],
+  "immediate_recommendations": ["short action"],
+  "lifestyle_adjustments": ["long-term habit"],
+  "seek_medical_help_if": ["red flag symptom"]
+}
 
 TONE GUIDELINES:
 - Use phrases like: "may indicate", "could be related to"
 - Avoid diagnosis phrases like: "you have"
 - Avoid medical jargon
-- Keep each bullet short and mobile-friendly
+- Keep each item short and mobile-friendly
+
+If you cannot comply, return an empty JSON object {}.
+
 
 Now analyze the following answers:
 
@@ -99,13 +90,21 @@ Answer: Occasionally
     try {
       const response = await client.chat.send({
         chatGenerationParams: {
-          model: "stepfun/step-3.5-flash:free",
+          model: "arcee-ai/trinity-large-preview:free",
           messages: [{ role: "user", content: prompt }],
         },
       });
 
-      const text = response.choices[0].message.content;
-      setResult(text);
+      const raw = response.choices[0].message.content;
+
+      try {
+        const json = JSON.parse(raw);
+        console.log(json);
+        setResult(JSON.stringify(json, null, 2));
+      } catch (e) {
+        console.error("Invalid JSON:", raw);
+        setResult("AI returned invalid JSON");
+      }
     } catch (err) {
       console.error(err);
       setResult("Error calling AI");
