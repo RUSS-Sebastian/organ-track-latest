@@ -5,9 +5,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MeController;
 use App\Http\Controllers\Api\OrganController;
 use App\Http\Controllers\Api\TrackController;
+use App\Http\Controllers\Api\AnswerController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -24,6 +27,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/{user_id}/tracks', [TrackController::class, 'index']);
     Route::put('/tracks/{id}', [TrackController::class, 'update']);
     Route::delete('/tracks/{id}', [TrackController::class, 'destroy']);
+
+    Route::post('/submit-and-generate-report', [AnswerController::class, 'submitAndGenerateReport']);
+
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

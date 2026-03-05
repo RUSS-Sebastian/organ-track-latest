@@ -24,10 +24,9 @@ class Question extends Model
 
     // Relationship with Organ
     public function organ()
-    {
-        return $this->belongsTo(Organ::class);
-    }
-
+{
+    return $this->belongsTo(Organ::class, 'organ_id'); // organ_id in questions table
+}
     public function options()
 {
     return $this->hasMany(QuestionOption::class);
