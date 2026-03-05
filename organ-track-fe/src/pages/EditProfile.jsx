@@ -8,9 +8,7 @@ const MASKED_PASSWORD = "••••••••";
 const EditProfile = () => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [profileImage, setProfileImage] = useState(
-    "https://via.placeholder.com/150",
-  );
+  const [profileImage, setProfileImage] = useState("");
 
   const [userData, setUserData] = useState({
     name: "Melissa Peters",
@@ -75,7 +73,7 @@ const EditProfile = () => {
           gender: user.gender || "",
         });
 
-        setProfileImage(user.image || "https://via.placeholder.com/150");
+        setProfileImage(user.image);
       } catch (err) {
         console.error("Failed to fetch profile:", err);
         setError(
@@ -177,16 +175,33 @@ const EditProfile = () => {
       const token = localStorage.getItem("token");
 
       // 1️⃣ Upload image
-      if (imageChanged) {
+      /*if (imageChanged) {
         const formData = new FormData();
         formData.append("image", selectedFile);
+        await axios.post("/profile/image", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }*/
+
+      if (imageChanged) {
+        console.log("image route called");
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+
+        console.log("=== FormData entries ===");
+        for (let [key, value] of formData.entries()) {
+          console.log(key, value); // should log "image" and the File object
+        }
 
         await axios.post("/profile/image", formData, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            // Do NOT manually set Content-Type; Axios handles it
           },
         });
+        console.log("=== Backend response ===", response.data);
       }
 
       // 2️⃣ Update profile
@@ -289,7 +304,9 @@ const EditProfile = () => {
             <div className="profile-picture-section">
               <div className="profile-image-wrapper">
                 <div className="profile-image-container">
-                  <img src={profileImage} className="profile-image" />
+                  {profileImage && (
+                    <img src={profileImage} className="profile-image" />
+                  )}
                   {isEditing && (
                     <div className="image-overlay">
                       <span className="camera-icon">📷</span>
