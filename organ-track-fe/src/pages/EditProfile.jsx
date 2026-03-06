@@ -167,7 +167,11 @@ const EditProfile = () => {
     }
   };
 
-  const performSave = async (textChanged, passwordChanged, imageChanged) => {
+  const performSave = async ({
+    textChanged,
+    passwordChanged,
+    imageChanged,
+  }) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -195,10 +199,9 @@ const EditProfile = () => {
           console.log(key, value); // should log "image" and the File object
         }
 
-        await axios.post("/profile/image", formData, {
+        const response = await axios.post("/profile/image", formData, {
           headers: {
             Authorization: `Bearer ${token}`,
-            // Do NOT manually set Content-Type; Axios handles it
           },
         });
         console.log("=== Backend response ===", response.data);
@@ -206,6 +209,7 @@ const EditProfile = () => {
 
       // 2️⃣ Update profile
       if (textChanged || passwordChanged) {
+        console.log("text change called");
         await axios.put(
           "/profile",
           {
@@ -249,7 +253,7 @@ const EditProfile = () => {
     const passwordChanged = hasPasswordChange();
     const imageChanged = !!selectedFile;
 
-    performSave(textChanged, passwordChanged, imageChanged);
+    performSave({ textChanged, passwordChanged, imageChanged });
   };
 
   const handleCancel = () => {
