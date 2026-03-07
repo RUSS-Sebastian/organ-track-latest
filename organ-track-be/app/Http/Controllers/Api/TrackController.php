@@ -1,78 +1,79 @@
 <?php
 
-    namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api;
 
-    use App\Http\Controllers\Controller;
-    use Illuminate\Http\Request;
-    use App\Models\Track;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Track;
+use App\Models\AiReport;
 
-    class TrackController extends Controller
+class TrackController extends Controller
+{
+    public function index(Request $request)
     {
-        public function index(Request $request, $user_id)
-        {
-            $page = $request->query('page', 1);
-            $limit = $request->query('limit', 10);
+        $perPage = $request->query('perPage', 10);
 
-            $tracks = Track::where('user_id', $user_id)
-                        ->paginate($limit, ['*'], 'page', $page);
+        $tracks = AiReport::orderBy('answered_date', 'asc') //desc
+            ->paginate($perPage);
 
-            return response()->json([
-                'data' => $tracks->items(),
-                'pagination' => [
-                    'page' => $tracks->currentPage(),
-                    'total_pages' => $tracks->lastPage(),
-                ]
-            ]);
-        }
-
-
-        public function update(Request $request, $id)
-        {
-            $track = Track::find($id);
-
-            if (!$track) {
-                return response()->json([
-                    'message' => 'Track not found'
-                ], 404);
-            }
-
-            /*if ($track->user_id !== $request->user()->id) {
-                return response()->json(['message' => 'Unauthorized'], 403);
-            } */
-
-            $request->validate([
-                'name' => 'required|string|max:255',
-            ]);
-
-            $track->update($request->only('name'));
-
-            return response()->json([
-                'message' => 'Track renamed successfully',
-                'data' => $track
-            ]);
-        }
-
-        public function destroy(Request $request, $id)
-        {
-            $track = Track::find($id);
-
-            if (!$track) {
-                return response()->json([
-                    'message' => 'Track not found'
-                ], 404);
-            }
-
-            
-            /*if ($track->user_id !== $request->user()->id) {
-                return response()->json(['message' => 'Unauthorized'], 403);
-            }*/
-
-            $track->delete();
-
-            return response()->json([
-                'message' => 'Track deleted successfully'
-            ]);
-        }
-
-
+        return response()->json([
+            'data' => $tracks->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'report_name' => $item->report_name,
+                    'answered_date' => $item->answered_date
+                ];
+            }),
+            'pagination' => [
+                'currentPage' => $tracks->currentPage(),
+                'perPage' => $tracks->perPage(),
+                'totalPages' => $tracks->lastPage(),
+                'totalItems' => $tracks->total()
+            ]
+        ]);
     }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'report_name' => 'required|string|max:255'
+        ]);
+
+        $track = AiReport::find($id);
+
+        if (!$track) {
+            return response()->json([
+                'message' => 'Track not found'
+            ], 404);
+        }
+
+        $track->report_name = $request->report_name;
+        $track->save();
+
+        return response()->json([
+            'message' => 'Report name updated successfully',
+            'data' => [
+                'id' => $track->id,
+                'report_name' => $track->report_name,
+                'answered_date' => $track->answered_date
+            ]
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $track = AiReport::find($id);
+
+        if (!$track) {
+            return response()->json([
+                'message' => 'Track not found'
+            ], 404);
+        }
+
+        $track->delete();
+
+        return response()->json([
+            'message' => 'Track deleted successfully'
+        ]);
+    }
+}

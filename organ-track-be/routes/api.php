@@ -22,7 +22,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/organs', [OrganController::class, 'index']);
     Route::get('/organs/{id}', [OrganController::class, 'showOrganQuestions']);
 
-    Route::get('/{user_id}/tracks', [TrackController::class, 'index']);
+    //Route::get('/{user_id}/tracks', [TrackController::class, 'index']);
+
+    Route::get('/tracks', [TrackController::class, 'index']);
     Route::put('/tracks/{id}', [TrackController::class, 'update']);
     Route::delete('/tracks/{id}', [TrackController::class, 'destroy']);
 
