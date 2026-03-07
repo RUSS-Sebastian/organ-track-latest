@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/tracks/{id}', [TrackController::class, 'destroy']);
 
     Route::post('/submit-and-generate-report', [AnswerController::class, 'submitAndGenerateReport']);
-
+    Route::get('/daily-check', [AnswerController::class, 'check']);
     Route::get('/ai-report/{report}', [AnswerController::class, 'getReportById']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });

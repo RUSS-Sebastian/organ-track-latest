@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 
 const DailyHabitCheckin = () => {
+  const todayLocal = new Date(); // device local datetime
+  const yyyy = todayLocal.getFullYear();
+  const mm = String(todayLocal.getMonth() + 1).padStart(2, "0");
+  const dd = String(todayLocal.getDate()).padStart(2, "0");
+  const todayDate = `${yyyy}-${mm}-${dd}`;
   const [timeLeft, setTimeLeft] = useState({
     hours: 0,
     minutes: 0,

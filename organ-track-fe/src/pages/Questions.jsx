@@ -162,6 +162,15 @@ export default function Questions() {
       })),
     };
 
+    // Detect current timezone
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // e.g., "Asia/Yangon"
+
+    // Include it in your payload
+    const payloadWithTimezone = {
+      ...payload, // existing answers etc.
+      timezone, // add timezone here
+    };
+
     console.log("Submitting payload:", payload);
 
     try {
@@ -169,7 +178,7 @@ export default function Questions() {
       // --- 3. Send to backend ---
       const response = await axios.post(
         "/submit-and-generate-report",
-        payload,
+        payloadWithTimezone,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
