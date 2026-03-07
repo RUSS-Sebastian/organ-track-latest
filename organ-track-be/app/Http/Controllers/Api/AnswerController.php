@@ -121,6 +121,9 @@ class AnswerController extends Controller
         Log::info('Created AI report', ['report_id' => $report->id, 'user_id' => $userId]);
         $reportId = $report->id; // use directly
 
+        // ✅ Update the report_name after getting the ID
+        $report->report_name = "Track - {$reportId}";
+        $report->save();
 
         // 5️⃣ Save UserAnswers using original IDs and link with report ID
         foreach ($answers as $answer) {
@@ -239,7 +242,7 @@ public function getReportById($reportId)
 
     // Return structured JSON for frontend
     return response()->json([
-        'title' => "Track - {$report->id}",
+        'title' => $report->report_name,
         'date' => $report->answered_date,
         'riskLevel' => $report->ai_response['risk_level'] ?? 'Unknown',
         'indicators' => $report->ai_response['possible_indicators'] ?? [],
