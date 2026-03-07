@@ -8,7 +8,7 @@ export const UserProvider = ({ children }) => {
   // simulate logged-in user
   const user = {
     name: "Russ",
-    gender: "female", // change to female to test
+    gender: "male", // change to female to test
   };
 
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
