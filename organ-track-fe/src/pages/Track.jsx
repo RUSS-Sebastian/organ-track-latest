@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   faArrowLeft,
   faChartSimple,
@@ -81,6 +82,10 @@ export default function TrackAnalysisPage() {
   const { reportId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const handleBack = () => {
+    navigate("/track"); // ✅ navigate to /track route
+  };
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
@@ -113,7 +118,7 @@ export default function TrackAnalysisPage() {
       <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <button className="text-xl text-gray-700">
+          <button className="text-xl text-gray-700" onClick={handleBack}>
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
           <h1 className="text-green-600 font-semibold text-lg">{data.title}</h1>

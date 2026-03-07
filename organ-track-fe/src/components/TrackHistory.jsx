@@ -26,7 +26,6 @@ export default function TrackHistory() {
       return {
         id,
         trackName: `Track ${id}`,
-        organ: ["Heart", "Lungs", "Liver", "Kidney"][id % 4],
         date: new Date(Date.now() - id * 86400000).toLocaleString(),
       };
     }).filter(Boolean);
@@ -87,9 +86,6 @@ export default function TrackHistory() {
                 Track Name
               </th>
               <th className="text-white font-bold font-['Montserrat'] text-[14px] px-2 py-2 text-left">
-                Organ
-              </th>
-              <th className="text-white font-bold font-['Montserrat'] text-[14px] px-2 py-2 text-left">
                 Date
               </th>
               <th className="text-white font-bold font-['Montserrat'] text-[14px] px-2 py-2 text-left">
@@ -122,9 +118,6 @@ export default function TrackHistory() {
                   {/* Track Name with padding */}
                   <td className="px-2 py-3 text-black font-['Montserrat'] text-[14px]">
                     {item.trackName}
-                  </td>
-                  <td className="px-2 py-3 text-black font-['Montserrat'] text-[14px]">
-                    {item.organ}
                   </td>
                   <td className="px-2 py-3 text-black font-['Montserrat'] text-[14px]">
                     {item.date}

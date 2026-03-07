@@ -82,11 +82,23 @@ function App() {
           />
           <Route
             path="/trackResult/:reportId"
-            element={<TrackAnalysisPage />}
+            element={
+              <PrivateRoute>
+                <TrackAnalysisPage />
+              </PrivateRoute>
+            }
           />
+
           <Route path="/ReportInput" element={<ReportInput />} />
           <Route path="/report" element={<Report />} />
-          <Route path="/thanks/:type/:reportId?" element={<Thanks />} />
+          <Route
+            path="/thanks/:type/:reportId?"
+            element={
+              <PrivateRoute>
+                <Thanks />
+              </PrivateRoute>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>
