@@ -10,7 +10,8 @@ class UserAnswer extends Model
         'user_id',
         'question_id',
         'option_id',
-        'answered_date'
+        'answered_date',
+        'ai_report_id'
     ];
 
     public function user()

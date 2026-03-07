@@ -10,8 +10,6 @@ use App\Http\Controllers\Api\AnswerController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-
-
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/me/organs', [MeController::class, 'organs']);
@@ -30,7 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/submit-and-generate-report', [AnswerController::class, 'submitAndGenerateReport']);
 
-
+    Route::get('/ai-report/{report}', [AnswerController::class, 'getReportById']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 

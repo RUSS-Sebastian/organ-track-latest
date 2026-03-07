@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 export default function Thanks() {
   const navigate = useNavigate();
   const { type } = useParams(); // type = "daily" or "syms"
+  const { reportId } = useParams();
 
   return (
     <div className="min-h-[874px] w-full flex justify-center items-start bg-[#14AE5C] pt-20">
@@ -26,9 +27,9 @@ export default function Thanks() {
           className="w-[132px] h-[50px] bg-[#354CDF] text-white font-semibold font-['Roboto'] rounded-md"
           onClick={() => {
             if (type === "daily") {
-              navigate("/"); // home
+              navigate("/");
             } else {
-              navigate("/report"); // organ results
+              navigate(`/trackResult/${reportId}`);
             }
           }}
         >

@@ -43,14 +43,7 @@ class AnswerController extends Controller
         $option = $options[$optionId] ?? null;
 
         if ($question && $option) {
-            UserAnswer::create([
-                'user_id' => $userId,
-                'question_id' => $question->id,
-                'option_id' => $option->id,
-                'answered_date' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+
 
             $organName = $question->organ?->name ?? 'General';
 
@@ -80,39 +73,39 @@ class AnswerController extends Controller
         }
 
         $prompt = "
-You are a health symptom analysis assistant for a mobile health tracking app.
-Your job:
-Analyze the provided question and answer pairs related to ONE organ and generate structured health insights for a user interface.
+            You are a health symptom analysis assistant for a mobile health tracking app.
+            Your job:
+            Analyze the provided question and answer pairs related to ONE organ and generate structured health insights for a user interface.
 
-IMPORTANT RULES:
-- This is NOT a medical diagnosis.
-- Use calm, supportive language.
-- Avoid scary or alarming words.
-- Do not mention AI, analysis, or reasoning.
-- Do not explain anything outside the format.
-- Keep language simple and easy to read.
+            IMPORTANT RULES:
+            - This is NOT a medical diagnosis.
+            - Use calm, supportive language.
+            - Avoid scary or alarming words.
+            - Do not mention AI, analysis, or reasoning.
+            - Do not explain anything outside the format.
+            - Keep language simple and easy to read.
 
-IMPORTANT OUTPUT RULES:
-You MUST return ONLY valid JSON.
-Do NOT include markdown.
-Do NOT include explanations.
-Do NOT include text before or after JSON.
+            IMPORTANT OUTPUT RULES:
+            You MUST return ONLY valid JSON.
+            Do NOT include markdown.
+            Do NOT include explanations.
+            Do NOT include text before or after JSON.
 
-Return JSON in this exact structure:
+            Return JSON in this exact structure:
 
-{
-  \"risk_level\": \"Good | Moderate | High\",
-  \"possible_indicators\": [\"short phrase\"],
-  \"immediate_recommendations\": [\"short action\"],
-  \"lifestyle_adjustments\": [\"long-term habit\"],
-  \"seek_medical_help_if\": [\"red flag symptom\"]
-}
-Now analyze the following answers:
+            {
+            \"risk_level\": \"Good | Moderate | High\",
+            \"possible_indicators\": [\"short phrase\"],
+            \"immediate_recommendations\": [\"short action\"],
+            \"lifestyle_adjustments\": [\"long-term habit\"],
+            \"seek_medical_help_if\": [\"red flag symptom\"]
+            }
+            Now analyze the following answers:
 
-Organ: {$organName}
+            Organ: {$organName}
 
-{$formattedQA}
-";
+            {$formattedQA}
+        ";
 
         $aiResult = $this->callOpenRouter($prompt);
 
@@ -125,8 +118,29 @@ Organ: {$organName}
             'created_at' => now(),
             'updated_at' => now()
         ]);
+        Log::info('Created AI report', ['report_id' => $report->id, 'user_id' => $userId]);
+        $reportId = $report->id; // use directly
 
-        $results[$organName] = $report->id; // return latest report ID per organ
+
+        // 5️⃣ Save UserAnswers using original IDs and link with report ID
+        foreach ($answers as $answer) {
+            $question = Question::find($answer['question_id']);
+            $optionId = is_array($answer['option_ids']) ? $answer['option_ids'][0] : $answer['option_ids'];
+            $option = QuestionOption::find($optionId);
+
+            if ($question && $option) {
+                UserAnswer::create([
+                    'user_id' => $userId,
+                    'ai_report_id' => $reportId,
+                    'question_id' => $question->id,
+                    'option_id' => $option->id,
+                    'answered_date' => now(),
+                ]);
+            }
+        }
+
+        $results[$organName] = $reportId; // return latest report ID per organ
+        Log::info('submitAndGenerateReport response', ['results' => $results]);
     }
 
     return response()->json([
@@ -208,5 +222,30 @@ Organ: {$organName}
         ]);
         return [];
     }
+}
+
+public function getReportById($reportId)
+{
+    $userId = Auth::id();
+
+    // Find AI report for this user
+    $report = AiReport::where('id', $reportId)
+                      ->where('user_id', $userId)
+                      ->first();
+
+    if (!$report) {
+        return response()->json(['message' => 'Report not found'], 404);
+    }
+
+    // Return structured JSON for frontend
+    return response()->json([
+        'title' => "Track - {$report->id}",
+        'date' => $report->answered_date,
+        'riskLevel' => $report->ai_response['risk_level'] ?? 'Unknown',
+        'indicators' => $report->ai_response['possible_indicators'] ?? [],
+        'immediateRecommendations' => $report->ai_response['immediate_recommendations'] ?? [],
+        'lifestyleAdjustments' => $report->ai_response['lifestyle_adjustments'] ?? [],
+        'seekMedical' => $report->ai_response['seek_medical_help_if'] ?? [],
+    ]);
 }
 }

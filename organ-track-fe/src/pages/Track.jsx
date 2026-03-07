@@ -1,5 +1,6 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useParams } from "react-router-dom";
 import {
   faArrowLeft,
   faChartSimple,
@@ -7,6 +8,7 @@ import {
   faCircleCheck,
   faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons";
+import axios from "../api/axios";
 
 // Fake backend JSON (replace later with API response)
 const fakeData = {
@@ -76,9 +78,36 @@ const CheckItem = ({ text, variant = "green" }) => (
 );
 
 export default function TrackAnalysisPage() {
-  const data = fakeData; // swap with props or API later
-  const config = riskConfig[data.riskLevel];
+  const { reportId } = useParams();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    axios
+      .get(`/ai-report/${reportId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        setData(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching report:", error);
+        setLoading(false);
+      });
+  }, [reportId]);
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+  const config = riskConfig[data.riskLevel];
   return (
     <div className="min-h-[874px] w-full flex justify-center bg-white">
       <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
@@ -206,7 +235,7 @@ export default function TrackAnalysisPage() {
 
             {/* Static notice */}
             <div className="bg-indigo-900 text-white rounded-xl p-4 mt-4">
-              <p className="font-semibold mb-1">
+              <div className="font-semibold mb-1">
                 <div className="flex items-center gap-2 font-semibold mb-1">
                   <FontAwesomeIcon
                     icon={faShieldHalved}
@@ -214,7 +243,7 @@ export default function TrackAnalysisPage() {
                   />
                   IMPORTANT NOTICE
                 </div>
-              </p>
+              </div>
               <p className="text-sm text-white/90">
                 If any of these occur, please consult a healthcare professional
                 immediately.

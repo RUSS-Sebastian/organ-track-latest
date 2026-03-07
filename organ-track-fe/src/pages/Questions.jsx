@@ -12,6 +12,7 @@ const isDraftExpired = (draft) => {
 };
 
 export default function Questions() {
+  const [submitting, setSubmitting] = useState(false);
   const [lang, setLang] = useState("en"); // "en" for English, "mm" for Myanmar
   const { organId } = useParams();
   const { organ, setOrgan } = useOrgan();
@@ -138,9 +139,8 @@ export default function Questions() {
     });
   };
 
-  const handleSubmit = () => {
-    // Find first unanswered question
-    //const firstUnansweredIndex = questions.findIndex((q) => !answers[q.id]);
+  const handleSubmit = async () => {
+    // --- 1. Check for unanswered questions ---
     const firstUnansweredIndex = questions.findIndex((q) => {
       const ans = answers[q.id];
       if (!ans) return true; // nothing selected
@@ -154,18 +154,58 @@ export default function Questions() {
       return;
     }
 
-    // All answered
-    console.log("Submitted answers:", answers);
-    // clear draft after submit
-    const draftKey = getDraftKey(organId);
-    if (draftKey) localStorage.removeItem(draftKey);
-    alert("Submitted successfully!"); // wait for user to click OK
+    // --- 2. Transform state into backend format ---
+    const payload = {
+      answers: Object.entries(answers).map(([questionId, optionId]) => ({
+        question_id: Number(questionId),
+        option_ids: optionId, // single choice only
+      })),
+    };
 
-    // Redirect after alert
-    if (isDaily) {
-      navigate("/thanks/daily");
-    } else {
-      navigate("/thanks/syms");
+    console.log("Submitting payload:", payload);
+
+    try {
+      setSubmitting(true); // <--- Show spinner overlay
+      // --- 3. Send to backend ---
+      const response = await axios.post(
+        "/submit-and-generate-report",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Accept: "application/json",
+          },
+        },
+      );
+      console.log("API response:", response.data);
+      // --- 4. Clear saved draft ---
+      const draftKey = getDraftKey(organId);
+      if (draftKey) localStorage.removeItem(draftKey);
+
+      alert("Submitted successfully!"); // wait for user to click OK
+
+      let data = response.data;
+
+      // If response is a string with extra text, extract JSON part
+      if (typeof data === "string") {
+        const jsonPart = data.substring(data.indexOf("{"));
+        data = JSON.parse(jsonPart);
+      }
+
+      const reportIds = data.report_ids || {};
+      const reportId = Object.values(reportIds)[0];
+      console.log("Extracted reportId:", reportId);
+      // --- 6. Navigate using the report ID ---
+      if (isDaily) {
+        navigate("/thanks/daily");
+      } else {
+        navigate(`/thanks/syms/${reportId}`);
+      }
+    } catch (error) {
+      console.error("Submission failed:", error);
+      alert("Submission failed, please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -274,6 +314,17 @@ export default function Questions() {
 
   return (
     <div className="w-full min-h-screen flex justify-center items-center bg-gray-50">
+      {/* --- Spinner overlay --- */}
+      {submitting && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <div className="loader border-4 border-t-4 border-green-500 rounded-full w-16 h-16 animate-spin"></div>
+            <p className="mt-4 text-white font-semibold">
+              Processing your answers...
+            </p>
+          </div>
+        </div>
+      )}
       {/* 402px centered container */}
       <div className="w-full max-w-[402px] h-[874px] bg-white mx-auto relative overflow-hidden">
         {showResumeOverlay && (
