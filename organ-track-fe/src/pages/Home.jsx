@@ -3,6 +3,7 @@ import ConditionBadge from "../components/ConditionBadge";
 import organImages from "../data/organImages";
 import { useUser } from "../context/UserContext";
 
+
 export default function Home() {
   const [user, setUser] = useState(null);
   const user1 = useUser();

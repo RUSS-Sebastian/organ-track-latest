@@ -1,98 +1,134 @@
 import { useState, useEffect } from "react";
-import { FiEdit2, FiTrash2 } from "react-icons/fi"; // rename & delete icons
-import ClipLoader from "react-spinners/ClipLoader"; // professional spinner
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import ClipLoader from "react-spinners/ClipLoader";
+import { useNavigate } from "react-router-dom";
 
 export default function TrackHistory() {
   const itemsPerPage = 10;
+  const navigate = useNavigate();
 
-  // --- State ---
-  const [trackData, setTrackData] = useState([]); // current page's data
+  const [trackData, setTrackData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // --- Fetch function simulating backend ---
+  const API_URL = "http://localhost:8000/api";
+
+  // Fetch tracks from Laravel API
   const fetchTrackData = async (page) => {
-    setLoading(true); // prevent multiple clicks
+    setLoading(true);
 
-    // simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 700));
+    const token = localStorage.getItem("token"); // Get token from localStorage
 
-    // simulate backend total
-    const simulatedTotal = 47; // assume backend has 47 tracks
-    const simulatedData = Array.from({ length: itemsPerPage }, (_, i) => {
-      const id = (page - 1) * itemsPerPage + i + 1;
-      if (id > simulatedTotal) return null; // don't exceed total
-      return {
-        id,
-        trackName: `Track ${id}`,
-        organ: ["Heart", "Lungs", "Liver", "Kidney"][id % 4],
-        date: new Date(Date.now() - id * 86400000).toLocaleString(),
-      };
-    }).filter(Boolean);
+    try {
+      const response = await fetch(
+        `${API_URL}/tracks?page=${page}&perPage=${itemsPerPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        },
+      );
 
-    setTrackData(simulatedData);
-    setTotalPages(Math.ceil(simulatedTotal / itemsPerPage));
+      const result = await response.json();
+
+      const formatted = result.data.map((item) => ({
+        id: item.id,
+        trackName: item.report_name ?? `Track ${item.id}`,
+        organ: "Unknown",
+        date: new Date(item.answered_date).toLocaleString(),
+      }));
+
+      setTrackData(formatted);
+      setTotalPages(result.pagination.totalPages);
+    } catch (error) {
+      console.error("Error fetching tracks:", error);
+      setTrackData([]);
+      setTotalPages(0);
+    }
+
     setLoading(false);
   };
 
-  // --- Load data on page change ---
   useEffect(() => {
-    fetchTrackData(currentPage);
+    const fetchData = async () => {
+      await fetchTrackData(currentPage);
+    };
+    fetchData();
   }, [currentPage]);
 
-  // --- Rename Track Handler ---
-  const handleRename = (id) => {
+  // Rename track
+  const handleRename = async (id) => {
     const newName = prompt("Enter new track name:");
     if (!newName) return;
 
-    // simulate backend update
-    setTrackData((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, trackName: newName } : item,
-      ),
-    );
-    // In real backend:
-    // fetch(`/api/track-history/${id}`, { method: "PUT", body: JSON.stringify({ trackName: newName }) })
+    const token = localStorage.getItem("token");
+
+    try {
+      await fetch(`${API_URL}/tracks/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          report_name: newName,
+        }),
+      });
+
+      fetchTrackData(currentPage);
+    } catch (error) {
+      console.error("Rename error:", error);
+    }
   };
 
-  // --- Delete Track Handler ---
-  const handleDelete = (id) => {
+  // Delete track
+  const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this track?")) return;
 
-    // simulate backend delete
     setLoading(true);
-    setTimeout(() => {
-      // After delete, refetch current page
+
+    const token = localStorage.getItem("token");
+
+    try {
+      await fetch(`${API_URL}/tracks/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
       fetchTrackData(currentPage);
-    }, 500);
-    // In real backend:
-    // fetch(`/api/track-history/${id}`, { method: "DELETE" })
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
+
+    setLoading(false);
   };
 
   const handleRowClick = (id) => {
-    alert(`Clicked row with ID ${id}`);
-    // Later you can navigate or show track details
-    // e.g., router.push(`/track/${id}`) in React Router
+    navigate(`/trackResult/${id}`);
   };
 
   return (
-    <div className="w-full bg-white p-1 rounded-lg shadow-md  flex flex-col">
-      {/* Table */}
+    <div className="w-full bg-white p-1 rounded-lg shadow-md flex flex-col">
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead className="bg-[#14AE5C]">
             <tr>
-              <th className="text-white font-bold font-['Montserrat'] text-[14px] px-2 py-2 text-left">
+              <th className="text-white font-bold text-[14px] px-2 py-2 text-left">
                 Track Name
               </th>
-              <th className="text-white font-bold font-['Montserrat'] text-[14px] px-2 py-2 text-left">
+              <th className="text-white font-bold text-[14px] px-2 py-2 text-left">
                 Organ
               </th>
-              <th className="text-white font-bold font-['Montserrat'] text-[14px] px-2 py-2 text-left">
+              <th className="text-white font-bold text-[14px] px-2 py-2 text-left">
                 Date
               </th>
-              <th className="text-white font-bold font-['Montserrat'] text-[14px] px-2 py-2 text-left">
+              <th className="text-white font-bold text-[14px] px-2 py-2 text-left">
                 Actions
               </th>
             </tr>
@@ -102,13 +138,12 @@ export default function TrackHistory() {
             {loading ? (
               <tr>
                 <td colSpan={4} className="py-8 text-center">
-                  {/* Professional spinner */}
                   <ClipLoader color="#14AE5C" size={40} />
                 </td>
               </tr>
             ) : trackData.length === 0 ? (
               <tr>
-                <td colSpan={4} className="py-8 text-center text-black">
+                <td colSpan={4} className="py-8 text-center">
                   No track history available.
                 </td>
               </tr>
@@ -119,16 +154,9 @@ export default function TrackHistory() {
                   onClick={() => handleRowClick(item.id)}
                   className="cursor-pointer hover:bg-gray-200"
                 >
-                  {/* Track Name with padding */}
-                  <td className="px-2 py-3 text-black font-['Montserrat'] text-[14px]">
-                    {item.trackName}
-                  </td>
-                  <td className="px-2 py-3 text-black font-['Montserrat'] text-[14px]">
-                    {item.organ}
-                  </td>
-                  <td className="px-2 py-3 text-black font-['Montserrat'] text-[14px]">
-                    {item.date}
-                  </td>
+                  <td className="px-2 py-3 text-[14px]">{item.trackName}</td>
+                  <td className="px-2 py-3 text-[14px]">{item.organ}</td>
+                  <td className="px-2 py-3 text-[14px]">{item.date}</td>
                   <td className="px-2 py-3 flex gap-3">
                     <button
                       onClick={(e) => {
@@ -139,6 +167,7 @@ export default function TrackHistory() {
                     >
                       <FiEdit2 />
                     </button>
+
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -165,9 +194,11 @@ export default function TrackHistory() {
         >
           Previous
         </button>
-        <span className="text-black font-['Montserrat']">
+
+        <span>
           Page {currentPage} of {totalPages}
         </span>
+
         <button
           onClick={() =>
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))

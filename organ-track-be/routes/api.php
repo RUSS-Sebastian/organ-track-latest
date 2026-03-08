@@ -12,8 +12,8 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/me/organs', [MeController::class, 'organs']);
-    Route::get('/me', [MeController::class, 'me']);
+    Route::get('/user/organs', [MeController::class, 'organs']);
+    Route::get('/user', [MeController::class, 'me']);
 
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/organs', [OrganController::class, 'index']);
     Route::get('/organs/{id}', [OrganController::class, 'showOrganQuestions']);
 
-    Route::get('/{user_id}/tracks', [TrackController::class, 'index']);
+    Route::get('/tracks', [TrackController::class, 'index']);
     Route::put('/tracks/{id}', [TrackController::class, 'update']);
     Route::delete('/tracks/{id}', [TrackController::class, 'destroy']);
 

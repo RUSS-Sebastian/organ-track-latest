@@ -10,35 +10,19 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "../api/axios";
 
-// Fake backend JSON (replace later with API response)
-const fakeData = {
-  title: "Track 1",
-  date: "11 February 2026",
-  riskLevel: "Needs Attention", // Good | Moderate | Needs Attention
-  indicators: [
-    "Possible Gastritis",
-    "Early signs of Acid Reflux",
-    "Stomach irritation due to diet and stress",
-  ],
-  immediateRecommendations: [
-    "Avoid spicy, oily, and acidic foods.",
-    "Do not skip meals.",
-    "Eat smaller portions more frequently.",
-    "Drink sufficient water (6–8 glasses daily).",
-  ],
-  lifestyleAdjustments: [
-    "Do not skip meals.",
-    "Eat smaller portions more frequently.",
-    "Drink sufficient water (6–8 glasses daily).",
-    "Avoid spicy, oily, and acidic foods.",
-  ],
-  seekMedical: [
-    "Severe or persistent abdominal pain",
-    "Black or tarry stools",
-    "Vomiting blood",
-    "Sudden weight loss",
-  ],
-};
+// Component to render checklist items
+const CheckItem = ({ text, variant = "green" }) => (
+  <div className="flex items-start gap-3">
+    <div
+      className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs ${
+        variant === "red" ? "bg-red-500" : "bg-green-500"
+      }`}
+    >
+      <FontAwesomeIcon icon={faCircleCheck} />
+    </div>
+    <p className="text-sm text-gray-700">{text}</p>
+  </div>
+);
 
 const riskConfig = {
   Good: {
@@ -64,25 +48,14 @@ const riskConfig = {
   },
 };
 
-const CheckItem = ({ text, variant = "green" }) => (
-  <div className="flex items-start gap-3">
-    <div
-      className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs ${
-        variant === "red" ? "bg-red-500" : "bg-green-500"
-      }`}
-    >
-      <FontAwesomeIcon icon={faCircleCheck} />
-    </div>
-    <p className="text-sm text-gray-700">{text}</p>
-  </div>
-);
-
 export default function TrackAnalysisPage() {
   const { reportId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     axios
       .get(`/ai-report/${reportId}`, {
         headers: {
@@ -91,11 +64,12 @@ export default function TrackAnalysisPage() {
         },
       })
       .then((response) => {
-        setData(response.data);
+        setData(response.data || {});
         setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching report:", error);
+        setData({});
         setLoading(false);
       });
   }, [reportId]);
@@ -107,7 +81,9 @@ export default function TrackAnalysisPage() {
       </div>
     );
   }
-  const config = riskConfig[data.riskLevel];
+
+  const config = riskConfig[data?.riskLevel] || riskConfig["Moderate"];
+
   return (
     <div className="min-h-[874px] w-full flex justify-center bg-white">
       <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
@@ -116,18 +92,15 @@ export default function TrackAnalysisPage() {
           <button className="text-xl text-gray-700">
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-green-600 font-semibold text-lg">{data.title}</h1>
-          <span className="text-xs text-gray-500">{data.date}</span>
+          <h1 className="text-green-600 font-semibold text-lg">{data?.title || "Unknown Track"}</h1>
+          <span className="text-xs text-gray-500">{data?.date || "-"}</span>
         </div>
 
         {/* Analysis Card */}
         <div className="bg-green-100 border border-green-300 rounded-2xl p-4 mb-4">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center">
-              <FontAwesomeIcon
-                icon={faChartSimple}
-                className="text-green-700"
-              />
+              <FontAwesomeIcon icon={faChartSimple} className="text-green-700" />
             </div>
             <div>
               <h2 className="font-semibold text-gray-800">Analysis Result</h2>
@@ -146,23 +119,23 @@ export default function TrackAnalysisPage() {
               <div>
                 <p className="text-sm text-gray-700">Risk Assessment</p>
                 <p className={`font-semibold ${config.text}`}>
-                  {data.riskLevel}
+                  {data?.riskLevel || "Moderate"}
                 </p>
               </div>
             </div>
 
-            {/* bars */}
+            {/* Risk bars */}
             <div className="flex items-center gap-1">
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
                   className={`w-2 h-6 rounded-full ${
                     i <
-                    (data.riskLevel === "Good"
+                    (data?.riskLevel === "Good"
                       ? 1
-                      : data.riskLevel === "Moderate"
-                        ? 2
-                        : 3)
+                      : data?.riskLevel === "Moderate"
+                      ? 2
+                      : 3)
                       ? config.badge
                       : "bg-gray-300"
                   }`}
@@ -178,11 +151,8 @@ export default function TrackAnalysisPage() {
             Possible Indicators
           </h3>
           <div className="space-y-2">
-            {data.indicators.map((item, i) => (
-              <div
-                key={i}
-                className="bg-gray-200 text-gray-700 rounded-xl px-4 py-3 text-sm"
-              >
+            {(data?.indicators || []).map((item, i) => (
+              <div key={i} className="bg-gray-200 text-gray-700 rounded-xl px-4 py-3 text-sm">
                 {item}
               </div>
             ))}
@@ -191,28 +161,26 @@ export default function TrackAnalysisPage() {
 
         {/* Immediate Recommendations */}
         <div className="bg-gray-100 rounded-2xl p-4 mb-4 border">
-          <h3 className="font-semibold text-gray-800 mb-3">
-            Immediate Recommendations
-          </h3>
+          <h3 className="font-semibold text-gray-800 mb-3">Immediate Recommendations</h3>
           <div className="space-y-3">
-            {data.immediateRecommendations.map((rec, i) => (
+            {(data?.immediateRecommendations || []).map((rec, i) => (
               <CheckItem key={i} text={rec} />
             ))}
           </div>
         </div>
 
-        {/* Lifestyle */}
+        {/* Lifestyle Adjustments */}
         <div className="bg-green-200 rounded-2xl p-4 mb-4">
           <h3 className="font-semibold text-gray-800">Lifestyle Adjustments</h3>
           <p className="text-xs text-gray-600 mb-3">Long-term healthy habits</p>
           <div className="space-y-3">
-            {data.lifestyleAdjustments.map((item, i) => (
+            {(data?.lifestyleAdjustments || []).map((item, i) => (
               <CheckItem key={i} text={item} />
             ))}
           </div>
         </div>
 
-        {/* Seek medical */}
+        {/* Seek Medical Help */}
         <div className="rounded-2xl overflow-hidden border mb-4">
           <div className="bg-red-600 text-white text-center py-6 px-4">
             <div className="w-14 h-14 bg-white/90 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
@@ -224,29 +192,20 @@ export default function TrackAnalysisPage() {
           </div>
 
           <div className="p-4 space-y-3 bg-gray-100">
-            {data.seekMedical.map((item, i) => (
-              <div
-                key={i}
-                className="bg-gray-200 text-red-600 rounded-xl px-4 py-3 text-sm font-medium"
-              >
+            {(data?.seekMedical || []).map((item, i) => (
+              <div key={i} className="bg-gray-200 text-red-600 rounded-xl px-4 py-3 text-sm font-medium">
                 {item}
               </div>
             ))}
 
             {/* Static notice */}
             <div className="bg-indigo-900 text-white rounded-xl p-4 mt-4">
-              <div className="font-semibold mb-1">
-                <div className="flex items-center gap-2 font-semibold mb-1">
-                  <FontAwesomeIcon
-                    icon={faShieldHalved}
-                    className="text-green-400"
-                  />
-                  IMPORTANT NOTICE
-                </div>
+              <div className="flex items-center gap-2 font-semibold mb-1">
+                <FontAwesomeIcon icon={faShieldHalved} className="text-green-400" />
+                IMPORTANT NOTICE
               </div>
               <p className="text-sm text-white/90">
-                If any of these occur, please consult a healthcare professional
-                immediately.
+                If any of these occur, please consult a healthcare professional immediately.
               </p>
             </div>
           </div>
