@@ -2,16 +2,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useOrgan } from "../context/OrganContext";
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
-// ================= DRAFT EXPIRY CONFIG =================
-const DAILY_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
-
-const isDraftExpired = (draft) => {
-  if (!draft?.timestamp) return false;
-  const now = Date.now();
-  return now - draft.timestamp > DAILY_EXPIRY;
-};
+import { useUser } from "../context/UserContext";
 
 export default function Questions() {
+  const { user } = useUser();
+  const userId = user?.id; // will be undefined until user is loaded
   const [submitting, setSubmitting] = useState(false);
   const [lang, setLang] = useState("en"); // "en" for English, "mm" for Myanmar
   const { organId } = useParams();
@@ -56,27 +51,6 @@ export default function Questions() {
   }, [organ, organId]);
 
   useEffect(() => {
-    const dailyDB = [
-      {
-        id: 1,
-        question: "Did you sleep 7-8 hours?",
-        options: ["Yes", "No"],
-        multi: false,
-      },
-      {
-        id: 2,
-        question: "Did you drink water today?",
-        options: ["Yes", "No"],
-        multi: false,
-      },
-      {
-        id: 3,
-        question: "Did you exercise today?",
-        options: ["Yes", "No"],
-        multi: false,
-      },
-    ];
-
     // ---------------- ORGAN FLOW ----------------
     if (isOrgan) {
       const fetchQuestions = async () => {
@@ -104,12 +78,30 @@ export default function Questions() {
 
     // ---------------- DAILY FLOW ----------------
     if (isDaily) {
-      setQuestions(dailyDB);
+      const fetchQuestions = async () => {
+        try {
+          const response = await axios.get(`/daily-questions`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Accept: "application/json",
+            },
+          });
+
+          setQuestions(response.data.questions); // 👈 store raw backend format
+        } catch (error) {
+          console.error("Fetch failed", error);
+          navigate("/checkin");
+        } finally {
+          setLoading(false); // ✅ stop loading after fetch
+        }
+      };
+
+      fetchQuestions();
       return;
     }
 
     // fallback safety
-    navigate("/track");
+    navigate("/");
   }, [organId]);
 
   const handleSelect = (question, optionId) => {
@@ -173,48 +165,70 @@ export default function Questions() {
 
     console.log("Submitting payload:", payload);
 
-    try {
-      setSubmitting(true); // <--- Show spinner overlay
-      // --- 3. Send to backend ---
-      const response = await axios.post(
-        "/submit-and-generate-report",
-        payloadWithTimezone,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            Accept: "application/json",
+    if (isDaily) {
+      try {
+        setSubmitting(true);
+
+        const response = await axios.post(
+          "/submit-daily",
+          payloadWithTimezone,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Accept: "application/json",
+            },
           },
-        },
-      );
-      console.log("API response:", response.data);
-      // --- 4. Clear saved draft ---
-      const draftKey = getDraftKey(organId);
-      if (draftKey) localStorage.removeItem(draftKey);
+        );
 
-      alert("Submitted successfully!"); // wait for user to click OK
-
-      let data = response.data;
-
-      // If response is a string with extra text, extract JSON part
-      if (typeof data === "string") {
-        const jsonPart = data.substring(data.indexOf("{"));
-        data = JSON.parse(jsonPart);
+        console.log("API response:", response.data);
+        const draftKey = getDraftKey(organId); // make sure draft key is user-specific
+        if (draftKey) localStorage.removeItem(draftKey);
+        alert("Submitted successfully!");
+        navigate("/");
+      } catch (err) {
+        console.error("Submission failed:", err);
+        setSubmitting(false);
+        alert("Failed to submit daily report. Please try again.");
       }
+    } else {
+      try {
+        setSubmitting(true); // <--- Show spinner overlay
+        // --- 3. Send to backend ---
+        const response = await axios.post(
+          "/submit-and-generate-report",
+          payloadWithTimezone,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Accept: "application/json",
+            },
+          },
+        );
+        console.log("API response:", response.data);
+        // --- 4. Clear saved draft ---
+        const draftKey = getDraftKey(organId);
+        if (draftKey) localStorage.removeItem(draftKey);
 
-      const reportIds = data.report_ids || {};
-      const reportId = Object.values(reportIds)[0];
-      console.log("Extracted reportId:", reportId);
-      // --- 6. Navigate using the report ID ---
-      if (isDaily) {
-        navigate("/thanks/daily");
-      } else {
+        alert("Submitted successfully!"); // wait for user to click OK
+
+        let data = response.data;
+
+        // If response is a string with extra text, extract JSON part
+        if (typeof data === "string") {
+          const jsonPart = data.substring(data.indexOf("{"));
+          data = JSON.parse(jsonPart);
+        }
+
+        const reportIds = data.report_ids || {};
+        const reportId = Object.values(reportIds)[0];
+        console.log("Extracted reportId:", reportId);
         navigate(`/thanks/syms/${reportId}`);
+      } catch (error) {
+        console.error("Submission failed:", error);
+        alert("Submission failed, please try again.");
+      } finally {
+        setSubmitting(false);
       }
-    } catch (error) {
-      console.error("Submission failed:", error);
-      alert("Submission failed, please try again.");
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -239,15 +253,18 @@ export default function Questions() {
   };
 
   // ================= DRAFT KEY BUILDER =================
+
   const getDraftKey = (organId) => {
-    console.log("getDraftKeyCalled");
-    if (organId === "daily") return "draft_daily";
-    if (organId) return `draft_organ_${organId}`;
+    if (!userId) return null; // safety
+
+    if (organId === "daily") return `draft_daily_user_${userId}`; // already user-specific
+    if (organId) return `draft_organ_${organId}_user_${userId}`; // ✅ make symptom draft user-specific
+
     return null;
   };
 
   useEffect(() => {
-    if (loading || questions.length === 0) return;
+    if (loading || questions.length === 0 || !userId) return;
 
     const draftKey = getDraftKey(organId);
     if (!draftKey) return;
@@ -258,19 +275,26 @@ export default function Questions() {
     try {
       const parsed = JSON.parse(saved);
 
-      // 🧨 PHASE 3: Expire daily drafts BEFORE overlay
-      if (organId === "daily") {
-        const now = Date.now();
-        const DAILY_EXPIRY = 24 * 60 * 60 * 1000;
+      // --- DAILY: check expiration ---
+      if (isDaily) {
+        const draftDate = new Date(parsed.timestamp);
+        const today = new Date();
 
-        if (now - parsed.timestamp > DAILY_EXPIRY) {
-          console.log("Daily draft expired → removing");
+        if (
+          draftDate.getFullYear() !== today.getFullYear() ||
+          draftDate.getMonth() !== today.getMonth() ||
+          draftDate.getDate() !== today.getDate()
+        ) {
+          // expired → remove
           localStorage.removeItem(draftKey);
           return;
         }
+
+        // ✅ Only show overlay if this draft belongs to current user
+        if (parsed.userId && parsed.userId !== userId) return;
       }
 
-      // ✅ Only show overlay if parsed draft has answers or a valid index
+      // Show resume overlay if there are answers
       if (parsed.answers && Object.keys(parsed.answers).length > 0) {
         setPendingDraft(parsed);
         setShowResumeOverlay(true);
@@ -278,8 +302,7 @@ export default function Questions() {
     } catch (e) {
       console.warn("Draft parse failed", e);
     }
-  }, [loading, questions, organId]);
-
+  }, [loading, questions, organId, userId]);
   // ================= AUTO SAVE DRAFT =================
   useEffect(() => {
     if (!organId || questions.length === 0) return;
@@ -308,6 +331,7 @@ export default function Questions() {
       currentIndex,
       version: 1,
       timestamp: Date.now(),
+      ...(isDaily && { userId }), // ✅ include userId only for daily
     };
 
     localStorage.setItem(draftKey, JSON.stringify(draft));
@@ -335,7 +359,7 @@ export default function Questions() {
         </div>
       )}
       {/* 402px centered container */}
-      <div className="w-full max-w-[402px] h-[874px] bg-white mx-auto relative overflow-hidden">
+      <div className="w-full max-w-[402px] h-[880px] bg-white mx-auto relative overflow-hidden">
         {showResumeOverlay && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
             <div className="bg-white rounded-xl p-6 w-[90%] max-w-[402px] text-center">

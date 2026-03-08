@@ -15,7 +15,7 @@ import bladderImg from "../assets/images/bladder3d-removebg-preview.png";
 import bloodVesselsImg from "../assets/images/artery3d-removebg-preview.png";
 import boneImg from "../assets/images/bone3d-removebg-preview.png";
 import maleOrganImg from "../assets/images/male3dnoBg.png";
-import femaleOrganImg from "../assets/images/female3dremovebg.png";
+import uterusImg from "../assets/images/female3dremovebg.png";
 
 const organImages = {
   brain: brainImg,
@@ -33,7 +33,7 @@ const organImages = {
   bloodVessels: bloodVesselsImg,
   bone: boneImg,
   maleOrgan: maleOrganImg,
-  femaleOrgan: femaleOrganImg,
+  uterus: uterusImg,
 };
 
 export default organImages;

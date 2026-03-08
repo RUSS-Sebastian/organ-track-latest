@@ -1,22 +1,26 @@
 import TrackHistory from "../components/TrackHistory"; // adjust path if needed
 import OrganSelectOverlay from "../components/OrganSelectOverlay";
 import { useState, useEffect } from "react";
-import { getAllDrafts, deleteDraft } from "../utils/draftStorage";
+import { getUserDrafts, deleteDraft } from "../utils/draftStorage";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export default function TrackSyms() {
   const [showOverlay, setShowOverlay] = useState(false);
-
   const navigate = useNavigate();
   const [drafts, setDrafts] = useState([]);
+  const { user } = useUser();
+  const userId = user?.id;
 
   useEffect(() => {
-    setDrafts(getAllDrafts());
-  }, []);
+    if (!userId) return;
+    setDrafts(getUserDrafts(userId));
+  }, [userId]);
 
   const handleDelete = (organId) => {
-    deleteDraft(organId);
-    setDrafts(getAllDrafts());
+    if (!userId) return;
+    deleteDraft(organId, userId);
+    setDrafts(getUserDrafts(userId));
   };
 
   const handleResume = (organId) => {

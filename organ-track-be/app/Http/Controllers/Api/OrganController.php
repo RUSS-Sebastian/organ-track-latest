@@ -61,4 +61,30 @@ class OrganController extends Controller
         'questions' => $questions
     ]);
 }
+
+public function showDailyQuestions()
+{
+    $questions = Question::where('category_type', 'Daily')
+        ->where('is_active', true)
+        ->select([
+            'id',
+            'question_text_en',
+            'question_text_mm',
+            'question_type'
+        ])
+        ->with(['options' => function ($q) {
+            $q->select([
+                'id',
+                'question_id',
+                'option_text_en',
+                'option_text_mm'
+            ]);
+        }])
+        ->get();
+
+    return response()->json([
+        'category_type' => 'Daily',
+        'questions' => $questions
+    ]);
+}
 }

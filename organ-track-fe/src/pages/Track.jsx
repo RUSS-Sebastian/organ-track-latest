@@ -11,36 +11,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "../api/axios";
 
-// Fake backend JSON (replace later with API response)
-const fakeData = {
-  title: "Track 1",
-  date: "11 February 2026",
-  riskLevel: "Needs Attention", // Good | Moderate | Needs Attention
-  indicators: [
-    "Possible Gastritis",
-    "Early signs of Acid Reflux",
-    "Stomach irritation due to diet and stress",
-  ],
-  immediateRecommendations: [
-    "Avoid spicy, oily, and acidic foods.",
-    "Do not skip meals.",
-    "Eat smaller portions more frequently.",
-    "Drink sufficient water (6–8 glasses daily).",
-  ],
-  lifestyleAdjustments: [
-    "Do not skip meals.",
-    "Eat smaller portions more frequently.",
-    "Drink sufficient water (6–8 glasses daily).",
-    "Avoid spicy, oily, and acidic foods.",
-  ],
-  seekMedical: [
-    "Severe or persistent abdominal pain",
-    "Black or tarry stools",
-    "Vomiting blood",
-    "Sudden weight loss",
-  ],
-};
-
 const riskConfig = {
   Good: {
     container: "bg-green-100 border-green-400",

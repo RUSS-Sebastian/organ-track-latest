@@ -11,12 +11,617 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\HealthReport;
+use App\Models\HealthReportOrgan;
+use App\Models\OrganScoreHistory;
+use App\Http\Controllers\OrganScoreController;
 
 class AnswerController extends Controller
 {
     /**
      * Submit answers, generate AI report, and return report ID
      */
+    /**public function submitDaily(Request $request)
+    {
+        $userId = Auth::id();
+        $answers = $request->answers;
+
+        $userTimezone = $request->input('timezone', config('app.timezone')); // default if not sent
+        $dt = new \DateTime('now', new \DateTimeZone($userTimezone));
+        $now = $dt->format('Y-m-d H:i:s'); // same format as Laravel's now()
+        $reportDate = $dt->format('Y-m-d');
+
+        $organMap = [
+            'Heart' => 1,
+            'Brain' => 2,
+            'Lungs' => 3,
+            'Liver' => 4,
+            'Kidney' => 5,
+            'Stomach' => 6,
+            'Muscles' => 7,
+            'Intestine' => 8,
+            'Gall Bladder' => 9,
+            'Pancreas' => 10,
+            'Skin' => 11,
+            'Bladder' => 12,
+            'Blood Vessels' => 13,
+            'Bone' => 14,
+            'Prostate' => 15, // male
+            'Uterus' => 16,   // female
+        ];
+
+        if (empty($answers)) {
+            return response()->json(['message' => 'No answers provided'], 400);
+        }
+
+        $aiFormat = [];
+
+        // Collect question & option IDs
+        $questionIds = collect($answers)->pluck('question_id');
+        $optionIds = collect($answers)->pluck('option_ids');
+
+        $questions = Question::whereIn('id', $questionIds)->get()->keyBy('id');
+        $options = QuestionOption::whereIn('id', $optionIds)->get()->keyBy('id');
+
+        // Save answers and build AI format (no organ grouping)
+        foreach ($answers as $answer) {
+
+            $question = $questions[$answer['question_id']] ?? null;
+
+            $optionId = is_array($answer['option_ids'])
+                ? $answer['option_ids'][0]
+                : $answer['option_ids'];
+
+            $option = $options[$optionId] ?? null;
+
+            if ($question && $option) {
+
+                // Format only question & answer pair
+                $aiFormat[] = [
+                    'question_text' => $question->question_text_en,
+                    'answer_text'   => $option->option_text_en
+                ];
+
+                UserAnswer::create([
+                    'user_id' => $userId,
+                    'question_id' => $question->id,
+                    'option_id' => $option->id,
+                    'answered_at' => $now
+                ]);
+            }
+        }
+
+        $formattedQA = "";
+        $count = 1;
+
+        foreach ($aiFormat as $qa) {
+            $formattedQA .= "Q{$count}: {$qa['question_text']}\n";
+            $formattedQA .= "Answer: {$qa['answer_text']}\n\n";
+            $count++;
+        }
+
+        // Determine gender-specific organ
+        $user = Auth::user();
+        $genderOrgan = $user->gender === 'male' ? 'Prostate' : 'Uterus';
+        $organScoresController = app(OrganScoreController::class);
+        $scoresData = $organScoresController->getLatestOrganScores()->getData(true);
+        $prevScores = $scoresData['scores'];
+
+         // Make sure gender organ is included
+        if (!isset($prevScores[$genderOrgan])) {
+            $prevScores[$genderOrgan] = 75;
+        }
+
+        // Format as JSON string for prompt
+        $prevScoresJson = json_encode($prevScores, JSON_PRETTY_PRINT);
+
+        // --- BUILD AI PROMPT ---
+
+        $prompt = "
+            You are a medical lifestyle analysis AI.
+
+            Your task is to analyze a user's daily habit question–answer pairs and generate a daily health report for 15 organs;
+
+            This is NOT a medical diagnosis.
+
+            Return ONLY valid JSON.
+
+            ---
+
+            ORGANS
+
+            1. Heart
+            2. Brain
+            3. Lungs
+            4. Liver
+            5. Kidney
+            6. Stomach
+            7. Muscles
+            8. Intestine
+            9. Gall Bladder
+            10. Pancreas
+            11. Skin
+            12. Bladder
+            13. Blood Vessels
+            14. Bone
+            15. {$genderOrgan}
+
+            ---
+
+            USER DAILY HABIT ANSWERS
+
+            {$formattedQA}
+
+            ---
+
+            PREVIOUS ORGAN SCORES
+
+            {$prevScoresJson}
+
+            ---
+
+            SCORING RULES
+
+            Score change must be between -2 and +2.
+
+            for example, if current score is 65 then next score can only be between 63 and 67 including both.
+
+            Score range must remain between 0 and 100.
+
+            ---
+
+            FOR EACH ORGAN RETURN
+
+            score  
+            summary (2 sentences)
+
+            positive_effects  
+            negative_effects  
+            identified_conditions  
+            recommendations (max 10)
+
+            ---
+
+            JSON FORMAT
+
+            {
+            \"organs\": [
+            {
+            \"name\": \"Heart\",
+            \"score\": 66,
+            \"summary\": \"...\",
+            \"positive_effects\": [],
+            \"negative_effects\": [],
+            \"identified_conditions\": [],
+            \"recommendations\": []
+            }
+            ]
+            }
+
+            ---
+
+            IMPORTANT
+
+            Return exactly 15 organs.
+
+            Return JSON only.
+        ";
+
+        $result = $this->generateDailyHealthReportAI($prompt);
+
+        // Save health report
+        $healthReport = HealthReport::create([
+            'user_id' => $userId,
+            'report_date' => $reportDate,
+        ]);
+
+        $healthReportId = $healthReport->id;
+
+        foreach ($result['organs'] as $organData) {
+            $organName = $organData['name'];
+
+            // Get organ_id from map
+            $organId = $organMap[$organName] ?? null;
+            if (!$organId) {
+                // skip if mapping missing
+                Log::warning("Organ ID not found for: {$organName}");
+                continue;
+            }
+
+            // AI response for this organ only
+            $aiResponse = json_encode($organData, JSON_UNESCAPED_UNICODE);
+            // Get current score for organ (from AI response)
+            $score = $organData['score'] ?? 75; // fallback default if missing
+
+
+            // Save to health_report_organs
+            HealthReportOrgan::create([
+                'health_report_id' => $healthReportId,
+                'organ_id' => $organId,
+                'ai_response' => $aiResponse,
+            ]);
+
+            // Save to organ_score_histories
+            OrganScoreHistory::create([
+                'user_id'     => $userId,
+                'organ_id'    => $organId,
+                'report_date' => $reportDate,
+                'score'       => $score,
+            ]);
+
+
+        }
+
+
+    }**/
+    public function submitDaily(Request $request)
+    {
+        Log::info('submitDaily: Request started', ['user_id' => Auth::id()]);
+
+        $userId = Auth::id();
+        $answers = $request->answers;
+
+        $userTimezone = $request->input('timezone', config('app.timezone'));
+        $dt = new \DateTime('now', new \DateTimeZone($userTimezone));
+        $now = $dt->format('Y-m-d H:i:s');
+        $reportDate = $dt->format('Y-m-d');
+
+        $organMap = [
+            'Heart' => 1, 'Brain' => 2, 'Lungs' => 3, 'Liver' => 4,
+            'Kidney' => 5, 'Stomach' => 6, 'Muscles' => 7, 'Intestine' => 8,
+            'Gall Bladder' => 9, 'Pancreas' => 10, 'Skin' => 11, 'Bladder' => 12,
+            'Blood Vessels' => 13, 'Bone' => 14, 'Prostate' => 15, 'Uterus' => 16,
+        ];
+
+        if (empty($answers)) {
+            Log::warning('submitDaily: No answers provided', ['user_id' => $userId]);
+            return response()->json(['message' => 'No answers provided'], 400);
+        }
+
+        $aiFormat = [];
+
+        // Collect IDs
+        $questionIds = collect($answers)->pluck('question_id');
+        $optionIds = collect($answers)->pluck('option_ids');
+
+        $questions = Question::whereIn('id', $questionIds)->get()->keyBy('id');
+        $options = QuestionOption::whereIn('id', $optionIds)->get()->keyBy('id');
+
+        foreach ($answers as $answer) {
+            $question = $questions[$answer['question_id']] ?? null;
+            $optionId = is_array($answer['option_ids']) ? $answer['option_ids'][0] : $answer['option_ids'];
+            $option = $options[$optionId] ?? null;
+
+            if ($question && $option) {
+                $aiFormat[] = [
+                    'question_text' => $question->question_text_en,
+                    'answer_text' => $option->option_text_en
+                ];
+
+                try {
+                    UserAnswer::create([
+                        'user_id' => $userId,
+                        'question_id' => $question->id,
+                        'option_id' => $option->id,
+                        'answered_date' => $now
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('submitDaily: Failed to save UserAnswer', [
+                        'user_id' => $userId,
+                        'question_id' => $question->id,
+                        'option_id' => $option->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        }
+
+        // Format Q&A for AI
+        $formattedQA = "";
+        foreach ($aiFormat as $index => $qa) {
+            $formattedQA .= "Q" . ($index + 1) . ": {$qa['question_text']}\n";
+            $formattedQA .= "Answer: {$qa['answer_text']}\n\n";
+        }
+
+        // Determine gender-specific organ
+        $user = Auth::user();
+        $genderOrgan = $user->gender === 'male' ? 'Prostate' : 'Uterus';
+
+        // Get previous scores
+        try {
+            $organScoresController = app(OrganScoreController::class);
+            $scoresData = $organScoresController->getLatestOrganScores()->getData(true);
+            $prevScores = $scoresData['scores'] ?? [];
+        } catch (\Exception $e) {
+            Log::error('submitDaily: Failed to fetch previous organ scores', [
+                'user_id' => $userId,
+                'error' => $e->getMessage()
+            ]);
+            $prevScores = [];
+        }
+
+        if (!isset($prevScores[$genderOrgan])) {
+            $prevScores[$genderOrgan] = 75;
+        }
+
+        $prevScoresJson = json_encode($prevScores, JSON_PRETTY_PRINT);
+
+        // Build AI prompt
+        $prompt = "
+            You are a medical lifestyle analysis AI.
+
+            Your task is to analyze a user's daily habit question–answer pairs and generate a daily health report for 15 organs;
+
+            This is NOT a medical diagnosis.
+
+            Return ONLY valid JSON.
+
+            ---
+
+            ORGANS
+
+            1. Heart
+            2. Brain
+            3. Lungs
+            4. Liver
+            5. Kidney
+            6. Stomach
+            7. Muscles
+            8. Intestine
+            9. Gall Bladder
+            10. Pancreas
+            11. Skin
+            12. Bladder
+            13. Blood Vessels
+            14. Bone
+            15. {$genderOrgan}
+
+            ---
+
+            USER DAILY HABIT ANSWERS
+
+            {$formattedQA}
+
+            ---
+
+            PREVIOUS ORGAN SCORES
+
+            {$prevScoresJson}
+
+            ---
+
+            SCORING RULES
+
+            Score change must be between -2 and +2.
+
+            for example, if current score is 65 then next score can only be between 63 and 67 including both.
+
+            Score range must remain between 0 and 100.
+
+            ---
+
+            FOR EACH ORGAN RETURN
+
+            score  
+            summary (1 short sentence)
+
+            positive_effects  
+            negative_effects  
+            identified_conditions  
+            recommendations (max 5)
+
+            ---
+
+            JSON FORMAT
+
+            {
+                \"organs\": [
+                    {
+                        \"name\": \"Heart\",
+                        \"score\": 66,
+                        \"summary\": \"...\",
+                        \"positive_effects\": [...],
+                        \"negative_effects\": [...],
+                        \"identified_conditions\": [...],
+                        \"recommendations\": [...]
+                    } 
+                ]
+            }
+
+            ---
+
+            IMPORTANT
+
+            Return exactly 15 organs.
+
+            Return JSON only.
+            Respond **ONLY** with valid JSON.
+            
+        ";
+
+        $result = $this->generateDailyHealthReportAI($prompt);
+
+        if (!$result) {
+            Log::error('submitDaily: AI returned null or invalid response', ['user_id' => $userId]);
+            return response()->json(['message' => 'AI report generation failed'], 500);
+        }
+
+        // Save HealthReport
+        try {
+            $healthReport = HealthReport::create([
+                'user_id' => $userId,
+                'report_date' => $reportDate,
+            ]);
+            $healthReportId = $healthReport->id;
+        } catch (\Exception $e) {
+            Log::error('submitDaily: Failed to create HealthReport', [
+                'user_id' => $userId,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['message' => 'Failed to save health report'], 500);
+        }
+
+        // Save HealthReportOrgan & OrganScoreHistory
+        foreach ($result['organs'] as $organData) {
+            $organName = $organData['name'];
+            $organId = $organMap[$organName] ?? null;
+
+            if (!$organId) {
+                Log::warning('submitDaily: Organ ID not found for organ', ['organ' => $organName]);
+                continue;
+            }
+
+            
+            $score = $organData['score'] ?? 75;
+
+            try {
+                HealthReportOrgan::create([
+                    'health_report_id' => $healthReportId,
+                    'organ_id' => $organId,
+                    'ai_response' => $organData,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('submitDaily: Failed to save HealthReportOrgan', [
+                    'health_report_id' => $healthReportId,
+                    'organ_id' => $organId,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            try {
+                OrganScoreHistory::create([
+                    'user_id' => $userId,
+                    'organ_id' => $organId,
+                    'report_date' => $reportDate,
+                    'score' => $score,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('submitDaily: Failed to save OrganScoreHistory', [
+                    'user_id' => $userId,
+                    'organ_id' => $organId,
+                    'score' => $score,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        Log::info('submitDaily: Successfully completed', ['user_id' => $userId, 'health_report_id' => $healthReportId]);
+
+        // Return response to frontend
+        return response()->json([
+            'message' => 'Daily health report generated successfully',
+            'health_report_id' => $healthReportId,
+            'ai_report' => $result
+        ]);
+    }
+
+
+    private function generateDailyHealthReportAI($prompt)
+    {
+        set_time_limit(240); // allow script to run for 120 seconds
+
+        try {
+
+            Log::info('Health Report AI: Request started');
+
+            $apiKey = env('OPENROUTER_API_KEY');
+
+            if (!$apiKey) {
+                Log::error('Health Report AI: Missing OPENROUTER_API_KEY');
+                return null;
+            }
+
+
+
+            $response = Http::timeout(240)
+                ->connectTimeout(30)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json',
+                ])
+                ->post('https://openrouter.ai/api/v1/chat/completions', [
+                    'model' => 'stepfun/step-3.5-flash:free',
+                    'messages' => [
+                        [
+                            'role' => 'user',
+                            'content' => $prompt
+                        ]
+                    ]
+                ]
+            );
+
+            Log::info('Health Report AI: API request sent');
+
+            if (!$response instanceof \Illuminate\Http\Client\Response) {
+                Log::error('Health Report AI: Invalid response object');
+                return null;
+            }
+
+            if ($response->failed()) {
+                Log::error('Health Report AI: API request failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+                return null;
+            }
+
+            $data = $response->json();
+
+            if (!$data) {
+                Log::error('Health Report AI: Failed to parse API JSON');
+                return null;
+            }
+
+            if (!isset($data['choices'][0]['message']['content'])) {
+                Log::error('Health Report AI: Missing AI content', [
+                    'response' => $data
+                ]);
+                return null;
+            }
+
+            $raw = $data['choices'][0]['message']['content'];
+
+            Log::info('Health Report AI: Raw response received');
+
+            // remove markdown if AI adds it
+            $raw = preg_replace('/```json|```/', '', $raw);
+            $raw = trim($raw);
+
+            $decoded = json_decode($raw, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('Health Report AI: Invalid JSON returned', [
+                    'json_error' => json_last_error_msg(),
+                    'raw_response' => $raw
+                ]);
+                return null;
+            }
+
+            if (!isset($decoded['organs'])) {
+                Log::error('Health Report AI: Missing organs key', [
+                    'decoded' => $decoded
+                ]);
+                return null;
+            }
+
+            Log::info('Health Report AI: Successfully parsed', [
+                'organ_count' => count($decoded['organs'])
+            ]);
+
+            return $decoded;
+
+        } catch (\Exception $e) {
+
+            Log::error('Health Report AI: Exception occurred', [
+                'error' => $e->getMessage()
+            ]);
+
+            return null;
+        }
+    }
+
+
+
     public function submitAndGenerateReport(Request $request)
     {
         $userId = Auth::id();

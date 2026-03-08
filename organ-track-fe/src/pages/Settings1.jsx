@@ -2,7 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ConfirmModal from "../components/ConfirmModal";
 import api from "../api/axios";
+import { useUser } from "../context/UserContext";
 const Settings = () => {
+  const { setToken } = useUser();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -37,6 +39,7 @@ const Settings = () => {
 
       localStorage.removeItem("token"); // remove token
       alert("Logged out successfully");
+      setToken(null); // <-- tell provider to clear user
       navigate("/login"); // redirect
     } catch (error) {
       console.error("Logout failed:", error);

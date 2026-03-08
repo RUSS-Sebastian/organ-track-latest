@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\MeController;
 use App\Http\Controllers\Api\OrganController;
 use App\Http\Controllers\Api\TrackController;
 use App\Http\Controllers\Api\AnswerController;
+use App\Http\Controllers\OrganScoreController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -21,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/organs', [OrganController::class, 'index']);
     Route::get('/organs/{id}', [OrganController::class, 'showOrganQuestions']);
+    Route::get('/daily-questions', [OrganController::class, 'showDailyQuestions']);
 
     Route::get('/{user_id}/tracks', [TrackController::class, 'index']);
     Route::put('/tracks/{id}', [TrackController::class, 'update']);
@@ -30,6 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/daily-check', [AnswerController::class, 'check']);
     Route::get('/ai-report/{report}', [AnswerController::class, 'getReportById']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/submit-daily', [AnswerController::class, 'submitDaily']);
+    Route::get('/latest-organ-status', [OrganScoreController::class, 'getLatestOrganStatus']);
 });
 
 

@@ -2,72 +2,33 @@ import { useState, useEffect } from "react";
 import ConditionBadge from "../components/ConditionBadge";
 import organImages from "../data/organImages";
 import { useUser } from "../context/UserContext";
+import ClipLoader from "react-spinners/ClipLoader";
+import axios from "../api/axios";
 
 export default function Home() {
-  const [user, setUser] = useState(null);
-  const user1 = useUser();
+  const [user1, setUser] = useState(null);
+  const { user } = useUser();
+  const [loading, setLoading] = useState(true); // loading state
 
   useEffect(() => {
-    // Simulate fetching user data from backend
     const fetchUser = async () => {
-      // Fake API delay
-      await new Promise((r) => setTimeout(r, 500));
+      try {
+        const token = localStorage.getItem("token");
 
-      const data = {
-        userId: "u_001",
-        gender: "male",
-        timezone: "Asia/Yangon",
-        organHealth: {
-          brain: {
-            status: "Good",
+        const response = await axios.get("/latest-organ-status", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
           },
-          lungs: {
-            status: "Moderate",
-          },
-          stomach: {
-            status: "Needs Attention",
-          },
-          kidney: {
-            status: "Good",
-          },
-          heart: {
-            status: "Good",
-          },
-          liver: {
-            status: "Moderate",
-          },
-          muscles: {
-            status: "Good",
-          },
-          intestine: {
-            status: "Good",
-          },
-          gallBladder: {
-            status: "Good",
-          },
-          pancreas: {
-            status: "Good",
-          },
-          skin: {
-            status: "Moderate",
-          },
-          bladder: {
-            status: "Good",
-          },
-          bloodVessels: {
-            status: "Good",
-          },
-          bone: {
-            status: "Good",
-          },
-          maleOrgan: null,
-          femaleOrgan: {
-            status: "Moderate",
-          },
-        },
-      };
+        });
 
-      setUser(data);
+        setUser(response.data);
+      } catch (error) {
+        console.error("Error fetching organ status:", error);
+        setUser(null);
+      } finally {
+        setLoading(false); // hide spinner
+      }
     };
 
     fetchUser();
@@ -83,8 +44,8 @@ export default function Home() {
     return "Good Night";
   };
 
-  const organStatuses = user?.organHealth
-    ? Object.values(user.organHealth)
+  const organStatuses = user1?.organHealth
+    ? Object.values(user1.organHealth)
         .filter((organ) => organ !== null)
         .map((organ) => organ.status)
     : [];
@@ -95,21 +56,25 @@ export default function Home() {
     (s) => s === "Needs Attention",
   ).length;
 
-  const organEntries = user?.organHealth
-    ? Object.entries(user.organHealth).filter(([key, value]) => value !== null)
+  const organEntries = user1?.organHealth
+    ? Object.entries(user1.organHealth).filter(([key, value]) => value !== null)
     : [];
-
-  if (!user) return <div>Loading...</div>;
 
   return (
     <div className="w-full min-h-screen flex flex-col">
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="absolute inset-0 z-50 bg-white bg-opacity-50 flex items-center justify-center">
+          <ClipLoader color="#4DD880" size={80} />
+        </div>
+      )}
       {/* Scrollable content */}
       <div className="flex-1 overflow-auto ">
         <div className="max-w-[402px] md:max-w-3xl mx-auto px-4 py-4  space-y-6">
           {/* Dynamic Greeting */}
           <p className="text-left text-[20px] md:text-3xl font-roboto font-semibold">
             {getGreeting()}!{" "}
-            <span className="font-bold text-[#4DD880]">{user1.name}</span>
+            <span className="font-bold text-[#4DD880]">{user.name}</span>
           </p>
 
           {/* Subtitle */}

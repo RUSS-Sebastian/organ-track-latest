@@ -8,20 +8,22 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null); // store real user data
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
   useEffect(() => {
     const fetchUser = async () => {
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       try {
-        const token = localStorage.getItem("token"); // assuming you store token here
-        if (!token) throw new Error("No token found");
-
+        setLoading(true);
         const response = await axios.get("/me", {
-          headers: {
-            Authorization: `Bearer ${token}`, // send token in header
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        setUser(response.data); // store name, gender, email, id
+        setUser(response.data);
       } catch (err) {
         console.error("Failed to fetch user:", err);
         setUser(null);
@@ -31,7 +33,7 @@ export const UserProvider = ({ children }) => {
     };
 
     fetchUser();
-  }, []);
+  }, [token]);
 
   // ✅ display cool spinner while loading
   if (loading) {
@@ -42,7 +44,11 @@ export const UserProvider = ({ children }) => {
     );
   }
 
-  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ user, setToken }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 // custom hook

@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
+import axios from "../api/axios";
+const ENABLE_TEST_MODE = true;
+import { useNavigate } from "react-router-dom";
 
 const DailyHabitCheckin = () => {
   const todayLocal = new Date(); // device local datetime
+  const navigate = useNavigate();
   const yyyy = todayLocal.getFullYear();
   const mm = String(todayLocal.getMonth() + 1).padStart(2, "0");
   const dd = String(todayLocal.getDate()).padStart(2, "0");
@@ -13,23 +17,57 @@ const DailyHabitCheckin = () => {
   });
   const [canAnswer, setCanAnswer] = useState(false);
   const [startTime] = useState(new Date());
-  const [testMode, setTestMode] = useState(false);
+  const [testMode, setTestMode] = useState(ENABLE_TEST_MODE);
   const [testTime, setTestTime] = useState({
     hours: 0,
     minutes: 0,
     seconds: 10, // Default test time: 10 seconds
   });
   const [showTestControls, setShowTestControls] = useState(false);
+  const [answeredToday, setAnsweredToday] = useState(null);
+
+  useEffect(() => {
+    const fetchDailyStatus = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await axios.get("/daily-check", {
+          params: {
+            today: todayDate,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const answered = response.data.answered_today;
+
+        setAnsweredToday(answered);
+
+        if (answered) {
+          // User already answered → show countdown
+          setCanAnswer(false);
+        } else {
+          // User has NOT answered → allow answering immediately
+          setCanAnswer(true);
+        }
+      } catch (error) {
+        console.error("Daily check failed:", error);
+      }
+    };
+
+    fetchDailyStatus();
+  }, []);
 
   // Navigation function
   const goToTrackPage = () => {
-    window.location.href = "/track"; // or use router.push if using Next.js
+    navigate("/questions/daily"); // or use router.push if using Next.js
     // If using React Router, you can use: navigate('/track');
   };
 
   // Calculate time left until midnight (12:00 AM)
   const calculateTimeLeft = () => {
-    if (testMode) {
+    if (ENABLE_TEST_MODE && testMode) {
       // In test mode, use the test time values
       return {
         hours: testTime.hours,
@@ -66,6 +104,8 @@ const DailyHabitCheckin = () => {
   };
 
   useEffect(() => {
+    // Only start countdown if user already answered today
+    if (!testMode && answeredToday !== true) return;
     // Initial calculation
     setTimeLeft(calculateTimeLeft());
 
@@ -75,7 +115,7 @@ const DailyHabitCheckin = () => {
       setTimeLeft(newTimeLeft);
 
       // Check if we've reached zero in test mode or midnight in real mode
-      if (testMode) {
+      if (ENABLE_TEST_MODE && testMode) {
         if (
           newTimeLeft.hours === 0 &&
           newTimeLeft.minutes === 0 &&
@@ -125,7 +165,13 @@ const DailyHabitCheckin = () => {
 
     // Cleanup interval on component unmount
     return () => clearInterval(timer);
-  }, [testMode, testTime.hours, testTime.minutes, testTime.seconds]);
+  }, [
+    answeredToday,
+    testMode,
+    testTime.hours,
+    testTime.minutes,
+    testTime.seconds,
+  ]);
 
   // Toggle test mode
   const toggleTestMode = () => {
@@ -184,19 +230,21 @@ const DailyHabitCheckin = () => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
       {/* Test Mode Toggle Button */}
-      <button
-        onClick={toggleTestMode}
-        className="absolute top-4 right-4 z-50 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-green-200 flex items-center gap-2 hover:bg-white transition-all duration-300 group"
-      >
-        <span
-          className={`text-sm font-medium ${testMode ? "text-green-600" : "text-gray-500"}`}
+      {ENABLE_TEST_MODE && (
+        <button
+          onClick={toggleTestMode}
+          className="absolute top-4 right-4 z-50 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-green-200 flex items-center gap-2 hover:bg-white transition-all duration-300 group"
         >
-          {testMode ? "Test Mode ON" : "Test Mode"}
-        </span>
-      </button>
+          <span
+            className={`text-sm font-medium ${testMode ? "text-green-600" : "text-gray-500"}`}
+          >
+            {testMode ? "Test Mode ON" : "Test Mode"}
+          </span>
+        </button>
+      )}
 
       {/* Test Controls Panel */}
-      {showTestControls && (
+      {ENABLE_TEST_MODE && showTestControls && (
         <div className="absolute top-20 right-4 z-50 w-72 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-green-200 p-4 animate-slideDown">
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-semibold text-green-800 flex items-center gap-2">
@@ -439,16 +487,6 @@ const DailyHabitCheckin = () => {
                 </div>
               )}
             </div>
-
-            {/* Make the entire card clickable when ready (optional) */}
-            {canAnswer && (
-              <div
-                onClick={goToTrackPage}
-                className="absolute inset-0 cursor-pointer z-20"
-                style={{ background: "transparent" }}
-                title="Click anywhere to go to track page"
-              ></div>
-            )}
 
             {/* Decorative Footer */}
             <div className="mt-12 flex justify-center gap-2">

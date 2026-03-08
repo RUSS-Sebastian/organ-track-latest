@@ -2,9 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import api from "../api/axios"; // Font Awesome
+import { useUser } from "../context/UserContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { setToken } = useUser();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -61,6 +63,7 @@ export default function Login() {
 
         // Save token for future requests if needed
         localStorage.setItem("token", res.data.token);
+        setToken(res.data.token); // <-- tell provider to update user
 
         // Navigate to home page
         navigate("/");
