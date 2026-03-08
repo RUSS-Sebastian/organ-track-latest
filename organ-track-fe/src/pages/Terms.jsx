@@ -1,16 +1,42 @@
+import { useLocation, useNavigate } from "react-router-dom";
+
 export default function Terms() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const fromRegister = location.state?.from === "register";
+
+  const handleDecline = () => {
+    navigate("/register", { state: { termsAccepted: false } });
+  };
+
+  const handleAccept = () => {
+    navigate("/register", { state: { termsAccepted: true } });
+  };
+
   return (
     <div
       className="w-full max-w-[402px] mx-auto  px-4 py-6"
       style={{ minHeight: "2490px" }}
     >
-      {/* AGREEMENT */}
-      <p
-        className="text-left  text-[#9F9F9F] font-sans"
-        style={{ fontFamily: "Montserrat", fontWeight: "400" }}
-      >
-        AGREEMENT
-      </p>
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        {!fromRegister && (
+          <button
+            onClick={() => navigate("/")}
+            className="text-lg px-2 py-1 rounded-full hover:bg-gray-100"
+          >
+            ←
+          </button>
+        )}
+
+        <p
+          className="text-left  text-[#9F9F9F] font-sans"
+          style={{ fontFamily: "Montserrat", fontWeight: "400" }}
+        >
+          AGREEMENT
+        </p>
+      </div>
 
       {/* Header */}
       <h1
@@ -287,23 +313,28 @@ export default function Terms() {
           Conditions, please contact the Organ Track development team.
         </p>
       </div>
-      <div className="w-full max-w-[402px] mx-auto mt-6 flex justify-between gap-4 px-4 md:max-w-3xl">
-        {/* Decline Button */}
-        <button
-          className="w-[154px] h-[52px] md:w-48 md:h-14 border-2 border-[#2DF251] rounded-[8px] bg-white text-[#2DF251] font-sans font-semibold text-base md:text-lg"
-          style={{ fontFamily: "Montserrat", fontWeight: 600 }}
-        >
-          Decline
-        </button>
 
-        {/* Accept Button */}
-        <button
-          className="w-[154px] h-[52px] md:w-48 md:h-14 rounded-[8px] bg-[#2DF251] text-black font-sans font-semibold text-base md:text-lg"
-          style={{ fontFamily: "Montserrat", fontWeight: 600 }}
-        >
-          Accept
-        </button>
-      </div>
+      {fromRegister && (
+        <div className="w-full max-w-[402px] mx-auto mt-6 flex justify-between gap-4 px-4 md:max-w-3xl">
+          <button
+            type="button"
+            onClick={handleDecline}
+            className="w-[154px] h-[52px] md:w-48 md:h-14 border-2 border-[#2DF251] rounded-[8px] bg-white text-[#2DF251] font-sans font-semibold text-base md:text-lg"
+            style={{ fontFamily: "Montserrat", fontWeight: 600 }}
+          >
+            Decline
+          </button>
+
+          <button
+            type="button"
+            onClick={handleAccept}
+            className="w-[154px] h-[52px] md:w-48 md:h-14 rounded-[8px] bg-[#2DF251] text-black font-sans font-semibold text-base md:text-lg"
+            style={{ fontFamily: "Montserrat", fontWeight: 600 }}
+          >
+            Accept
+          </button>
+        </div>
+      )}
     </div>
   );
 }

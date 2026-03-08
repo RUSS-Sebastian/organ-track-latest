@@ -19,6 +19,7 @@ import Countdown from "./pages/Countdown";
 import PrivateRoute from "./components/PrivateRoute";
 import AiTest from "./pages/AiTest";
 import TrackAnalysisPage from "./pages/Track";
+import ReportDetails from "./pages/ReportDetails";
 function App() {
   return (
     <BrowserRouter>
@@ -28,9 +29,11 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/Terms" element={<Terms />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/Landing" element={<LandingPage />} />
         <Route path="/ai" element={<AiTest />} />
         <Route path="/each-organ" element={<EachOrgan />} />
+        <Route path="/report-details" element={<ReportDetails />} />
 
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>

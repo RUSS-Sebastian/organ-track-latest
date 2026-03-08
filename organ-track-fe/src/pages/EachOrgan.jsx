@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 function EachOrgan() {
   // TODO: replace this with real score from API or navigation state
-  const currentScore = 30;
+  const currentScore = 60;
   const navigate = useNavigate();
 
   const scoreConfig = useMemo(() => {
@@ -135,7 +135,7 @@ function EachOrgan() {
         <div className="bg-[#0A3B5C] rounded-2xl p-5 text-white flex justify-between items-center mb-6 shadow-lg">
           {/* Condition */}
           <div>
-            <p className="text-sm mb-2 font-semibold" style={{ fontSize:20 }}>
+            <p className="text-sm mb-2 font-semibold">
               Brain Condition
             </p>
             <span
@@ -271,7 +271,6 @@ function EachOrgan() {
                 const [x, y] = point.split(",").map(Number);
                 return (
                   <circle
-                    // eslint-disable-next-line react/no-array-index-key
                     key={index}
                     cx={x}
                     cy={y}
