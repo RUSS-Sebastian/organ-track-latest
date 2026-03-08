@@ -24,7 +24,7 @@ const fakeData = {
     "Avoid spicy, oily, and acidic foods.",
     "Do not skip meals.",
     "Eat smaller portions more frequently.",
-    "Drink sufficient water (6–8 glasses daily).",
+    "Drink sufficient water (6-8 glasses daily).",
   ],
   lifestyleAdjustments: [
     "Do not skip meals.",
