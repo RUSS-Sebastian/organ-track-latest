@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
 
+import EachOrgan from "./pages/EachOrgan";
 import Home from "./pages/Home";
 import Report from "./pages/Report";
 import TrackSyms from "./pages/TrackSyms";
@@ -29,6 +30,7 @@ function App() {
         <Route path="/Terms" element={<Terms />} />
         <Route path="/Landing" element={<LandingPage />} />
         <Route path="/ai" element={<AiTest />} />
+        <Route path="/each-organ" element={<EachOrgan />} />
 
         {/* Pages WITH Navbar */}
         <Route element={<Layout />}>

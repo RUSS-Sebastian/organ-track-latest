@@ -1,0 +1,139 @@
+.organ-container{
+  padding:20px;
+  background:#f5f6f7;
+  font-family:Arial;
+}
+
+.organ-title{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.score-card{
+  background:#0c3c5d;
+  color:white;
+  border-radius:15px;
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.status-good{
+  background:#27e05b;
+  padding:6px 15px;
+  border-radius:20px;
+}
+
+.score-circle .circle{
+  border:6px solid #27e05b;
+  border-radius:50%;
+  width:90px;
+  height:90px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+
+.score-number{
+  font-size:28px;
+  font-weight:bold;
+}
+
+.analysis-header{
+  margin:20px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.chart-card{
+  background:white;
+  border-radius:12px;
+  padding:15px;
+}
+
+.chart-placeholder{
+  height:150px;
+  background:#eaeaea;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.current-date{
+  margin:15px 0;
+}
+
+.summary-section{
+  text-align:center;
+}
+
+.positive-card{
+  background:#d8f3dc;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+}
+
+.negative-card{
+  background:#ffd6d6;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+}
+
+.conditions-card{
+  background:#f0f0f0;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+}
+
+.condition-item{
+  display:flex;
+  align-items:center;
+  margin-top:10px;
+}
+
+.dot{
+  width:10px;
+  height:10px;
+  background:#4c6ef5;
+  border-radius:50%;
+  margin-right:10px;
+}
+
+.risk-card{
+  background:#0c3c5d;
+  color:white;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+}
+
+.low{
+  background:#2ecc71;
+  padding:3px 10px;
+  border-radius:5px;
+}
+
+.medium{
+  background:#f1c40f;
+  padding:3px 10px;
+  border-radius:5px;
+}
+
+.high{
+  background:#e74c3c;
+  padding:3px 10px;
+  border-radius:5px;
+}
+
+.recommend-card{
+  background:#2ecc71;
+  padding:15px;
+  border-radius:10px;
+  margin-top:15px;
+}
