@@ -28,7 +28,7 @@ export default function TrackHistory() {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
-        },
+        }
       );
 
       const result = await response.json();
@@ -52,10 +52,7 @@ export default function TrackHistory() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchTrackData(currentPage);
-    };
-    fetchData();
+    fetchTrackData(currentPage);
   }, [currentPage]);
 
   // Rename track
@@ -212,3 +209,5 @@ export default function TrackHistory() {
     </div>
   );
 }
+
+//211
