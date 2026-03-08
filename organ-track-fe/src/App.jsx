@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
 
+import EachOrgan from "./pages/EachOrgan";
 import Home from "./pages/Home";
 import Report from "./pages/Report";
 import TrackSyms from "./pages/TrackSyms";
@@ -17,6 +18,7 @@ import Countdown from "./pages/Countdown";
 import PrivateRoute from "./components/PrivateRoute";
 import AiTest from "./pages/AiTest";
 import TrackAnalysisPage from "./pages/Track";
+import ReportDetails from "./pages/ReportDetails";
 function App() {
   return (
     <BrowserRouter>
@@ -86,9 +88,41 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/each-organ/:organId"
+            element={
+              <PrivateRoute>
+                <EachOrgan />
+              </PrivateRoute>
+            }
+          />
 
-          <Route path="/ReportInput" element={<ReportInput />} />
-          <Route path="/report" element={<Report />} />
+          <Route
+            path="/report-details"
+            element={
+              <PrivateRoute>
+                <ReportDetails />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/ReportInput"
+            element={
+              <PrivateRoute>
+                <ReportInput />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/report"
+            element={
+              <PrivateRoute>
+                <Report />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/thanks/:type/:reportId?"
             element={
@@ -104,5 +138,3 @@ function App() {
 }
 
 export default App;
-
-/* */

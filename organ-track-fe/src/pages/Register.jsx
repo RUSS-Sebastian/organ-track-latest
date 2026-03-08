@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import systemLogo from "../assets/images/systemLogo.png";
 
@@ -14,11 +14,21 @@ export default function Register() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState(""); // to show exact backend error
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    if (location.state && typeof location.state.termsAccepted === "boolean") {
+      setFormData((prev) => ({
+        ...prev,
+        agree: location.state.termsAccepted,
+      }));
+    }
+  }, [location.state?.termsAccepted]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -267,7 +277,18 @@ export default function Register() {
                 checked={formData.agree}
                 onChange={handleChange}
               />
-              <span>I agree to the terms and conditions</span>
+              <span>
+                I agree to the{" "}
+                <button
+                  type="button"
+                  className="underline font-semibold"
+                  onClick={() =>
+                    navigate("/terms", { state: { from: "register" } })
+                  }
+                >
+                  terms and conditions
+                </button>
+              </span>
             </div>
             {errors.agree && (
               <p className="text-red-200 text-sm">{errors.agree}</p>

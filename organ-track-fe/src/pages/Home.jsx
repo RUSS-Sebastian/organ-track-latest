@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import ConditionBadge from "../components/ConditionBadge";
+import { useNavigate } from "react-router-dom";
 import organImages from "../data/organImages";
+import { organs } from "../data/organ";
 import { useUser } from "../context/UserContext";
 import ClipLoader from "react-spinners/ClipLoader";
 import axios from "../api/axios";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [user1, setUser] = useState(null);
   const { user } = useUser();
   const [loading, setLoading] = useState(true); // loading state
@@ -60,6 +63,24 @@ export default function Home() {
     ? Object.entries(user1.organHealth).filter(([key, value]) => value !== null)
     : [];
 
+  const normalize = (str) => str.replace(/\s+/g, "").toLowerCase();
+
+  const findOrganId = (name) => {
+    const allOrgans = [...organs.common, ...organs.male, ...organs.female];
+    const organObj = allOrgans.find(
+      (o) => normalize(o.name) === normalize(name),
+    );
+    return organObj?.id ?? null;
+  };
+
+  // helper to convert "Blood Vessels" → "bloodVessels"
+  const toCamelCase = (str) => {
+    return str
+      .replace(/\s(.)/g, (_, group1) => group1.toUpperCase()) // capitalize letters after spaces
+      .replace(/\s/g, "") // remove spaces
+      .replace(/^(.)/, (_, group1) => group1.toLowerCase()); // lowercase first letter
+  };
+
   return (
     <div className="w-full min-h-screen flex flex-col">
       {/* Loading Overlay */}
@@ -113,29 +134,35 @@ export default function Home() {
               </p>
             </div>
           </div>
-          {/* Organ Grid */}
-          <div className="grid grid-cols-2  gap-6 mt-8">
-            {organEntries.map(([organName, organData]) => (
-              <div
-                key={organName}
-                className="flex flex-col items-center cursor-pointer"
-                onClick={() => console.log(organName)}
-              >
-                {/* Image Container */}
-                <div className="w-[171px] h-[171px]  bg-[#1E1B39] flex items-center justify-center rounded-xl border border-yellow-500">
-                  <img
-                    src={organImages[organName]}
-                    alt={organName}
-                    className="w-[150px] h-[150px]  object-contain"
-                  />
-                </div>
 
-                {/* Status Badge */}
-                <div className="mt-3">
-                  <ConditionBadge status={organData.status} />
+          {/* Organ Grid */}
+          <div className="grid grid-cols-2 gap-6 mt-8">
+            {organEntries.map(([organName, organData]) => {
+              const organId = findOrganId(organName); // get organId
+              return (
+                <div
+                  key={organName}
+                  className="flex flex-col items-center cursor-pointer"
+                  onClick={() => {
+                    if (organId) navigate(`/each-organ/${organId}`);
+                  }}
+                >
+                  {/* Image Container */}
+                  <div className="w-[171px] h-[171px] bg-[#1E1B39] flex items-center justify-center rounded-xl border border-yellow-500">
+                    <img
+                      src={organImages[toCamelCase(organName)]}
+                      alt={organName}
+                      className="w-[150px] h-[150px] object-contain"
+                    />
+                  </div>
+
+                  {/* Status Badge */}
+                  <div className="mt-3">
+                    <ConditionBadge status={organData.status} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Future content goes here */}

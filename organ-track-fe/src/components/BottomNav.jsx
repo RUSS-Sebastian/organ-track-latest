@@ -52,7 +52,10 @@ export default function BottomNav() {
                 } else if (item.to === "/report") {
                   isActive =
                     path.startsWith("/report") ||
-                    path.startsWith("/reportinput");
+                    path.startsWith("/reportinput") ||
+                    path.startsWith("/report-details");
+                } else if (item.to === "/") {
+                  isActive = path.startsWith("/each-organ") || path === "/";
                 }
 
                 // OTHER ROUTES

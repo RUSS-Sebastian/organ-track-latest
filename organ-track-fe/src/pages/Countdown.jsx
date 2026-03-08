@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../api/axios";
-const ENABLE_TEST_MODE = true;
+const ENABLE_TEST_MODE = false;
 import { useNavigate } from "react-router-dom";
 
 const DailyHabitCheckin = () => {

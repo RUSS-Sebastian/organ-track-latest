@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\OrganController;
 use App\Http\Controllers\Api\TrackController;
 use App\Http\Controllers\Api\AnswerController;
 use App\Http\Controllers\OrganScoreController;
+use App\Http\Controllers\Api\OrganReportController;
+use App\Http\Controllers\Api\OrganChartController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -24,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/organs/{id}', [OrganController::class, 'showOrganQuestions']);
     Route::get('/daily-questions', [OrganController::class, 'showDailyQuestions']);
 
-    Route::get('/{user_id}/tracks', [TrackController::class, 'index']);
+    Route::get('/tracks', [TrackController::class, 'index']);
     Route::put('/tracks/{id}', [TrackController::class, 'update']);
     Route::delete('/tracks/{id}', [TrackController::class, 'destroy']);
 
@@ -34,6 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/submit-daily', [AnswerController::class, 'submitDaily']);
     Route::get('/latest-organ-status', [OrganScoreController::class, 'getLatestOrganStatus']);
+    Route::get('/organ-report/{organId}',[OrganReportController::class, 'show']);
+    Route::get('/organ-chart/{organId}', [OrganChartController::class, 'getOrganChart']);
+
 });
 
 
