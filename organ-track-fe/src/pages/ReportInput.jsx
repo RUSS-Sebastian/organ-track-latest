@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "../api/axios";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const ReportInput = () => {
   const navigate = useNavigate();
@@ -10,6 +12,8 @@ const ReportInput = () => {
   const [startMonth, setStartMonth] = useState(new Date());
   const [endMonth, setEndMonth] = useState(new Date());
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const today = new Date();
   today.setHours(0, 0, 0, 0); // reset time
@@ -74,9 +78,21 @@ const ReportInput = () => {
     const start = parseDateString(newStartDate);
     const end = parseDateString(newEndDate);
 
-    if (start && end && start > end) {
-      setError("End date cannot be earlier than start date");
-      return false;
+    if (start && end) {
+      if (start > end) {
+        setError("End date cannot be earlier than start date");
+        return false;
+      }
+
+      // difference in days
+      const diffTime = end.getTime() - start.getTime();
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+      if (diffDays > 2) {
+        // <-- now allows only 3 days total
+        setError("Date range cannot exceed 3 days");
+        return false;
+      }
     }
 
     setError("");
@@ -111,19 +127,44 @@ const ReportInput = () => {
     if (startDate) validateDates(startDate, formatted);
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!startDate || !endDate) {
       setError("Please select both start date and end date");
       return;
     }
-    if (validateDates(startDate, endDate)) {
-      setError("");
-      console.log("Generating report from", startDate, "to", endDate);
-      navigate("/checkin", { state: { startDate, endDate } });
+    if (!validateDates(startDate, endDate)) return;
+
+    setError("");
+    setLoading(true);
+    setSuccessMessage("");
+
+    try {
+      const token = localStorage.getItem("token"); // adjust if using context/auth provider
+
+      const response = await axios.post(
+        "/health-report/generate",
+        { start_date: startDate, end_date: endDate },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        },
+      );
+
+      if (response.data?.success) {
+        setSuccessMessage("Health report generated successfully!");
+      } else {
+        setError(response.data?.message || "Failed to generate report.");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "API request failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isGenerateDisabled = !startDate || !endDate;
+  const isGenerateDisabled = !startDate || !endDate || loading;
 
   // Calendar component
   const CalendarComponent = ({
@@ -395,6 +436,13 @@ const ReportInput = () => {
             </div>
           )}
 
+          {/* Success Message */}
+          {successMessage && (
+            <div className="mb-4 p-3 bg-green-50/90 border border-green-200 rounded-lg text-green-600 text-center">
+              {successMessage}
+            </div>
+          )}
+
           {/* Generate Button */}
           <button
             onClick={handleGenerate}
@@ -408,10 +456,14 @@ const ReportInput = () => {
               }
             `}
           >
-            {!isGenerateDisabled && (
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            {loading ? (
+              <div className="flex justify-center items-center gap-2">
+                <ClipLoader size={18} color="#ffffff" />
+                <span>Generating...</span>
+              </div>
+            ) : (
+              "Generate Health Report"
             )}
-            <span className="relative z-10">Generate Health Report</span>
           </button>
 
           {/* Success Message */}

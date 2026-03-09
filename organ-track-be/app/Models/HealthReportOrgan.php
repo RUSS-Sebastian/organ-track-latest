@@ -16,10 +16,14 @@ class HealthReportOrgan extends Model
         'ai_response' => 'array'
     ];
 
+
+    // ✅ MODIFY THIS FUNCTION
     public function report()
     {
-        return $this->belongsTo(HealthReport::class);
+        // explicitly specify the foreign key column
+        return $this->belongsTo(HealthReport::class, 'health_report_id');
     }
+
 
     public function organ()
     {

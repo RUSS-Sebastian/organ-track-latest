@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\AnswerController;
 use App\Http\Controllers\OrganScoreController;
 use App\Http\Controllers\Api\OrganReportController;
 use App\Http\Controllers\Api\OrganChartController;
+use App\Http\Controllers\Api\HealthAnalysisController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -38,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/latest-organ-status', [OrganScoreController::class, 'getLatestOrganStatus']);
     Route::get('/organ-report/{organId}',[OrganReportController::class, 'show']);
     Route::get('/organ-chart/{organId}', [OrganChartController::class, 'getOrganChart']);
+    Route::post('/health-report/generate', [HealthAnalysisController::class, 'generatePrompt']);
 
 });
 

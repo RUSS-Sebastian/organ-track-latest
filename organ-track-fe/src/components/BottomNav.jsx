@@ -5,8 +5,12 @@ import { useLocation } from "react-router-dom";
 export default function BottomNav() {
   const navItems = [
     { to: "/", label: "Home", icon: Home },
-    { to: "/report", label: "Report", icon: FileText },
-    { to: "/checkin", label: "Check-in", icon: CheckCircle },
+    ,
+    /*{ to: "/report", label: "Report", icon: FileText }*/ {
+      to: "/checkin",
+      label: "Check-in",
+      icon: CheckCircle,
+    },
     { to: "/track", label: "Track-Syms", icon: Activity },
     { to: "/settings", label: "Settings", icon: Settings },
   ];
@@ -49,11 +53,6 @@ export default function BottomNav() {
                   isActive =
                     path.startsWith("/settings") ||
                     path.startsWith("/EditProfile");
-                } else if (item.to === "/report") {
-                  isActive =
-                    path.startsWith("/report") ||
-                    path.startsWith("/reportinput") ||
-                    path.startsWith("/report-details");
                 } else if (item.to === "/") {
                   isActive = path.startsWith("/each-organ") || path === "/";
                 }
@@ -91,3 +90,10 @@ export default function BottomNav() {
     </div>
   );
 }
+/*
+else if (item.to === "/report") {
+                  isActive =
+                    path.startsWith("/report") ||
+                    path.startsWith("/reportinput") ||
+                    path.startsWith("/report-details");
+                } */
