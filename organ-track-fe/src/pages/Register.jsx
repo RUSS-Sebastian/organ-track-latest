@@ -25,6 +25,7 @@ export default function Register() {
     if (location.state && typeof location.state.termsAccepted === "boolean") {
       setFormData((prev) => ({
         ...prev,
+        ...location.state,
         agree: location.state.termsAccepted,
       }));
     }
@@ -283,7 +284,9 @@ export default function Register() {
                   type="button"
                   className="underline font-semibold"
                   onClick={() =>
-                    navigate("/terms", { state: { from: "register" } })
+                    navigate("/terms", {
+                      state: { from: "register", formData: formData },
+                    })
                   }
                 >
                   terms and conditions

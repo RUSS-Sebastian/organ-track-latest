@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/submit-daily', [AnswerController::class, 'submitDaily']);
     Route::get('/latest-organ-status', [OrganScoreController::class, 'getLatestOrganStatus']);
     Route::get('/organ-report/{organId}',[OrganReportController::class, 'show']);
+    Route::get('/organ-report-specific/{organId}',[OrganReportController::class, 'showspecific']);
     Route::get('/organ-chart/{organId}', [OrganChartController::class, 'getOrganChart']);
     Route::post('/health-report/generate', [HealthAnalysisController::class, 'generatePrompt']);
 

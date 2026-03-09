@@ -3,15 +3,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 export default function Terms() {
   const location = useLocation();
   const navigate = useNavigate();
-
+  const formData = location.state?.formData ?? {};
   const fromRegister = location.state?.from === "register";
 
-  const handleDecline = () => {
-    navigate("/register", { state: { termsAccepted: false } });
+  const handleAccept = () => {
+    navigate("/register", {
+      state: { ...formData, termsAccepted: true },
+    });
   };
 
-  const handleAccept = () => {
-    navigate("/register", { state: { termsAccepted: true } });
+  const handleDecline = () => {
+    navigate("/register", {
+      state: { ...formData, termsAccepted: false },
+    });
   };
 
   return (

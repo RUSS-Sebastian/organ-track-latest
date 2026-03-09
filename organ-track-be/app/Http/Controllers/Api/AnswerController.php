@@ -405,9 +405,9 @@ class AnswerController extends Controller
             score  
             summary (1 short sentence)
 
-            positive_effects  
-            negative_effects  
-            identified_conditions  
+            positive_effects (as short and compact as possible)
+            negative_effects (as short and compact as possible)
+            identified_conditions (as short and compact as possible)
             recommendations (max 5)
 
             ---
@@ -433,7 +433,6 @@ class AnswerController extends Controller
             IMPORTANT
 
             Return exactly 15 organs.
-
             Return JSON only.
             Respond **ONLY** with valid JSON.
             
@@ -541,6 +540,7 @@ class AnswerController extends Controller
                 ])
                 ->post('https://openrouter.ai/api/v1/chat/completions', [
                     'model' => 'stepfun/step-3.5-flash:free',
+                    'response_format' => ['type' => 'json_object'],
                     'messages' => [
                         [
                             'role' => 'user',
@@ -587,6 +587,28 @@ class AnswerController extends Controller
             $raw = preg_replace('/```json|```/', '', $raw);
             $raw = trim($raw);
 
+            /*
+            |---------------------------------------------
+            | FIX 1: Remove control characters
+            |---------------------------------------------
+            | These characters sometimes break json_decode()
+            */
+            $raw = preg_replace('/[\x00-\x1F\x7F]/u', '', $raw);
+
+            /*
+            |---------------------------------------------
+            | FIX 2: Detect truncated AI responses
+            |---------------------------------------------
+            | If JSON does not end with }, it means
+            | the AI response was cut off.
+            */
+            if (!str_ends_with(trim($raw), '}')) {
+                Log::error('Health Report AI: Response truncated', [
+                    'raw_response' => $raw
+                ]);
+                return null;
+            }
+
             $decoded = json_decode($raw, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -607,6 +629,11 @@ class AnswerController extends Controller
             Log::info('Health Report AI: Successfully parsed', [
                 'organ_count' => count($decoded['organs'])
             ]);
+
+            if (!$decoded || !isset($decoded['organs'])) {
+                Log::error('Health Report AI: Invalid AI response', ['data' => $data]);
+                return null;
+            }
 
             return $decoded;
 

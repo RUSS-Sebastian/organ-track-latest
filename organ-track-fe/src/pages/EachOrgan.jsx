@@ -2,6 +2,9 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import organImages from "../data/organImages";
 import axios from "../api/axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { subYears, isAfter } from "date-fns";
 
 function EachOrgan() {
   const navigate = useNavigate();
@@ -11,6 +14,8 @@ function EachOrgan() {
   const [organData, setOrganData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeRange, setActiveRange] = useState("week");
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Today by default
+  const [calendarOpen, setCalendarOpen] = useState(false); // toggle calendar popup
   const [chartData, setChartData] = useState({ current: {}, previous: {} });
   // UseMemo for scoreConfig safely
   const scoreConfig = useMemo(() => {
@@ -38,29 +43,35 @@ function EachOrgan() {
     };
   }, [organData]);
 
-  useEffect(() => {
-    const fetchOrganData = async () => {
-      try {
-        const token = localStorage.getItem("token"); // pass auth token
-        const response = await axios.get(`/organ-report/${organId}`, {
+  const fetchOrganByDate = async (date) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const formattedDate = formatDate(date); // YYYY-MM-DD string for backend
+
+      const res = await axios.get(
+        `/organ-report-specific/${organId}?date=${formattedDate}`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
-        });
+        },
+      );
 
-        setOrganData(response.data);
-      } catch (err) {
-        console.error("Failed to fetch organ data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (organId) {
-      fetchOrganData();
+      setOrganData(res.data);
+      setSelectedDate(date); // Keep as Date object!
+    } catch (err) {
+      console.error("Failed to fetch organ data for date:", err);
+      setOrganData(null);
+    } finally {
+      setLoading(false);
     }
-  }, [organId]);
+  };
+
+  useEffect(() => {
+    if (organId) fetchOrganByDate(selectedDate);
+  }, [organId, selectedDate]);
 
   useEffect(() => {
     const fetchChart = async () => {
@@ -88,6 +99,21 @@ function EachOrgan() {
   }, [organId, activeRange]);
 
   const progressAngle = (scoreConfig.score / 100) * 360;
+
+  const formatDate = (date) => {
+    const d = typeof date === "string" ? new Date(date) : date; // always Date
+    const tzOffset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
+  };
+
+  // Get YYYY-MM-DD in local timezone
+  const todayLocal = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, "0");
+    const day = today.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   /* ===== ORGAN IMAGE MAP ===== */
 
@@ -392,6 +418,33 @@ function EachOrgan() {
             </svg>
           </div>
         </div>
+
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={() => setCalendarOpen(!calendarOpen)}
+            className="px-3 py-1 rounded-full border bg-gray-100 hover:bg-gray-200"
+          >
+            {formatDate(selectedDate)} {/* Safe formatting for display */}
+          </button>
+        </div>
+
+        {calendarOpen && (
+          <div className="flex justify-center mb-4 z-50">
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date) => {
+                setSelectedDate(date);
+                setCalendarOpen(false);
+              }}
+              inline
+              maxDate={new Date()} // disable future
+              minDate={subYears(new Date(), 5)} // optional: last 5 years
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+            />
+          </div>
+        )}
 
         {/* SUMMARY */}
         <div className="text-center mb-6">

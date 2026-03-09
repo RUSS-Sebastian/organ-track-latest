@@ -32,13 +32,7 @@ class HealthAnalysisController extends Controller
             ->with('organ')
             ->orderBy('report.report_date')
             ->get();
-        $organResponses = HealthReportOrgan::whereHas('report', function ($query) use ($userId, $startDate, $endDate) {
-    $query->where('user_id', $userId)
-          ->whereBetween('report_date', [$startDate, $endDate]);
-})
-->with('organ')
-->orderBy('report.report_date')
-->get();
+        
 
         // Prepare list of JSON objects for prompt
         $dataForAnalysis = $organResponses->map(function ($item) {
