@@ -1,21 +1,10 @@
 .landing-page {
-  background: linear-gradient(135deg, 
-    #e0f7e0 0%, 
-    #b8e6b8 20%, 
-    #90d490 40%, 
-    #68c268 60%, 
-    #40b040 80%, 
-    #18a318 100%);
+  background: #02c39a;
   min-height: 100vh;
-  color: #0d530d;
 }
 
 /* VIVID Navigation Bar - More Transparent but Visible */
 .top-navbar.vivid-green-nav {
-  background-color: rgba(40, 167, 69, 0.92); /* More vivid green */
-  backdrop-filter: blur(15px) saturate(180%);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(40, 167, 69, 0.3);
   padding: 1.2rem 2.5rem;
 }
 
@@ -75,17 +64,29 @@
 
 /* Individual Button Styling for Vividness */
 .features-btn {
-  background: linear-gradient(135deg, rgba(52, 199, 89, 0.9), rgba(40, 167, 69, 0.9));
+  background: linear-gradient(
+    135deg,
+    rgba(52, 199, 89, 0.9),
+    rgba(40, 167, 69, 0.9)
+  );
   border: 2px solid #34c759;
 }
 
 .contact-btn {
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.9), rgba(0, 96, 255, 0.9));
+  background: linear-gradient(
+    135deg,
+    rgba(0, 122, 255, 0.9),
+    rgba(0, 96, 255, 0.9)
+  );
   border: 2px solid #007aff;
 }
 
 .login-btn {
-  background: linear-gradient(135deg, rgba(255, 149, 0, 0.9), rgba(255, 94, 0, 0.9));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 149, 0, 0.9),
+    rgba(255, 94, 0, 0.9)
+  );
   border: 2px solid #ff9500;
   color: white;
 }
@@ -126,18 +127,16 @@
 /* Hero Section with VIVID green overlay */
 .hero-section {
   padding-top: 110px;
-  background: linear-gradient(rgba(40, 167, 69, 0.15), transparent);
   position: relative;
 }
 
 .hero-section::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 400px;
-  background: radial-gradient(circle at 50% 0%, rgba(40, 167, 69, 0.25), transparent 70%);
   z-index: -1;
 }
 
@@ -147,7 +146,7 @@
   padding: 4rem 0;
   border-radius: 40px 40px 0 0;
   margin-top: 3rem;
-  box-shadow: 
+  box-shadow:
     0 -20px 60px rgba(40, 167, 69, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
   border-top: 3px solid #28a745;
@@ -161,11 +160,10 @@
 
 /* VIVID Green Footer */
 .footer.vivid-green-footer {
-  background: linear-gradient(135deg, #1e7e34 0%, #155d27 100%);
+  background: #00a896;
   color: white;
   padding: 4rem 0 2rem;
   margin-top: 0;
-  border-top: 3px solid #28a745;
 }
 
 .footer-content {
@@ -201,7 +199,7 @@
   .nav-links {
     gap: 0.8rem;
   }
-  
+
   .nav-link {
     font-size: 1rem;
     padding: 0.7rem 1.2rem;
@@ -212,44 +210,44 @@
   .top-navbar.vivid-green-nav {
     padding: 1rem 1.5rem;
   }
-  
+
   .nav-logo h2 {
     font-size: 1.6rem;
   }
-  
+
   .logo-icon {
     font-size: 1.4rem;
   }
-  
+
   .nav-links {
     gap: 0.6rem;
   }
-  
+
   .nav-link {
     font-size: 0.85rem;
     padding: 0.6rem 1rem;
   }
-  
+
   .register-btn {
     padding: 0.7rem 1.2rem;
     font-size: 0.85rem;
   }
-  
+
   .nav-icon {
     display: inline-block; /* Keep icons on mobile */
     font-size: 1rem;
     margin-right: 4px;
   }
-  
+
   .hero-section {
     padding-top: 90px;
   }
-  
+
   .main-content.vivid-green-bg {
     padding: 2.5rem 0;
     border-radius: 25px 25px 0 0;
   }
-  
+
   .container {
     padding: 0 1.2rem;
   }
@@ -261,12 +259,12 @@
     justify-content: flex-end;
     gap: 0.5rem;
   }
-  
+
   .nav-link {
     padding: 0.5rem 0.8rem;
     font-size: 0.8rem;
   }
-  
+
   .nav-logo h2 {
     font-size: 1.4rem;
   }
@@ -289,14 +287,16 @@
 
 @keyframes glow {
   from {
-    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5),
-                0 0 20px rgba(40, 167, 69, 0.3),
-                0 0 30px rgba(40, 167, 69, 0.1);
+    box-shadow:
+      0 0 10px rgba(40, 167, 69, 0.5),
+      0 0 20px rgba(40, 167, 69, 0.3),
+      0 0 30px rgba(40, 167, 69, 0.1);
   }
   to {
-    box-shadow: 0 0 15px rgba(40, 167, 69, 0.8),
-                0 0 25px rgba(40, 167, 69, 0.5),
-                0 0 35px rgba(40, 167, 69, 0.2);
+    box-shadow:
+      0 0 15px rgba(40, 167, 69, 0.8),
+      0 0 25px rgba(40, 167, 69, 0.5),
+      0 0 35px rgba(40, 167, 69, 0.2);
   }
 }
 
@@ -316,7 +316,7 @@ html {
 .nav-link.login-btn {
   background: none !important;
   border: none !important;
-  color: #4a6b73 !important;
+  color: #edeaea !important;
   box-shadow: none !important;
 }
 
@@ -325,13 +325,13 @@ html {
 .nav-link.login-btn:hover {
   background: none !important;
   border: none !important;
-  color: #00a86b !important;
+  color: #c9c9c8 !important;
 }
 
 /* Make register button green */
 .nav-link.register-btn {
-  background: #00a86b !important;
-  border: 2px solid #00a86b !important;
+  background: #17d891 !important;
+  border: 2px solid #17d891 !important;
   color: white !important;
   animation: none !important;
 }
@@ -349,12 +349,12 @@ html {
     padding: 60px 15px 40px;
     border-radius: 0 0 30px 30px;
   }
-  
+
   .main-content {
     padding: 2.5rem 0;
     border-radius: 30px 30px 0 0;
   }
-  
+
   .container {
     padding: 0 1.2rem;
   }
@@ -365,24 +365,24 @@ html {
     padding: 50px 12px 30px;
     border-radius: 0 0 25px 25px;
   }
-  
+
   .main-content {
     padding: 2rem 0;
     border-radius: 25px 25px 0 0;
   }
-  
+
   .container {
     padding: 0 1rem;
   }
-  
+
   .footer {
     padding: 3rem 0 1.5rem;
   }
-  
+
   .footer-logo h3 {
     font-size: 1.5rem;
   }
-  
+
   .footer-logo p {
     font-size: 0.9rem;
   }
@@ -390,14 +390,6 @@ html {
 /* =========================================== */
 /* FORCE NAVBAR WHITE TEXT OVERRIDE           */
 /* =========================================== */
-
-/* OVERRIDE ANY EXISTING NAVBAR STYLES */
-.navbar, 
-.top-navbar, 
-.vivid-green-nav {
-  background: linear-gradient(135deg, #00a86b 0%, #0d98ba 100%) !important;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
-}
 
 /* MAKE ALL NAV LINKS WHITE */
 .nav-link,
@@ -420,7 +412,7 @@ html {
 .features-btn::after,
 .contact-btn::after,
 .login-btn::after {
-  content: '' !important;
+  content: "" !important;
   position: absolute !important;
   bottom: 0 !important;
   left: 0 !important;
@@ -483,7 +475,7 @@ html {
 .mobile-nav-link::before,
 .mobile-nav-link::after {
   display: none !important;
-  content: '' !important;
+  content: "" !important;
 }
 
 .nav-link i,
@@ -495,11 +487,11 @@ html {
 }
 
 .nav-link.features-btn::before,
-.nav-link.contact-btn::before, 
+.nav-link.contact-btn::before,
 .nav-link.login-btn::before,
 .nav-link.register-btn::before {
   display: none !important;
-  content: '' !important;
+  content: "" !important;
 }
 
 /* MAKE NAVBAR TEXT BOLD WHITE */
@@ -522,5 +514,5 @@ html {
 /* Remove any icons */
 .nav-link::before {
   display: none !important;
-  content: '' !important;
+  content: "" !important;
 }
