@@ -37,7 +37,6 @@ const organImages = {
   uterus: uterusImg,
 };
 
-// Create an array with display names and colors
 const organs = [
   { name: "Brain", key: "brain", color: "#6c5ce7" },
   { name: "Heart", key: "heart", color: "#ff6b6b" },
@@ -62,6 +61,7 @@ const OrganSlider = () => {
   const trackRef = useRef(null);
   const [visibleCount, setVisibleCount] = useState(4);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const CLONE_COUNT = 6;
   const extendedOrgans = [
@@ -74,6 +74,7 @@ const OrganSlider = () => {
   const startIndex = CLONE_COUNT;
   const currentIndexRef = useRef(startIndex);
   const cardWidthRef = useRef(0);
+  const autoSlideTimerRef = useRef(null);
 
   // Update visible count based on screen width
   useEffect(() => {
@@ -90,7 +91,6 @@ const OrganSlider = () => {
     return () => window.removeEventListener("resize", updateVisibleCount);
   }, []);
 
-  // Calculate width of a single card including gap
   const getCardWidth = () => {
     if (!trackRef.current) return 0;
     const firstCard = trackRef.current.children[startIndex];
@@ -101,8 +101,7 @@ const OrganSlider = () => {
     return cardRect.width + gap;
   };
 
-  // Move to a specific index with infinite wrap
-  const goToIndex = (newIndex, direction = "next") => {
+  const goToIndex = (newIndex) => {
     if (isAnimating) return;
     setIsAnimating(true);
 
@@ -135,13 +134,13 @@ const OrganSlider = () => {
   };
 
   const nextSlide = () => {
-    const newIndex = currentIndexRef.current + 1;
-    goToIndex(newIndex, "next");
+    if (isAnimating) return;
+    goToIndex(currentIndexRef.current + 1);
   };
 
   const prevSlide = () => {
-    const newIndex = currentIndexRef.current - 1;
-    goToIndex(newIndex, "prev");
+    if (isAnimating) return;
+    goToIndex(currentIndexRef.current - 1);
   };
 
   // Initialize track position
@@ -167,6 +166,24 @@ const OrganSlider = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Auto‑slide timer
+  useEffect(() => {
+    const startTimer = () => {
+      if (autoSlideTimerRef.current) clearInterval(autoSlideTimerRef.current);
+      autoSlideTimerRef.current = setInterval(() => {
+        if (!isAnimating && !isHovered) {
+          nextSlide();
+        }
+      }, 3000); // 3 seconds interval
+    };
+
+    startTimer();
+
+    return () => {
+      if (autoSlideTimerRef.current) clearInterval(autoSlideTimerRef.current);
+    };
+  }, [isAnimating, isHovered, visibleCount]); // restart when visibleCount changes
+
   return (
     <section ref={containerRef} className="py-8 sm:py-10 md:py-12">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
@@ -175,7 +192,11 @@ const OrganSlider = () => {
         </h2>
       </div>
 
-      <div className="relative max-w-[1400px] mx-auto px-8 sm:px-10">
+      <div
+        className="relative max-w-[1400px] mx-auto px-8 sm:px-10"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <button
           onClick={prevSlide}
           disabled={isAnimating}

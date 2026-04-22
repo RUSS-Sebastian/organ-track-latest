@@ -3,21 +3,21 @@ import React from "react";
 const KeyBenefits = () => {
   const benefits = [
     {
-      icon: "❤️",
+      icon: "fa-solid fa-calendar-check", // Daily Health Tracking
       title: "Daily Health Tracking",
       description:
         "Answer structured daily lifestyle questions on diet, sleep, stress, hydration, and habits. Our system analyzes your inputs using medical rule-based logic to evaluate organ impact and detect early risk patterns.",
       quote: "Small daily habits create big health outcomes.",
     },
     {
-      icon: "🦴",
+      icon: "fa-solid fa-stethoscope", // Organ-Specific Monitoring
       title: "Organ-Specific Monitoring",
       description:
         "Select a specific organ and answer symptom-tracking questions tailored to it. The system generates personalized risk levels, recommendations, warnings, and visual organ score trends to support early prevention.",
       quote: "Listen to your organs before they whisper into emergencies.",
     },
     {
-      icon: "📊",
+      icon: "fa-solid fa-chart-simple", // Comprehensive Health Reports
       title: "Comprehensive Health Reports",
       description:
         "Generate detailed date-range reports including organ-wise scores, habit streaks, risk analysis, explanations, and overall health summaries — downloadable as structured PDF reports for tracking and sharing.",
@@ -26,7 +26,7 @@ const KeyBenefits = () => {
   ];
 
   return (
-    <section className="py-20 px-[10%] bg-[#f4f9f6] text-center">
+    <section className="py-20 px-[10%] bg-gradient-to-br from-[#f8fff8] to-[#e8ffe8] text-center">
       <div className="mb-16">
         <h2 className="text-3xl md:text-4xl text-[#1e5c3f] mb-3 font-bold">
           What Makes OrganTrack Special
@@ -43,7 +43,9 @@ const KeyBenefits = () => {
             key={index}
             className="bg-white p-8 md:p-9 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)]"
           >
-            <div className="text-5xl mb-5">{benefit.icon}</div>
+            <div className="text-5xl mb-5">
+              <i className={`${benefit.icon} text-[#00a86b]`}></i>
+            </div>
             <h3 className="text-xl md:text-2xl text-[#1e5c3f] mb-4 font-bold">
               {benefit.title}
             </h3>

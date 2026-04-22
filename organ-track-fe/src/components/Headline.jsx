@@ -7,6 +7,36 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Headline = () => {
   const container = useRef();
+  const headlineRef = useRef();
+
+  // Typing animation
+  useGSAP(
+    () => {
+      const headline = headlineRef.current;
+      if (!headline) return;
+
+      const fullText = "Track Your Organ Health with Precision";
+      headline.textContent = ""; // Start empty
+
+      const obj = { length: 0 };
+
+      gsap.to(obj, {
+        length: fullText.length,
+        duration: 4.0,
+        ease: `steps(${fullText.length})`, // one step per character
+        // or ease: "steps(30)" for smoother but still stepped
+        scrollTrigger: {
+          trigger: headline,
+          start: "top 85%",
+          toggleActions: "play none none none",
+        },
+        onUpdate: () => {
+          headline.textContent = fullText.substring(0, Math.floor(obj.length));
+        },
+      });
+    },
+    { scope: container },
+  );
 
   useGSAP(
     () => {
@@ -41,9 +71,12 @@ const Headline = () => {
       ref={container}
       className="max-w-[900px] mx-auto px-4 sm:px-5 py-6 sm:py-10"
     >
-      {/* Headline */}
-      <h1 className="text-[1.8rem] xs:text-[2rem] sm:text-[2.3rem] md:text-[2.8rem] lg:text-[3.2rem] font-bold leading-tight mb-4 sm:mb-6 md:mb-[25px] text-[#1a535c] [text-shadow:0_2px_4px_rgba(0,0,0,0.1)]">
-        Track Your Organ Health with Precision
+      {/* Headline with typing animation */}
+      <h1
+        ref={headlineRef}
+        className="text-[1.8rem] xs:text-[2rem] sm:text-[2.3rem] md:text-[2.8rem] lg:text-[3.2rem] font-bold leading-tight mb-4 sm:mb-6 md:mb-[25px] text-[#1a535c] [text-shadow:0_2px_4px_rgba(0,0,0,0.1)]"
+      >
+        {/* Text will be filled by GSAP */}
       </h1>
 
       {/* Subheadline */}

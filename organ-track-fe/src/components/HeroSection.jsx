@@ -3,173 +3,91 @@ import doctorImage from "../assets/doctor-image.png";
 
 const HeroSection = () => {
   return (
-    <section className="max-w-[1200px] mx-auto px-5 py-10">
-      <div className="flex items-center gap-10 lg:gap-[60px] flex-wrap">
-        {/* Visual Section (Left) */}
-        <div className="flex-1 min-w-[300px]">
-          <div className="bg-white/10 backdrop-blur-[20px] rounded-[30px] p-8 md:p-10 border-2 border-white/30 shadow-[0_20px_60px_rgba(0,0,0,0.2)]">
-            {/* Organ Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 mb-10">
-              {/* Heart */}
-              <div className="group flex flex-col items-center justify-center p-4 md:p-5 bg-white/15 backdrop-blur-[10px] rounded-[20px] border-2 border-white/40 transition-all duration-400 cursor-pointer relative overflow-hidden hover:bg-white/25 hover:-translate-y-2 hover:scale-[1.08] hover:border-white hover:shadow-[0_15px_35px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-white/5 before:z-[1] before:transition-all before:duration-400 hover:before:bg-gradient-to-br hover:before:from-white/20 hover:before:to-white/10">
-                <div className="w-[60px] md:w-[70px] h-[60px] md:h-[70px] flex items-center justify-center text-2xl md:text-4xl text-[rgba(255,107,107,0.9)] mb-2 relative z-[2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
-                  <i className="fas fa-heartbeat"></i>
-                </div>
-                <span className="text-xs md:text-sm text-white font-semibold text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] relative z-[2]">
-                  Heart
-                </span>
-              </div>
-
-              {/* Lungs */}
-              <div className="group flex flex-col items-center justify-center p-4 md:p-5 bg-white/15 backdrop-blur-[10px] rounded-[20px] border-2 border-white/40 transition-all duration-400 cursor-pointer relative overflow-hidden hover:bg-white/25 hover:-translate-y-2 hover:scale-[1.08] hover:border-white hover:shadow-[0_15px_35px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-white/5 before:z-[1] before:transition-all before:duration-400 hover:before:bg-gradient-to-br hover:before:from-white/20 hover:before:to-white/10">
-                <div className="w-[60px] md:w-[70px] h-[60px] md:h-[70px] flex items-center justify-center text-2xl md:text-4xl text-[rgba(78,205,196,0.9)] mb-2 relative z-[2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
-                  <i className="fas fa-lungs"></i>
-                </div>
-                <span className="text-xs md:text-sm text-white font-semibold text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] relative z-[2]">
-                  Lungs
-                </span>
-              </div>
-
-              {/* Liver */}
-              <div className="group flex flex-col items-center justify-center p-4 md:p-5 bg-white/15 backdrop-blur-[10px] rounded-[20px] border-2 border-white/40 transition-all duration-400 cursor-pointer relative overflow-hidden hover:bg-white/25 hover:-translate-y-2 hover:scale-[1.08] hover:border-white hover:shadow-[0_15px_35px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-white/5 before:z-[1] before:transition-all before:duration-400 hover:before:bg-gradient-to-br hover:before:from-white/20 hover:before:to-white/10">
-                <div className="w-[60px] md:w-[70px] h-[60px] md:h-[70px] flex items-center justify-center text-2xl md:text-4xl text-[rgba(255,230,109,0.9)] mb-2 relative z-[2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
-                  <i className="fas fa-prescription-bottle"></i>
-                </div>
-                <span className="text-xs md:text-sm text-white font-semibold text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] relative z-[2]">
-                  Liver
-                </span>
-              </div>
-
-              {/* Kidney */}
-              <div className="group flex flex-col items-center justify-center p-4 md:p-5 bg-white/15 backdrop-blur-[10px] rounded-[20px] border-2 border-white/40 transition-all duration-400 cursor-pointer relative overflow-hidden hover:bg-white/25 hover:-translate-y-2 hover:scale-[1.08] hover:border-white hover:shadow-[0_15px_35px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-white/5 before:z-[1] before:transition-all before:duration-400 hover:before:bg-gradient-to-br hover:before:from-white/20 hover:before:to-white/10">
-                <div className="w-[60px] md:w-[70px] h-[60px] md:h-[70px] flex items-center justify-center text-2xl md:text-4xl text-[rgba(26,83,92,0.9)] mb-2 relative z-[2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
-                  <i className="fas fa-filter"></i>
-                </div>
-                <span className="text-xs md:text-sm text-white font-semibold text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] relative z-[2]">
-                  Kidney
-                </span>
-              </div>
-
-              {/* Brain */}
-              <div className="group flex flex-col items-center justify-center p-4 md:p-5 bg-white/15 backdrop-blur-[10px] rounded-[20px] border-2 border-white/40 transition-all duration-400 cursor-pointer relative overflow-hidden hover:bg-white/25 hover:-translate-y-2 hover:scale-[1.08] hover:border-white hover:shadow-[0_15px_35px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-white/5 before:z-[1] before:transition-all before:duration-400 hover:before:bg-gradient-to-br hover:before:from-white/20 hover:before:to-white/10">
-                <div className="w-[60px] md:w-[70px] h-[60px] md:h-[70px] flex items-center justify-center text-2xl md:text-4xl text-[rgba(108,92,231,0.9)] mb-2 relative z-[2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
-                  <i className="fas fa-brain"></i>
-                </div>
-                <span className="text-xs md:text-sm text-white font-semibold text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] relative z-[2]">
-                  Brain
-                </span>
-              </div>
-
-              {/* Stomach */}
-              <div className="group flex flex-col items-center justify-center p-4 md:p-5 bg-white/15 backdrop-blur-[10px] rounded-[20px] border-2 border-white/40 transition-all duration-400 cursor-pointer relative overflow-hidden hover:bg-white/25 hover:-translate-y-2 hover:scale-[1.08] hover:border-white hover:shadow-[0_15px_35px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-white/5 before:z-[1] before:transition-all before:duration-400 hover:before:bg-gradient-to-br hover:before:from-white/20 hover:before:to-white/10">
-                <div className="w-[60px] md:w-[70px] h-[60px] md:h-[70px] flex items-center justify-center text-2xl md:text-4xl text-[rgba(253,121,168,0.9)] mb-2 relative z-[2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
-                  <i className="fas fa-tint"></i>
-                </div>
-                <span className="text-xs md:text-sm text-white font-semibold text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] relative z-[2]">
-                  Stomach
-                </span>
-              </div>
-
-              {/* Eyes */}
-              <div className="group flex flex-col items-center justify-center p-4 md:p-5 bg-white/15 backdrop-blur-[10px] rounded-[20px] border-2 border-white/40 transition-all duration-400 cursor-pointer relative overflow-hidden hover:bg-white/25 hover:-translate-y-2 hover:scale-[1.08] hover:border-white hover:shadow-[0_15px_35px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-white/5 before:z-[1] before:transition-all before:duration-400 hover:before:bg-gradient-to-br hover:before:from-white/20 hover:before:to-white/10">
-                <div className="w-[60px] md:w-[70px] h-[60px] md:h-[70px] flex items-center justify-center text-2xl md:text-4xl text-[rgba(0,206,201,0.9)] mb-2 relative z-[2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
-                  <i className="fas fa-eye"></i>
-                </div>
-                <span className="text-xs md:text-sm text-white font-semibold text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] relative z-[2]">
-                  Eyes
-                </span>
-              </div>
-
-              {/* Skin */}
-              <div className="group flex flex-col items-center justify-center p-4 md:p-5 bg-white/15 backdrop-blur-[10px] rounded-[20px] border-2 border-white/40 transition-all duration-400 cursor-pointer relative overflow-hidden hover:bg-white/25 hover:-translate-y-2 hover:scale-[1.08] hover:border-white hover:shadow-[0_15px_35px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-white/5 before:z-[1] before:transition-all before:duration-400 hover:before:bg-gradient-to-br hover:before:from-white/20 hover:before:to-white/10">
-                <div className="w-[60px] md:w-[70px] h-[60px] md:h-[70px] flex items-center justify-center text-2xl md:text-4xl text-[rgba(250,177,160,0.9)] mb-2 relative z-[2] drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
-                  <i className="fas fa-hand-sparkles"></i>
-                </div>
-                <span className="text-xs md:text-sm text-white font-semibold text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] relative z-[2]">
-                  Skin
-                </span>
-              </div>
-            </div>
-
-            {/* Doctor Section */}
-            <div className="bg-white/90 backdrop-blur-[15px] rounded-[25px] p-6 md:p-8 border-2 border-white/60 flex flex-col lg:flex-row items-center gap-6 md:gap-8 relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-[rgba(0,168,107,0.05)] before:to-[rgba(13,152,186,0.05)] before:z-[1]">
-              <div className="flex-shrink-0 relative z-[2]">
+    <section className="max-w-[1200px] mx-auto px-4 sm:px-5 py-8 sm:py-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        {/* Left Column - Doctor Card */}
+        <div className="order-2 lg:order-1">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-3xl p-6 md:p-8 border border-white/40 shadow-xl max-w-md lg:max-w-none mx-auto">
+            <div className="flex flex-col items-center text-center">
+              {/* Doctor Image - centered above text */}
+              <div className="mb-4">
                 <img
                   src={doctorImage}
                   alt="Medical Professional"
-                  className="w-[150px] md:w-[200px] h-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)]"
+                  className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 object-contain drop-shadow-lg"
                 />
               </div>
-              <div className="flex-1 text-center lg:text-left relative z-[2]">
-                <h3 className="text-[#1a535c] text-xl md:text-2xl lg:text-3xl mb-3 flex items-center justify-center lg:justify-start gap-3">
-                  <i className="fas fa-shield-alt text-[#00a86b] text-2xl md:text-3xl"></i>
-                  Medical Advisory Supported
-                </h3>
-                <p className="text-[#4a6b73] text-sm md:text-base leading-relaxed mb-5">
-                  Our organ tracking algorithms are reviewed by healthcare
-                  professionals to ensure accurate, reliable health monitoring.
-                </p>
-                <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                  <div className="flex items-center gap-2 text-[#1a535c] text-xs md:text-sm font-medium px-4 py-2 bg-[rgba(0,168,107,0.1)] rounded-[20px] border border-[rgba(0,168,107,0.2)]">
-                    <i className="fas fa-check-circle text-[#00a86b]"></i>
-                    <span>HIPAA Compliant</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[#1a535c] text-xs md:text-sm font-medium px-4 py-2 bg-[rgba(0,168,107,0.1)] rounded-[20px] border border-[rgba(0,168,107,0.2)]">
-                    <i className="fas fa-check-circle text-[#00a86b]"></i>
-                    <span>Doctor Reviewed</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[#1a535c] text-xs md:text-sm font-medium px-4 py-2 bg-[rgba(0,168,107,0.1)] rounded-[20px] border border-[rgba(0,168,107,0.2)]">
-                    <i className="fas fa-check-circle text-[#00a86b]"></i>
-                    <span>Evidence-Based</span>
-                  </div>
-                </div>
+
+              {/* Doctor Info */}
+              <h3 className="text-[#1a535c] text-xl sm:text-2xl md:text-3xl font-bold mb-2 flex items-center justify-center gap-0.5">
+                <span>Medical Advisory Supported</span>
+              </h3>
+              <p className="text-[#4a6b73] text-sm sm:text-base leading-relaxed mb-4 max-w-md">
+                Our organ tracking algorithms are reviewed by healthcare
+                professionals to ensure accurate, reliable health monitoring.
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Badge>HIPAA Compliant</Badge>
+                <Badge>Doctor Reviewed</Badge>
+                <Badge>Evidence-Based</Badge>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Text Section (Right) */}
-        <div className="flex-1 min-w-[300px] text-center lg:text-left">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl text-white mb-5 leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.1)]">
-            Professional Organ Health Tracking
-          </h1>
-          <p className="text-lg md:text-xl text-white/95 mb-8 md:mb-10 leading-relaxed font-light">
-            Monitor your vital organs with medical-grade precision. Get insights
-            that help you make informed health decisions.
-          </p>
+        {/* Right Column - Text & CTA */}
+        <div className="order-1 lg:order-2">
+          {/* Container with max-width and auto margins for balanced centering */}
+          <div className="max-w-2xl mx-auto lg:mx-0 lg:ml-auto lg:mr-0 text-center lg:text-left">
+            {/* Headline */}
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-5xl font-bold text-white leading-tight mb-4 drop-shadow-lg lg:text-center">
+              Professional Organ Health Tracking
+            </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 md:mb-10">
-            <div className="flex items-center gap-3 text-white text-sm md:text-base bg-white/10 backdrop-blur-[10px] px-5 py-3 rounded-[10px] border border-white/20">
-              <i className="fas fa-check-circle text-[#e8f5e9] text-base md:text-lg"></i>
-              <span>Medical advisory supported</span>
-            </div>
-            <div className="flex items-center gap-3 text-white text-sm md:text-base bg-white/10 backdrop-blur-[10px] px-5 py-3 rounded-[10px] border border-white/20">
-              <i className="fas fa-check-circle text-[#e8f5e9] text-base md:text-lg"></i>
-              <span>Clinical accuracy standards</span>
-            </div>
-            <div className="flex items-center gap-3 text-white text-sm md:text-base bg-white/10 backdrop-blur-[10px] px-5 py-3 rounded-[10px] border border-white/20">
-              <i className="fas fa-check-circle text-[#e8f5e9] text-base md:text-lg"></i>
-              <span>Professional health reports</span>
-            </div>
-            <div className="flex items-center gap-3 text-white text-sm md:text-base bg-white/10 backdrop-blur-[10px] px-5 py-3 rounded-[10px] border border-white/20">
-              <i className="fas fa-check-circle text-[#e8f5e9] text-base md:text-lg"></i>
-              <span>Secure & confidential</span>
-            </div>
-          </div>
+            {/* Subheadline */}
+            <p className="text-base xs:text-lg sm:text-xl text-white/90 mb-6 sm:mb-8 leading-relaxed lg:text-center">
+              Monitor your vital organs with medical-grade precision. Get
+              insights that help you make informed health decisions.
+            </p>
 
-          <div className="flex justify-center lg:justify-start">
-            <button
-              className="bg-white text-[#00a86b] font-semibold text-base md:text-lg px-6 md:px-8 py-4 rounded-full flex items-center gap-3 transition-all duration-300 shadow-[0_10px_30px_rgba(255,255,255,0.2)] hover:-translate-y-1 hover:scale-105 hover:shadow-[0_15px_40px_rgba(255,255,255,0.3)] border-none cursor-pointer"
-              onClick={() => (window.location.href = "/login")}
-            >
-              <i className="fas fa-play-circle"></i>
-              Start Monitoring
-            </button>
+            {/* Features Grid – centered on all screens */}
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 mb-6 sm:mb-8 max-w-md lg:max-w-xl mx-auto">
+              <FeatureItem>Medical advisory supported</FeatureItem>
+              <FeatureItem>Clinical accuracy standards</FeatureItem>
+              <FeatureItem>Professional health reports</FeatureItem>
+              <FeatureItem>Secure & confidential</FeatureItem>
+            </div>
+
+            {/* CTA Button – centered */}
+            <div className="flex justify-center lg:justify-center">
+              <button
+                onClick={() => (window.location.href = "/login")}
+                className="bg-white text-[#00a86b] font-semibold text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-full flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                <i className="fas fa-play-circle"></i>
+                Start Monitoring
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
 };
+
+// Helper components
+const Badge = ({ children }) => (
+  <div className="flex items-center gap-1.5 text-[#1a535c] text-xs sm:text-sm font-medium px-3 py-1.5 bg-[rgba(0,168,107,0.1)] rounded-full border border-[rgba(0,168,107,0.2)]">
+    <i className="fas fa-check-circle text-[#00a86b] text-xs"></i>
+    <span>{children}</span>
+  </div>
+);
+
+const FeatureItem = ({ children }) => (
+  <div className="flex items-center gap-2 text-white text-sm sm:text-base bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20">
+    <i className="fas fa-check-circle text-[#e8f5e9] text-base"></i>
+    <span>{children}</span>
+  </div>
+);
 
 export default HeroSection;
