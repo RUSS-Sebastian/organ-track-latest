@@ -19,6 +19,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import AiTest from "./pages/AiTest";
 import TrackAnalysisPage from "./pages/Track";
 import ReportDetails from "./pages/ReportDetails";
+
 function App() {
   return (
     <BrowserRouter>

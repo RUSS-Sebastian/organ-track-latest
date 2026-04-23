@@ -37,31 +37,82 @@ const organImages = {
   uterus: uterusImg,
 };
 
-const organs = [
-  { name: "Brain", key: "brain", color: "#6c5ce7" },
-  { name: "Heart", key: "heart", color: "#ff6b6b" },
-  { name: "Lungs", key: "lungs", color: "#4ecdc4" },
-  { name: "Stomach", key: "stomach", color: "#fd79a8" },
-  { name: "Kidney", key: "kidney", color: "#c44569" },
-  { name: "Liver", key: "liver", color: "#ffe66d" },
-  { name: "Muscles", key: "muscles", color: "#e17055" },
-  { name: "Intestine", key: "intestine", color: "#a29bfe" },
-  { name: "Gall Bladder", key: "gallBladder", color: "#b2bec3" },
-  { name: "Pancreas", key: "pancreas", color: "#74b9ff" },
-  { name: "Skin", key: "skin", color: "#fab1a0" },
-  { name: "Bladder", key: "bladder", color: "#81ecec" },
-  { name: "Blood Vessels", key: "bloodVessels", color: "#ff9ff3" },
-  { name: "Bone", key: "bone", color: "#fdcb6e" },
-  { name: "Prostate", key: "prostate", color: "#55efc4" },
-  { name: "Uterus", key: "uterus", color: "#dfe6e9" },
+const organKeys = [
+  { key: "brain", color: "#6c5ce7" },
+  { key: "heart", color: "#ff6b6b" },
+  { key: "lungs", color: "#4ecdc4" },
+  { key: "stomach", color: "#fd79a8" },
+  { key: "kidney", color: "#c44569" },
+  { key: "liver", color: "#ffe66d" },
+  { key: "muscles", color: "#e17055" },
+  { key: "intestine", color: "#a29bfe" },
+  { key: "gallBladder", color: "#b2bec3" },
+  { key: "pancreas", color: "#74b9ff" },
+  { key: "skin", color: "#fab1a0" },
+  { key: "bladder", color: "#81ecec" },
+  { key: "bloodVessels", color: "#ff9ff3" },
+  { key: "bone", color: "#fdcb6e" },
+  { key: "prostate", color: "#55efc4" },
+  { key: "uterus", color: "#dfe6e9" },
 ];
 
-const OrganSlider = () => {
+const translations = {
+  en: {
+    title: "Organs you can track",
+    organNames: {
+      brain: "Brain",
+      heart: "Heart",
+      lungs: "Lungs",
+      stomach: "Stomach",
+      kidney: "Kidney",
+      liver: "Liver",
+      muscles: "Muscles",
+      intestine: "Intestine",
+      gallBladder: "Gall Bladder",
+      pancreas: "Pancreas",
+      skin: "Skin",
+      bladder: "Bladder",
+      bloodVessels: "Blood Vessels",
+      bone: "Bone",
+      prostate: "Prostate",
+      uterus: "Uterus",
+    },
+  },
+  mm: {
+    title: "စောင့်ကြည့်နိုင်သော အင်္ဂါများ",
+    organNames: {
+      brain: "ဦးနှောက်",
+      heart: "နှလုံး",
+      lungs: "အဆုတ်",
+      stomach: "အစာအိမ်",
+      kidney: "ကျောက်ကပ်",
+      liver: "အသည်း",
+      muscles: "ကြွက်သား",
+      intestine: "အူလမ်းကြောင်း",
+      gallBladder: "သည်းခြေအိတ်",
+      pancreas: "ပန်ကရိယ",
+      skin: "အရေပြား",
+      bladder: "ဆီးအိမ်",
+      bloodVessels: "သွေးကြောများ",
+      bone: "အရိုး",
+      prostate: "ဆီးကြို",
+      uterus: "သားအိမ်",
+    },
+  },
+};
+
+const OrganSlider = ({ language = "en" }) => {
   const containerRef = useRef(null);
   const trackRef = useRef(null);
   const [visibleCount, setVisibleCount] = useState(4);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  const t = translations[language] || translations.en;
+  const organs = organKeys.map((item) => ({
+    ...item,
+    name: t.organNames[item.key] || item.key,
+  }));
 
   const CLONE_COUNT = 6;
   const extendedOrgans = [
@@ -106,9 +157,18 @@ const OrganSlider = () => {
     setIsAnimating(true);
 
     const track = trackRef.current;
-    const cardWidth = getCardWidth();
-    cardWidthRef.current = cardWidth;
+    let cardWidth = getCardWidth();
 
+    // Safety: if cardWidth is 0 (e.g., track not yet measured), abort and retry next frame
+    if (!cardWidth || cardWidth <= 0) {
+      requestAnimationFrame(() => {
+        setIsAnimating(false);
+        goToIndex(newIndex);
+      });
+      return;
+    }
+
+    cardWidthRef.current = cardWidth;
     const distance = -newIndex * cardWidth;
 
     gsap.to(track, {
@@ -116,6 +176,11 @@ const OrganSlider = () => {
       duration: 0.6,
       ease: "power2.inOut",
       onComplete: () => {
+        let currentCardWidth = getCardWidth();
+        if (!currentCardWidth || currentCardWidth <= 0) {
+          currentCardWidth = cardWidthRef.current; // fallback to last known
+        }
+
         let adjustedIndex = newIndex;
 
         if (newIndex >= startIndex + totalOriginal) {
@@ -125,8 +190,9 @@ const OrganSlider = () => {
         }
 
         if (adjustedIndex !== newIndex) {
-          gsap.set(track, { x: -adjustedIndex * cardWidth });
+          gsap.set(track, { x: -adjustedIndex * currentCardWidth });
         }
+
         currentIndexRef.current = adjustedIndex;
         setIsAnimating(false);
       },
@@ -144,14 +210,17 @@ const OrganSlider = () => {
   };
 
   // Initialize track position
-  useGSAP(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const cardWidth = getCardWidth();
-    cardWidthRef.current = cardWidth;
-    gsap.set(track, { x: -startIndex * cardWidth });
-    currentIndexRef.current = startIndex;
-  }, [visibleCount]);
+  useGSAP(
+    () => {
+      const track = trackRef.current;
+      if (!track) return;
+      const cardWidth = getCardWidth();
+      cardWidthRef.current = cardWidth;
+      gsap.set(track, { x: -startIndex * cardWidth });
+      currentIndexRef.current = startIndex;
+    },
+    { dependencies: [visibleCount, language] },
+  );
 
   // Recalculate position on resize
   useEffect(() => {
@@ -166,7 +235,7 @@ const OrganSlider = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Auto‑slide timer
+  // Auto-slide timer
   useEffect(() => {
     const startTimer = () => {
       if (autoSlideTimerRef.current) clearInterval(autoSlideTimerRef.current);
@@ -174,7 +243,7 @@ const OrganSlider = () => {
         if (!isAnimating && !isHovered) {
           nextSlide();
         }
-      }, 3000); // 3 seconds interval
+      }, 3000);
     };
 
     startTimer();
@@ -182,13 +251,13 @@ const OrganSlider = () => {
     return () => {
       if (autoSlideTimerRef.current) clearInterval(autoSlideTimerRef.current);
     };
-  }, [isAnimating, isHovered, visibleCount]); // restart when visibleCount changes
+  }, [isAnimating, isHovered, visibleCount]);
 
   return (
     <section ref={containerRef} className="py-8 sm:py-10 md:py-12">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-6 sm:mb-8 md:mb-10 drop-shadow-md">
-          Organs you can track
+          {t.title}
         </h2>
       </div>
 

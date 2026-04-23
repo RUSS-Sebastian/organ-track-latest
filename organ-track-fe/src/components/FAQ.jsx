@@ -1,40 +1,90 @@
 import React, { useState } from "react";
 
-const FAQ = () => {
-  const [activeIndex, setActiveIndex] = useState(null);
+const translations = {
+  en: {
+    title: "Frequently Asked Questions",
+    subtitle: "Get started with OrganTrack in minutes",
+    faqs: [
+      {
+        question: "How do I start using OrganTrack?",
+        answer:
+          "Simply click 'Start Tracking Now' on our homepage. No registration needed - you can begin monitoring your organs immediately with our free basic features.",
+      },
+      {
+        question: "Which organs can I track?",
+        answer:
+          "OrganTrack allows you to monitor 10+ vital organs including heart, lungs, liver, kidneys, brain, digestive system, and more. Each organ has specific health indicators.",
+      },
+      {
+        question: "How often should I check my organ health?",
+        answer:
+          "We recommend daily check-ins for consistent monitoring. However, you can track as frequently as you'd like based on your health goals and needs.",
+      },
+      {
+        question: "Can I generate reports without registering?",
+        answer:
+          "Yes! You can generate basic health reports immediately. Registration unlocks additional features like long-term trend analysis and detailed PDF reports.",
+      },
+      {
+        question: "Is my health data saved if I don't register?",
+        answer:
+          "Session data is saved locally in your browser. For long-term tracking across devices, we recommend creating a free account.",
+      },
+      {
+        question: "What's the difference between free and registered features?",
+        answer:
+          "Free features include basic organ tracking and reports. Registration adds: long-term history, PDF report downloads, personalized suggestions, and multi-device sync.",
+      },
+    ],
+    ctaText: "Ready to start your organ health journey?",
+    ctaButton: "Start Tracking Now",
+  },
+  mm: {
+    title: "အမေးများသော မေးခွန်းများ",
+    subtitle: "မိနစ်ပိုင်းအတွင်း OrganTrack ဖြင့် စတင်ပါ",
+    faqs: [
+      {
+        question: "OrganTrack ကို ဘယ်လိုစသုံးရမလဲ။",
+        answer:
+          "ကျွန်ုပ်တို့၏ ပင်မစာမျက်နှာရှိ 'ယခုစတင်စောင့်ကြည့်ပါ' ကို နှိပ်ပါ။ မှတ်ပုံတင်ရန်မလိုပါ - အခမဲ့အခြေခံလုပ်ဆောင်ချက်များဖြင့် သင့်အင်္ဂါများကို ချက်ချင်းစတင်စောင့်ကြည့်နိုင်ပါသည်။",
+      },
+      {
+        question: "ဘယ်အင်္ဂါတွေကို စောင့်ကြည့်နိုင်မလဲ။",
+        answer:
+          "OrganTrack သည် နှလုံး၊ အဆုတ်၊ အသည်း၊ ကျောက်ကပ်၊ ဦးနှောက်၊ အစာခြေစနစ်နှင့် အခြားအရာများအပါအဝင် အရေးကြီးအင်္ဂါ ၁၀ ခုကျော်ကို စောင့်ကြည့်နိုင်ပါသည်။ အင်္ဂါတစ်ခုစီတွင် တိကျသောကျန်းမာရေးညွှန်းကိန်းများရှိသည်။",
+      },
+      {
+        question: "အင်္ဂါကျန်းမာရေးကို ဘယ်နှစ်ကြိမ်စစ်ဆေးသင့်သလဲ။",
+        answer:
+          "တသမတ်တည်းစောင့်ကြည့်ရန်အတွက် နေ့စဉ်စစ်ဆေးရန် အကြံပြုပါသည်။ သို့သော် သင့်ကျန်းမာရေးပန်းတိုင်နှင့် လိုအပ်ချက်များပေါ်မူတည်၍ သင်နှစ်သက်သလောက် မကြာခဏစောင့်ကြည့်နိုင်ပါသည်။",
+      },
+      {
+        question: "မှတ်ပုံမတင်ဘဲ အစီရင်ခံစာထုတ်နိုင်သလား။",
+        answer:
+          "ဟုတ်ကဲ့။ အခြေခံကျန်းမာရေးအစီရင်ခံစာများကို ချက်ချင်းထုတ်နိုင်ပါသည်။ မှတ်ပုံတင်ခြင်းဖြင့် ရေရှည်လမ်းကြောင်းသစ်ခွဲခြမ်းစိတ်ဖြာခြင်းနှင့် အသေးစိတ် PDF အစီရင်ခံစာများကဲ့သို့သော ထပ်ဆောင်းလုပ်ဆောင်ချက်များကို သော့ဖွင့်နိုင်ပါသည်။",
+      },
+      {
+        question:
+          "မှတ်ပုံမတင်ရင် ကျွန်တော့်ကျန်းမာရေးဒေတာကို သိမ်းထားပေးမှာလား။",
+        answer:
+          "ဆက်ရှင်ဒေတာကို သင့်ဘရောက်ဇာတွင် စက်တွင်းသိမ်းဆည်းထားပါသည်။ စက်ပစ္စည်းအများအပြားတွင် ရေရှည်စောင့်ကြည့်ရန်အတွက် အခမဲ့အကောင့်ဖွင့်ရန် အကြံပြုပါသည်။",
+      },
+      {
+        question:
+          "အခမဲ့နှင့် မှတ်ပုံတင်ထားသော လုပ်ဆောင်ချက်များ ကွာခြားချက်က ဘာလဲ။",
+        answer:
+          "အခမဲ့လုပ်ဆောင်ချက်များတွင် အခြေခံအင်္ဂါစောင့်ကြည့်ခြင်းနှင့် အစီရင်ခံစာများပါဝင်သည်။ မှတ်ပုံတင်ခြင်းဖြင့် ရေရှည်မှတ်တမ်း၊ PDF အစီရင်ခံစာဒေါင်းလုဒ်များ၊ ကိုယ်ပိုင်အကြံပြုချက်များနှင့် စက်မျိုးစုံချိန်ကိုက်ခြင်းတို့ကို ထည့်သွင်းပေးပါသည်။",
+      },
+    ],
+    ctaText: "သင့်အင်္ဂါကျန်းမာရေးခရီးကို စတင်ရန် အဆင်သင့်ဖြစ်ပြီလား။",
+    ctaButton: "ယခုစတင်စောင့်ကြည့်ပါ",
+  },
+};
 
-  const faqs = [
-    {
-      question: "How do I start using OrganTrack?",
-      answer:
-        "Simply click 'Start Tracking Now' on our homepage. No registration needed - you can begin monitoring your organs immediately with our free basic features.",
-    },
-    {
-      question: "Which organs can I track?",
-      answer:
-        "OrganTrack allows you to monitor 10+ vital organs including heart, lungs, liver, kidneys, brain, digestive system, and more. Each organ has specific health indicators.",
-    },
-    {
-      question: "How often should I check my organ health?",
-      answer:
-        "We recommend daily check-ins for consistent monitoring. However, you can track as frequently as you'd like based on your health goals and needs.",
-    },
-    {
-      question: "Can I generate reports without registering?",
-      answer:
-        "Yes! You can generate basic health reports immediately. Registration unlocks additional features like long-term trend analysis and detailed PDF reports.",
-    },
-    {
-      question: "Is my health data saved if I don't register?",
-      answer:
-        "Session data is saved locally in your browser. For long-term tracking across devices, we recommend creating a free account.",
-    },
-    {
-      question: "What's the difference between free and registered features?",
-      answer:
-        "Free features include basic organ tracking and reports. Registration adds: long-term history, PDF report downloads, personalized suggestions, and multi-device sync.",
-    },
-  ];
+const FAQ = ({ language = "en" }) => {
+  const [activeIndex, setActiveIndex] = useState(null);
+  const t = translations[language] || translations.en;
+  const faqs = t.faqs;
 
   const toggleFAQ = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
@@ -44,11 +94,9 @@ const FAQ = () => {
     <section className="py-16 md:py-20 px-5 max-w-[900px] mx-auto">
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl text-[#1e5c3f] font-bold mb-2">
-          Frequently Asked Questions
+          {t.title}
         </h2>
-        <p className="text-lg text-[#4f6f60]">
-          Get started with OrganTrack in minutes
-        </p>
+        <p className="text-lg text-[#4f6f60]">{t.subtitle}</p>
       </div>
 
       <div className="space-y-4">
@@ -91,14 +139,14 @@ const FAQ = () => {
 
       <div className="text-center mt-16 p-8 md:p-10 bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] rounded-2xl border-2 border-[#00a86b]">
         <p className="text-xl md:text-2xl text-[#1a535c] mb-6 font-medium">
-          Ready to start your organ health journey?
+          {t.ctaText}
         </p>
         <button
           className="w-full md:w-auto bg-gradient-to-r from-[#00a86b] to-[#0d98ba] text-white border-none py-4 px-8 md:py-5 md:px-9 text-base md:text-lg rounded-full cursor-pointer inline-flex items-center justify-center gap-3 transition-all duration-300 font-semibold shadow-[0_8px_20px_rgba(0,168,107,0.3)] hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,168,107,0.4)]"
           onClick={() => (window.location.href = "/login")}
         >
           <i className="fas fa-heartbeat"></i>
-          Start Tracking Now
+          {t.ctaButton}
         </button>
       </div>
     </section>

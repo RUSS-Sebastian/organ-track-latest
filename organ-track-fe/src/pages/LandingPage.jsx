@@ -6,13 +6,43 @@ import CTASection from "../components/CTASection";
 import TrustElements from "../components/TrustElements";
 import FAQ from "../components/FAQ";
 import OrganCarousel from "../components/OrganCarousel";
+import { LanguageProvider, useLanguage } from "../context/LanguageContext";
+
+// Translations object
+const translations = {
+  en: {
+    logo: "OrganTrack",
+    tagline: "Your health monitoring companion",
+    login: "Log In",
+    getStarted: "Get Started",
+    copyright:
+      "© 2026 OrganTrack. All rights reserved. For educational purposes.",
+  },
+  mm: {
+    logo: "အော်ဂန်ထရက်",
+    tagline: "သင့်ကျန်းမာရေးစောင့်ကြည့်ဖော်",
+    login: "အကောင့်ဝင်ရန်",
+    getStarted: "စတင်ရန်",
+    copyright: "© ၂၀၂၆ အော်ဂန်ထရက်။ ပညာရေးအတွက်သာ။",
+  },
+};
 
 const LandingPage = () => {
+  return (
+    <LanguageProvider>
+      <LandingPageContent />
+    </LanguageProvider>
+  );
+};
+
+const LandingPageContent = () => {
+  const { language, setLanguage } = useLanguage();
+  const t = translations[language];
+
   const handleNavigation = (path) => {
     window.location.href = path;
   };
 
-  const [language, setLanguage] = useState("en");
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const langDropdownRef = useRef(null);
 
@@ -54,7 +84,7 @@ const LandingPage = () => {
                     <i className="fas fa-heartbeat text-white text-base sm:text-lg md:text-xl"></i>
                   </div>
                   <h2 className="hidden sm:block text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight drop-shadow-sm transition-all duration-300">
-                    Organ<span className="text-[#e8f5e9]">Track</span>
+                    {t.logo}
                   </h2>
                 </div>
 
@@ -105,14 +135,14 @@ const LandingPage = () => {
                     className="text-white font-medium text-xs sm:text-sm md:text-base px-2.5 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full transition-all duration-300 hover:bg-white/20 whitespace-nowrap"
                     onClick={() => handleNavigation("/login")}
                   >
-                    Log In
+                    {t.login}
                   </button>
 
                   <button
                     className="bg-white text-[#00a86b] font-semibold text-xs sm:text-sm md:text-base px-2.5 sm:px-5 md:px-6 py-1.5 sm:py-2 md:py-2.5 rounded-full shadow-md shadow-black/10 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#00a86b]/20 border border-white whitespace-nowrap"
                     onClick={() => handleNavigation("/register")}
                   >
-                    Get Started
+                    {t.getStarted}
                   </button>
                 </div>
               </div>
@@ -122,18 +152,18 @@ const LandingPage = () => {
 
         {/* Hero Section Wrapper */}
         <section className="pt-4 sm:pt-6 md:pt-8 relative">
-          <Headline />
-          <OrganCarousel />
-          <HeroSection />
+          <Headline language={language} />
+          <OrganCarousel language={language} />
+          <HeroSection language={language} />
         </section>
 
         {/* Main Content */}
         <div className="bg-gradient-to-br from-[#f8fff8] to-[#e8ffe8] py-10 md:py-16 rounded-t-[25px] md:rounded-t-[40px] mt-12 shadow-[0_-20px_60px_rgba(40,167,69,0.25),inset_0_1px_0_rgba(255,255,255,0.6)] border-t-4 border-[#28a745]">
           <div className="max-w-[1200px] mx-auto px-4 md:px-8">
-            <KeyBenefits />
-            <TrustElements />
-            <CTASection />
-            <FAQ />
+            <KeyBenefits language={language} />
+            <TrustElements language={language} />
+            <CTASection language={language} />
+            <FAQ language={language} />
           </div>
         </div>
 
@@ -142,16 +172,15 @@ const LandingPage = () => {
           <div className="max-w-[1200px] mx-auto px-4 md:px-8 text-center">
             <div className="mb-8">
               <h3 className="text-3xl md:text-4xl font-bold mb-3 drop-shadow-lg">
-                OrganTrack
+                {t.logo}
               </h3>
               <p className="text-white/90 text-lg md:text-xl font-medium">
-                Your health monitoring companion
+                {t.tagline}
               </p>
             </div>
             <div className="mt-12 pt-8 border-t-2 border-white/30">
               <p className="text-white/80 text-sm md:text-base">
-                © 2026 OrganTrack. All rights reserved. For educational
-                purposes.
+                {t.copyright}
               </p>
             </div>
           </div>
