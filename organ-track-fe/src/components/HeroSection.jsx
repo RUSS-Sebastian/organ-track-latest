@@ -19,9 +19,9 @@ const translations = {
     cta: "Start Monitoring",
   },
   mm: {
-    doctorTitle: "ဆေးဘက်ဆိုင်ရာအကြံပေးအဖွဲ့မှ ပံ့ပိုးထားသည်",
+    doctorTitle: "ဆေးဘက်ဆိုင်ရာ အကြံပေးချက်များဖြင့် ပံ့ပိုးထားသည်။",
     doctorDescription:
-      "ကျွန်ုပ်တို့၏ အင်္ဂါစောင့်ကြည့်မှုဆိုင်ရာ အယ်လ်ဂိုရီသမ်များကို တိကျပြီး ယုံကြည်စိတ်ချရသော ကျန်းမာရေးစောင့်ကြည့်မှုဖြစ်စေရန် ကျန်းမာရေးစောင့်ရှောက်မှုပညာရှင်များက ပြန်လည်သုံးသပ်ထားပါသည်။",
+      "တိကျခိုင်မာသော ကျန်းမာရေးစောင့်ကြည့်မှုအတွက် ကျွန်ုပ်တို့၏ စနစ်များကို ဆေးဘက်ဆိုင်ရာပညာရှင်များက အနီးကပ်ကြီးကြပ် စစ်ဆေးထားပါသည်။",
     badge1: "HIPAA လိုက်နာမှု",
     badge2: "ဆရာဝန်မှ သုံးသပ်ထားသည်",
     badge3: "အထောက်အထားအခြေပြု",
@@ -57,7 +57,6 @@ const HeroSection = ({ language = "en" }) => {
 
               {/* Doctor Info */}
               <h3 className="text-[#1a535c] text-xl sm:text-2xl md:text-3xl font-bold mb-2 flex items-center justify-center gap-1">
-                <i className="fas fa-shield-alt text-[#00a86b] text-xl sm:text-2xl"></i>
                 <span>{t.doctorTitle}</span>
               </h3>
               <p className="text-[#4a6b73] text-sm sm:text-base leading-relaxed mb-4 max-w-md">

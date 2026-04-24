@@ -19,7 +19,7 @@ const translations = {
       "© 2026 OrganTrack. All rights reserved. For educational purposes.",
   },
   mm: {
-    logo: "အော်ဂန်ထရက်",
+    logo: "ကိုယ်အင်္ဂါကျန်းမာရေး လမ်းညွှန်",
     tagline: "သင့်ကျန်းမာရေးစောင့်ကြည့်ဖော်",
     login: "အကောင့်ဝင်ရန်",
     getStarted: "စတင်ရန်",
