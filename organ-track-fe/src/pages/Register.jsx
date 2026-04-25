@@ -158,10 +158,10 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-[874px] w-full flex justify-center bg-white">
-      <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
-        <div className="w-full flex flex-col items-center mb-6">
-          <div className="w-50 h-50 bg-white-200 rounded-full flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen w-full flex justify-center bg-white">
+      <div className="w-full max-w-[402px] px-3 sm:px-4 pt-4 sm:pt-6 pb-8 sm:pb-10">
+        <div className="w-full flex flex-col items-center mb-4 sm:mb-6">
+          <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-50 md:h-50 bg-white-200 rounded-full flex items-center justify-center overflow-hidden">
             <img
               src={systemLogo}
               alt="Logo"
@@ -170,23 +170,23 @@ export default function Register() {
           </div>
         </div>
 
-        <div className="bg-green-500 rounded-3xl px-6 py-8 shadow-md">
-          <h1 className="text-white text-3xl font-bold text-center mb-6">
+        <div className="bg-green-500 rounded-3xl px-4 sm:px-6 py-6 sm:py-8 shadow-md">
+          <h1 className="text-white text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6">
             Hello!
           </h1>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             {/* Username */}
             <div>
               <div className="relative">
-                <i className="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
+                <i className="fa-solid fa-user absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
                 <input
                   type="text"
                   name="username"
                   placeholder="Username"
                   value={formData.username}
                   onChange={handleChange}
-                  className="w-full bg-white pl-12 pr-4 py-3 rounded-xl outline-none"
+                  className="w-full bg-white pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-xl outline-none"
                 />
               </div>
               {errors.username && (
@@ -197,14 +197,14 @@ export default function Register() {
             {/* Email */}
             <div>
               <div className="relative">
-                <i className="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
+                <i className="fa-solid fa-envelope absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
                 <input
                   type="text"
                   name="email"
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-white pl-12 pr-4 py-3 rounded-xl outline-none"
+                  className="w-full bg-white pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-xl outline-none"
                 />
               </div>
               {errors.email && (
@@ -212,34 +212,36 @@ export default function Register() {
               )}
             </div>
 
+            {/* Password */}
             <div className="relative">
-              <i className="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
+              <i className="fa-solid fa-lock absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full bg-white pl-12 pr-10 py-3 rounded-xl outline-none"
+                className="w-full bg-white pl-10 sm:pl-12 pr-10 py-2.5 sm:py-3 rounded-xl outline-none"
               />
               <i
-                className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer`}
+                className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer`}
                 onClick={() => setShowPassword(!showPassword)}
               ></i>
             </div>
 
+            {/* Confirm Password */}
             <div className="relative">
-              <i className="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
+              <i className="fa-solid fa-lock absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
                 placeholder="Enter your password again"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full bg-white pl-12 pr-10 py-3 rounded-xl outline-none"
+                className="w-full bg-white pl-10 sm:pl-12 pr-10 py-2.5 sm:py-3 rounded-xl outline-none"
               />
               <i
-                className={`fa-solid ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"} absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer`}
+                className={`fa-solid ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"} absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer`}
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               ></i>
             </div>
@@ -253,12 +255,12 @@ export default function Register() {
             {/* Gender */}
             <div>
               <div className="relative">
-                <i className="fa-solid fa-venus-mars absolute left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
+                <i className="fa-solid fa-venus-mars absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
                 <select
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
-                  className="w-full bg-white pl-12 pr-4 py-3 rounded-xl outline-none appearance-none"
+                  className="w-full bg-white pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 rounded-xl outline-none appearance-none"
                 >
                   <option value="">Gender</option>
                   <option value="male">Male</option>
@@ -306,10 +308,10 @@ export default function Register() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-3 rounded-xl font-semibold mt-4 text-white 
-    bg-green-700 
-    ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-green-800 active:scale-95 transition-all duration-150"}
-  `}
+              className={`w-full py-2.5 sm:py-3 rounded-xl font-semibold mt-4 text-white 
+            bg-green-700 
+            ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-green-800 active:scale-95 transition-all duration-150"}
+          `}
             >
               {isSubmitting ? (
                 <svg
@@ -339,7 +341,10 @@ export default function Register() {
           </form>
 
           {/* Bottom Link */}
-          <div className="mt-6 text-center text-sm" style={{ color: "#fff" }}>
+          <div
+            className="mt-4 sm:mt-6 text-center text-xs sm:text-sm"
+            style={{ color: "#fff" }}
+          >
             Already have an account?{" "}
             <span
               onClick={() => navigate("/login")}

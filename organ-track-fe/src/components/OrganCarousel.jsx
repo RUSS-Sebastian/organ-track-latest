@@ -95,7 +95,7 @@ const translations = {
       bladder: "ဆီးအိမ်",
       bloodVessels: "သွေးကြောများ",
       bone: "အရိုး",
-      prostate: "ဆီးကြို",
+      prostate: "ဆီးကျိတ်",
       uterus: "သားအိမ်",
     },
   },

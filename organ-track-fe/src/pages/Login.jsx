@@ -84,28 +84,28 @@ export default function Login() {
 
   return (
     <div className="min-h-screen w-full flex justify-center items-center bg-white">
-      <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
+      <div className="w-full max-w-[402px] px-3 sm:px-4 pt-4 sm:pt-6 pb-8 sm:pb-10">
         {/* Form Container */}
-        <div className="bg-white  px-6 py-8 ">
-          <h1 className="text-4xl font-bold text-center mb-6">
+        <div className="bg-white px-4 sm:px-6 py-6 sm:py-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6">
             Welcome <span className="text-green-600">Back!</span>
           </h1>
-          <p className="text-center text-gray-500 mb-12">
+          <p className="text-sm sm:text-base text-center text-gray-500 mb-8 sm:mb-12">
             Nice to see you again
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Email */}
             <div>
               <div className="relative">
-                <i className="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
+                <i className="fa-solid fa-envelope absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
                 <input
                   type="email"
                   name="email"
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-gray-100 pl-12 pr-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full bg-gray-100 pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500"
                   required
                 />
               </div>
@@ -115,8 +115,8 @@ export default function Login() {
             </div>
 
             {/* Password */}
-            <div className="relative mb-12">
-              <i className="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
+            <div className="relative mb-8 sm:mb-12">
+              <i className="fa-solid fa-lock absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-green-500"></i>
 
               <input
                 type={showPassword ? "text" : "password"}
@@ -124,12 +124,12 @@ export default function Login() {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full bg-gray-100 pl-12 pr-12 py-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full bg-gray-100 pl-10 sm:pl-12 pr-12 py-2.5 sm:py-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500"
                 required
               />
 
               <i
-                className={`fa-solid absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 ${
+                className={`fa-solid absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 ${
                   showPassword ? "fa-eye-slash" : "fa-eye"
                 }`}
                 onClick={() => setShowPassword(!showPassword)}
@@ -139,8 +139,9 @@ export default function Login() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-[229px] h-[59px] bg-green-600 text-white py-2 rounded-[30px] font-semibold mt-4 hover:bg-green-700 transition block mx-auto 
-                ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition block mx-auto mt-4
+            w-44 sm:w-56 md:w-[229px] h-12 sm:h-14 md:h-[59px] text-sm sm:text-base
+            ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {isSubmitting ? (
                 <svg
@@ -170,7 +171,7 @@ export default function Login() {
           </form>
 
           {/* Bottom Link */}
-          <div className="mt-6 text-center text-sm text-gray-700">
+          <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-700">
             Don’t have an account?{" "}
             <span
               onClick={() => navigate("/register")}
