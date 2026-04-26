@@ -1,20 +1,43 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import api from "../api/axios"; // Font Awesome
+import api from "../api/axios";
 import { useUser } from "../context/UserContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setToken } = useUser();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiError, setApiError] = useState(""); // to show API error
+  const [apiError, setApiError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Language state: read from route state if coming from Register, else default "en"
+  const [lang, setLang] = useState(location.state?.lang || "en");
+
+  // Translations object
+  const t = {
+    welcome: { en: "Welcome", my: "ကြိုဆိုပါ၏" },
+    back: { en: "Back!", my: "ပြန်လည်!" },
+    niceToSee: {
+      en: "Nice to see you again",
+      my: "ပြန်တွေ့ရတာ ဝမ်းသာပါတယ်",
+    },
+    emailPlaceholder: { en: "Email", my: "အီးမေးလ်" },
+    passwordPlaceholder: { en: "Password", my: "စကားဝှက်" },
+    signIn: { en: "Sign In", my: "အကောင့်ဝင်ရန်" },
+    noAccount: {
+      en: "Don’t have an account?",
+      my: "အကောင့်မရှိသေးဘူးလား?",
+    },
+    signUp: { en: "Sign Up", my: "အကောင့်ဖွင့်ရန်" },
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -28,17 +51,14 @@ export default function Login() {
 
     let newErrors = {};
 
-    // Basic validation
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = "Invalid email format";
     }
 
-    // Password strong validation
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
     if (formData.password && !passwordRegex.test(formData.password)) {
@@ -61,17 +81,14 @@ export default function Login() {
         const res = await api.post("/login", payload);
         console.log("Login success:", res.data);
 
-        // Save token for future requests if needed
         localStorage.setItem("token", res.data.token);
-        setToken(res.data.token); // <-- tell provider to update user
+        setToken(res.data.token);
 
-        // Navigate to home page
         navigate("/");
       } catch (err) {
         console.error("Login failed:", err.response?.data || err.message);
         alert(err.response?.data?.message || "Login unsuccessful");
 
-        // Optionally clear form
         setFormData({
           email: "",
           password: "",
@@ -87,11 +104,12 @@ export default function Login() {
       <div className="w-full max-w-[402px] px-3 sm:px-4 pt-4 sm:pt-6 pb-8 sm:pb-10">
         {/* Form Container */}
         <div className="bg-white px-4 sm:px-6 py-6 sm:py-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 sm:mb-6">
-            Welcome <span className="text-green-600">Back!</span>
+          <h1 className="text-2xl sm:text-3xl md:text-3xl font-bold text-center mb-4 sm:mb-6">
+            {t.welcome[lang]}{" "}
+            <span className="text-green-600">{t.back[lang]}</span>
           </h1>
           <p className="text-sm sm:text-base text-center text-gray-500 mb-8 sm:mb-12">
-            Nice to see you again
+            {t.niceToSee[lang]}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -102,7 +120,7 @@ export default function Login() {
                 <input
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder={t.emailPlaceholder[lang]}
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full bg-gray-100 pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500"
@@ -121,7 +139,7 @@ export default function Login() {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="Password"
+                placeholder={t.passwordPlaceholder[lang]}
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full bg-gray-100 pl-10 sm:pl-12 pr-12 py-2.5 sm:py-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500"
@@ -165,20 +183,46 @@ export default function Login() {
                   ></path>
                 </svg>
               ) : (
-                "Sign In"
+                t.signIn[lang]
               )}
             </button>
           </form>
 
           {/* Bottom Link */}
           <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-700">
-            Don’t have an account?{" "}
+            {t.noAccount[lang]}{" "}
             <span
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/register", { state: { lang } })}
               className="text-green-600 font-medium cursor-pointer"
             >
-              Sign Up
+              {t.signUp[lang]}
             </span>
+          </div>
+
+          {/* Language Toggle */}
+          <div className="mt-6 flex justify-center">
+            <div className="flex items-center bg-gray-100 rounded-full p-1 cursor-pointer select-none">
+              <span
+                onClick={() => setLang("en")}
+                className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  lang === "en"
+                    ? "bg-green-600 text-white shadow-sm"
+                    : "text-gray-700"
+                }`}
+              >
+                Eng
+              </span>
+              <span
+                onClick={() => setLang("my")}
+                className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  lang === "my"
+                    ? "bg-green-600 text-white shadow-sm"
+                    : "text-gray-700"
+                }`}
+              >
+                မြန်မာ
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -16,10 +16,42 @@ export default function Register() {
   const navigate = useNavigate();
   const location = useLocation();
   const [errors, setErrors] = useState({});
-  const [apiError, setApiError] = useState(""); // to show exact backend error
+  const [apiError, setApiError] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Language state: read from route state, default "en"
+  const [lang, setLang] = useState(location.state?.lang || "en");
+
+  // Translations for Register page
+  const t = {
+    hello: { en: "Hello!", my: "ဟယ်လို!" },
+    usernamePlaceholder: { en: "Username", my: "အသုံးပြုသူအမည်" },
+    emailPlaceholder: { en: "Email", my: "အီးမေးလ်" },
+    passwordPlaceholder: { en: "Enter your password", my: "စကားဝှက်ထည့်ပါ" },
+    confirmPasswordPlaceholder: {
+      en: "Enter your password again",
+      my: "စကားဝှက်ပြန်ထည့်ပါ",
+    },
+    genderPlaceholder: { en: "Gender", my: "ကျား/မ" },
+    male: { en: "Male", my: "ကျား" },
+    female: { en: "Female", my: "မ" },
+    agreeText: {
+      en: "I agree to the",
+      my: "ကျွန်ုပ်သဘောတူပါသည်",
+    },
+    termsLink: {
+      en: "terms and conditions",
+      my: "စည်းကမ်းချက်များ",
+    },
+    signUpBtn: { en: "Sign Up", my: "အကောင့်ဖွင့်ရန်" },
+    alreadyAccount: {
+      en: "Already have an account?",
+      my: "အကောင့်ရှိပြီးသားလား?",
+    },
+    signInLink: { en: "Sign in", my: "အကောင့်ဝင်ရန်" },
+  };
 
   useEffect(() => {
     if (location.state && typeof location.state.termsAccepted === "boolean") {
@@ -33,7 +65,6 @@ export default function Register() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
@@ -43,7 +74,6 @@ export default function Register() {
   const validate = () => {
     let newErrors = {};
 
-    // Required
     if (!formData.username) newErrors.username = "Username is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
@@ -52,22 +82,18 @@ export default function Register() {
     if (!formData.gender) newErrors.gender = "Gender is required";
     if (!formData.agree) newErrors.agree = "You must agree to terms";
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = "Invalid email format";
     }
 
-    // Strong password validation
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
-
     if (formData.password && !passwordRegex.test(formData.password)) {
       newErrors.password =
         "Password must be 8+ chars, include uppercase, lowercase, number & special char";
     }
 
-    // Match check
     if (
       formData.password &&
       formData.confirmPassword &&
@@ -84,12 +110,11 @@ export default function Register() {
 
     const validationErrors = validate();
     setErrors(validationErrors);
-    setApiError(""); // clear previous API error
+    setApiError("");
 
     console.log("=== Debug: Form Data ===");
     console.log(formData);
 
-    // Check password match before sending
     if (formData.password !== formData.confirmPassword) {
       console.warn("Passwords do not match!");
     } else {
@@ -97,7 +122,6 @@ export default function Register() {
     }
 
     if (Object.keys(validationErrors).length === 0) {
-      // Prepare payload for backend
       const payload = {
         name: formData.username,
         email: formData.email,
@@ -109,36 +133,29 @@ export default function Register() {
       console.log("=== Debug: Payload to backend ===");
       console.log(payload);
 
-      // Set loading state
       setIsSubmitting(true);
 
-      // Call Laravel API
       api
         .post("/register", payload)
         .then((res) => {
           console.log("=== Debug: Backend Response ===");
           console.log(res.data);
-
-          // Show success alert
           alert("Registration successful! Please login.");
-          window.location.href = "/login"; // or navigate("/login") if using React Router
+          // Pass language so login page opens in the same language
+          window.location.href = `/login?lang=${lang}`; // fallback, but better to navigate with state
+          // Or use navigate: navigate("/login", { state: { lang } });
         })
         .catch((err) => {
           console.log("=== Debug: API Error Response ===");
           console.error(err.response?.data || err.message);
-
-          // Show exact backend message if available
           if (err.response?.data?.message) {
             setApiError(err.response.data.message);
           } else if (err.response?.data?.errors) {
-            // Laravel field validation errors
             setErrors(err.response.data.errors);
             setApiError("Please check the highlighted fields.");
           } else {
             setApiError("Something went wrong. Try again.");
           }
-
-          // Clear form
           setFormData({
             username: "",
             email: "",
@@ -157,6 +174,13 @@ export default function Register() {
     }
   };
 
+  // Navigate to terms page, passing lang and current form data
+  const goToTerms = () => {
+    navigate("/terms", {
+      state: { from: "register", formData, lang },
+    });
+  };
+
   return (
     <div className="min-h-screen w-full flex justify-center bg-white">
       <div className="w-full max-w-[402px] px-3 sm:px-4 pt-4 sm:pt-6 pb-8 sm:pb-10">
@@ -172,7 +196,7 @@ export default function Register() {
 
         <div className="bg-green-500 rounded-3xl px-4 sm:px-6 py-6 sm:py-8 shadow-md">
           <h1 className="text-white text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6">
-            Hello!
+            {t.hello[lang]}
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
@@ -183,7 +207,7 @@ export default function Register() {
                 <input
                   type="text"
                   name="username"
-                  placeholder="Username"
+                  placeholder={t.usernamePlaceholder[lang]}
                   value={formData.username}
                   onChange={handleChange}
                   className="w-full bg-white pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-xl outline-none"
@@ -201,7 +225,7 @@ export default function Register() {
                 <input
                   type="text"
                   name="email"
-                  placeholder="Email"
+                  placeholder={t.emailPlaceholder[lang]}
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full bg-white pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-xl outline-none"
@@ -218,7 +242,7 @@ export default function Register() {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="Enter your password"
+                placeholder={t.passwordPlaceholder[lang]}
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full bg-white pl-10 sm:pl-12 pr-10 py-2.5 sm:py-3 rounded-xl outline-none"
@@ -235,7 +259,7 @@ export default function Register() {
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                placeholder="Enter your password again"
+                placeholder={t.confirmPasswordPlaceholder[lang]}
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 className="w-full bg-white pl-10 sm:pl-12 pr-10 py-2.5 sm:py-3 rounded-xl outline-none"
@@ -262,9 +286,9 @@ export default function Register() {
                   onChange={handleChange}
                   className="w-full bg-white pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 rounded-xl outline-none appearance-none"
                 >
-                  <option value="">Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="">{t.genderPlaceholder[lang]}</option>
+                  <option value="male">{t.male[lang]}</option>
+                  <option value="female">{t.female[lang]}</option>
                 </select>
               </div>
               {errors.gender && (
@@ -281,17 +305,13 @@ export default function Register() {
                 onChange={handleChange}
               />
               <span>
-                I agree to the{" "}
+                {t.agreeText[lang]}{" "}
                 <button
                   type="button"
                   className="underline font-semibold"
-                  onClick={() =>
-                    navigate("/terms", {
-                      state: { from: "register", formData: formData },
-                    })
-                  }
+                  onClick={goToTerms}
                 >
-                  terms and conditions
+                  {t.termsLink[lang]}
                 </button>
               </span>
             </div>
@@ -335,7 +355,7 @@ export default function Register() {
                   ></path>
                 </svg>
               ) : (
-                "Sign Up"
+                t.signUpBtn[lang]
               )}
             </button>
           </form>
@@ -345,13 +365,39 @@ export default function Register() {
             className="mt-4 sm:mt-6 text-center text-xs sm:text-sm"
             style={{ color: "#fff" }}
           >
-            Already have an account?{" "}
+            {t.alreadyAccount[lang]}{" "}
             <span
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/login", { state: { lang } })}
               style={{ color: "#fff", fontWeight: 500, cursor: "pointer" }}
             >
-              Sign in
+              {t.signInLink[lang]}
             </span>
+          </div>
+
+          {/* Language Toggle (same style as Login, adapted for green background) */}
+          <div className="mt-6 flex justify-center">
+            <div className="flex items-center bg-white rounded-full p-1 cursor-pointer select-none">
+              <span
+                onClick={() => setLang("en")}
+                className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  lang === "en"
+                    ? "bg-green-600 text-white shadow-sm"
+                    : "text-green-800"
+                }`}
+              >
+                Eng
+              </span>
+              <span
+                onClick={() => setLang("my")}
+                className={`px-3 sm:px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  lang === "my"
+                    ? "bg-green-600 text-white shadow-sm"
+                    : "text-green-800"
+                }`}
+              >
+                မြန်မာ
+              </span>
+            </div>
           </div>
         </div>
       </div>
