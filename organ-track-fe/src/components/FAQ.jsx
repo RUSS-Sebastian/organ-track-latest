@@ -91,15 +91,15 @@ const FAQ = ({ language = "en" }) => {
   };
 
   return (
-    <section className="py-16 md:py-20 px-5 max-w-[900px] mx-auto">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl text-[#1e5c3f] font-bold mb-2">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-5 max-w-[900px] mx-auto">
+      <div className="text-center mb-8 sm:mb-10 md:mb-12">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl text-[#1e5c3f] font-bold mb-2">
           {t.title}
         </h2>
-        <p className="text-lg text-[#4f6f60]">{t.subtitle}</p>
+        <p className="text-base sm:text-lg text-[#4f6f60]">{t.subtitle}</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {faqs.map((faq, index) => (
           <div
             key={index}
@@ -110,12 +110,12 @@ const FAQ = ({ language = "en" }) => {
             }`}
             onClick={() => toggleFAQ(index)}
           >
-            <div className="flex justify-between items-center p-5 md:p-6 bg-[#f8fdf9]">
-              <h3 className="text-base md:text-lg text-[#1a535c] font-semibold flex-1 pr-5">
+            <div className="flex justify-between items-center p-4 sm:p-5 md:p-6 bg-[#f8fdf9]">
+              <h3 className="text-sm sm:text-base md:text-lg text-[#1a535c] font-semibold flex-1 pr-4 sm:pr-5">
                 {faq.question}
               </h3>
               <span
-                className={`text-3xl text-[#00a86b] font-light min-w-[24px] text-center transition-transform duration-300 ${
+                className={`text-2xl sm:text-3xl text-[#00a86b] font-light min-w-[24px] text-center transition-transform duration-300 ${
                   activeIndex === index ? "rotate-180" : ""
                 }`}
               >
@@ -129,7 +129,7 @@ const FAQ = ({ language = "en" }) => {
                 padding: activeIndex === index ? "0 1.5rem 1.5rem" : "0 1.5rem",
               }}
             >
-              <p className="text-[#4a6b73] leading-relaxed text-sm md:text-base">
+              <p className="text-[#4a6b73] leading-relaxed text-xs sm:text-sm md:text-base">
                 {faq.answer}
               </p>
             </div>
@@ -137,12 +137,12 @@ const FAQ = ({ language = "en" }) => {
         ))}
       </div>
 
-      <div className="text-center mt-16 p-8 md:p-10 bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] rounded-2xl border-2 border-[#00a86b]">
-        <p className="text-xl md:text-2xl text-[#1a535c] mb-6 font-medium">
+      <div className="text-center mt-12 sm:mt-16 p-6 sm:p-8 md:p-10 bg-gradient-to-br from-[#e8f5e9] to-[#c8e6c9] rounded-2xl border-2 border-[#00a86b]">
+        <p className="text-lg sm:text-xl md:text-2xl text-[#1a535c] mb-4 sm:mb-6 font-medium">
           {t.ctaText}
         </p>
         <button
-          className="w-full md:w-auto bg-gradient-to-r from-[#00a86b] to-[#0d98ba] text-white border-none py-4 px-8 md:py-5 md:px-9 text-base md:text-lg rounded-full cursor-pointer inline-flex items-center justify-center gap-3 transition-all duration-300 font-semibold shadow-[0_8px_20px_rgba(0,168,107,0.3)] hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,168,107,0.4)]"
+          className="w-full sm:w-auto bg-gradient-to-r from-[#00a86b] to-[#0d98ba] text-white border-none py-3 px-6 sm:py-4 sm:px-8 md:py-5 md:px-9 text-sm sm:text-base md:text-lg rounded-full cursor-pointer inline-flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 font-semibold shadow-[0_8px_20px_rgba(0,168,107,0.3)] hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,168,107,0.4)]"
           onClick={() => (window.location.href = "/login")}
         >
           <i className="fas fa-heartbeat"></i>

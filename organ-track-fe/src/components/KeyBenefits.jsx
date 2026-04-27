@@ -66,35 +66,39 @@ const KeyBenefits = ({ language = "en" }) => {
   const benefits = t.benefits;
 
   return (
-    <section className="py-20 px-[10%] bg-gradient-to-br from-[#f8fff8] to-[#e8ffe8] text-center">
-      <div className="mb-16">
-        <h2 className="text-3xl md:text-4xl text-[#1e5c3f] mb-3 font-bold">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-[8%] lg:px-[10%] bg-gradient-to-br from-[#f8fff8] to-[#e8ffe8] text-center">
+      <div className="mb-10 sm:mb-14 md:mb-16">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl text-[#1e5c3f] mb-2 sm:mb-3 font-bold">
           {t.sectionTitle}
         </h2>
-        <p className="text-lg text-[#4f6f60] max-w-3xl mx-auto">
+        <p className="text-base sm:text-lg text-[#4f6f60] max-w-3xl mx-auto px-2 sm:px-0">
           {t.sectionSubtitle}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {benefits.map((benefit, index) => (
           <div
             key={index}
-            className="bg-white p-8 md:p-9 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)]"
+            className="bg-white p-5 sm:p-8 md:p-9 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)]"
           >
-            <div className="text-5xl mb-5">
+            <div className="text-4xl sm:text-5xl mb-5">
               <i className={`${benefit.icon} text-[#00a86b]`}></i>
             </div>
-            <h3 className="text-xl md:text-2xl text-[#1e5c3f] mb-4 font-bold">
+            <h3 className="text-lg sm:text-xl md:text-2xl text-[#1e5c3f] mb-3 sm:mb-4 font-bold">
               {benefit.title}
             </h3>
-            <p className="text-base text-[#4f6f60] leading-relaxed text-center mb-6">
+            <p className="text-sm sm:text-base text-[#4f6f60] leading-relaxed text-center mb-5 sm:mb-6">
               {benefit.description}
             </p>
-            <div className="inline-block max-w-[90%] mt-3 italic text-[15px] text-[#2e7d5b] bg-[#e8f5ef] px-5 py-3 rounded-xl relative">
-              <span className="text-xl text-[#1e5c3f] font-bold">“</span>
+            <div className="inline-block max-w-full sm:max-w-[90%] mt-2 sm:mt-3 italic text-sm sm:text-[15px] text-[#2e7d5b] bg-[#e8f5ef] px-4 py-2 sm:px-5 sm:py-3 rounded-xl relative">
+              <span className="text-lg sm:text-xl text-[#1e5c3f] font-bold">
+                “
+              </span>
               {benefit.quote}
-              <span className="text-xl text-[#1e5c3f] font-bold">”</span>
+              <span className="text-lg sm:text-xl text-[#1e5c3f] font-bold">
+                ”
+              </span>
             </div>
           </div>
         ))}

@@ -23,8 +23,8 @@ export default function Login() {
 
   // Translations object
   const t = {
-    welcome: { en: "Welcome", my: "ကြိုဆိုပါ၏" },
-    back: { en: "Back!", my: "ပြန်လည်!" },
+    welcome: { en: "Welcome", my: "ပြန်လည်" },
+    back: { en: "Back!", my: "ကြိုဆိုပါတယ်!" },
     niceToSee: {
       en: "Nice to see you again",
       my: "ပြန်တွေ့ရတာ ဝမ်းသာပါတယ်",
