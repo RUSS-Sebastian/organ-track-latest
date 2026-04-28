@@ -265,215 +265,201 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="min-h-[874px] w-full flex justify-center bg-white">
-      {/* ⚡ Loading overlay at the very top */}
-      {isLoading && (
-        <div className="loading-overlay">
-          <div className="spinner">Processing...</div>
+  <div className="min-h-screen w-full flex justify-center bg-white">
+    {/* Loading overlay */}
+    {isLoading && (
+      <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+        <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-medium">Processing...</p>
         </div>
-      )}
-      {/* Mobile container */}
-      <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
-        <div className="relative flex items-center justify-center h-[56px]">
-          {/* Back Button (left aligned) */}
-          <button
-            onClick={() => navigate("/settings")}
-            className="
-              absolute left-0
-              text-[22px]
-              font-semibold
-              text-black
-              w-[32px]
-              h-[32px]
-              flex items-center justify-center
-              active:scale-95
-            "
-          >
-            ←
-          </button>
+      </div>
+    )}
 
-          {/* Centered Title */}
-          <h1 className="text-[20px] font-bold font-['Roboto'] text-black">
-            Edit Profile
-          </h1>
-        </div>
-
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="spinner">Loading profile...</div>
-          </div>
-        ) : (
-          <div className="profile-content">
-            {/* Profile Picture Section */}
-            <div className="profile-picture-section">
-              <div className="profile-image-wrapper">
-                <div className="profile-image-container">
-                  {profileImage && (
-                    <img src={profileImage} className="profile-image" />
-                  )}
-                  {isEditing && (
-                    <div className="image-overlay">
-                      <span className="camera-icon">📷</span>
-                    </div>
-                  )}
-                </div>
-                {isEditing && (
-                  <>
-                    <input
-                      type="file"
-                      id="profile-image-input"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="profile-image-input"
-                    />
-                    <label
-                      htmlFor="profile-image-input"
-                      className="change-photo-link"
-                    >
-                      Change Photo
-                    </label>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Profile Info Table */}
-            {/* Profile Info Section */}
-            <div className="w-full mt-6 px-1">
-              {/* Name */}
-              <div className="mb-5">
-                <div className="text-[14px] font-semibold text-black mb-2">
-                  Name
-                </div>
-
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="name"
-                    value={tempData.name}
-                    onChange={handleChange}
-                    placeholder="Enter your name"
-                    className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                  />
-                ) : (
-                  <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
-                    {userData.name}
-                  </div>
-                )}
-              </div>
-
-              {/* Email */}
-              {!isEditing && (
-                <div className="mb-5">
-                  <div className="text-[14px] font-semibold text-black mb-2">
-                    Email
-                  </div>
-                  <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
-                    {userData.email}
-                  </div>
-                </div>
-              )}
-
-              {/* Password */}
-              {isEditing && (
-                <div className="mb-5">
-                  <div className="text-[14px] font-semibold text-black mb-2">
-                    Password
-                  </div>
-
-                  <div className="relative w-full">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      value={tempPassword}
-                      onChange={handleChange}
-                      placeholder="Enter new password"
-                      className="w-full h-[44px] px-4 pr-10 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                    />
-
-                    <span
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <i className="fa-solid fa-eye-slash"></i>
-                      ) : (
-                        <i className="fa-solid fa-eye"></i>
-                      )}
-                    </span>
-                  </div>
-                  {passwordError && (
-                    <div className="text-red-500 text-[12px] mt-1">
-                      {passwordError}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Gender */}
-              <div className="mb-6">
-                <div className="text-[14px] font-semibold text-black mb-2">
-                  Gender
-                </div>
-
-                {isEditing ? (
-                  <select
-                    name="gender"
-                    value={tempData.gender}
-                    onChange={handleChange}
-                    className="w-full h-[44px] px-4 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition"
-                  >
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
-                ) : (
-                  <div className="w-full h-[44px] px-4 flex items-center rounded-[8px] border border-gray-200 bg-gray-100 text-[14px] text-gray-700">
-                    {userData.gender}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <div className="action-buttons">
-              {isEditing ? (
-                <>
-                  <button
-                    className="save-btn"
-                    onClick={handleSaveClick}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Saving..." : "Save Changes"}
-                  </button>
-                  <button
-                    className="cancel-btn"
-                    onClick={handleCancel}
-                    disabled={isLoading}
-                  >
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <button className="edit-profile-btn" onClick={handleEdit}>
-                  Edit Profile
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+    {/* Main content – full width, responsive padding */}
+    <div className="w-full px-4 sm:px-6 lg:px-8 pt-6 pb-10 max-w-2xl mx-auto">
+      {/* Header with back button */}
+      <div className="relative flex items-center justify-center h-14 sm:h-16 mb-6">
+        <button
+          onClick={() => navigate("/settings")}
+          className="absolute left-0 text-2xl sm:text-3xl font-semibold text-black w-8 h-8 flex items-center justify-center active:scale-95"
+        >
+          ←
+        </button>
+        <h1 className="text-xl sm:text-2xl font-bold text-black">
+          Edit Profile
+        </h1>
       </div>
 
-      {/* 🔐 PASSWORD CONFIRMATION MODAL - Re-enter new password */}
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-gray-500">Loading profile...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="profile-content space-y-6">
+          {/* Profile Picture Section – now with FontAwesome icons */}
+          <div className="flex flex-col items-center">
+            <div className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full bg-gray-200 overflow-hidden">
+              {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  {/* FontAwesome user icon – fills the entire circle */}
+                  <i className="fa-solid fa-user text-[6rem] sm:text-[8rem] lg:text-[10rem]"></i>
+                </div>
+              )}
+              {isEditing && (
+                <label className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer hover:bg-black/40 transition">
+                  {/* FontAwesome camera icon */}
+                  <i className="fa-solid fa-camera text-white text-3xl sm:text-4xl"></i>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+            {isEditing && (
+              <p className="mt-2 text-sm text-green-600 font-medium">
+                Tap to change photo
+              </p>
+            )}
+          </div>
+
+          {/* Profile Info Form – unchanged */}
+          <div className="w-full space-y-5">
+            {/* Name */}
+            <div>
+              <div className="text-sm sm:text-base font-semibold text-black mb-1.5">Name</div>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="name"
+                  value={tempData.name}
+                  onChange={handleChange}
+                  placeholder="Enter your name"
+                  className="w-full h-11 sm:h-12 px-4 rounded-lg border border-gray-300 bg-gray-50 text-sm sm:text-base outline-none focus:bg-white focus:border-green-500 transition"
+                />
+              ) : (
+                <div className="w-full h-11 sm:h-12 px-4 flex items-center rounded-lg border border-gray-200 bg-gray-50 text-sm sm:text-base text-gray-700">
+                  {userData.name}
+                </div>
+              )}
+            </div>
+
+            {/* Email (only when not editing) */}
+            {!isEditing && (
+              <div>
+                <div className="text-sm sm:text-base font-semibold text-black mb-1.5">Email</div>
+                <div className="w-full h-11 sm:h-12 px-4 flex items-center rounded-lg border border-gray-200 bg-gray-50 text-sm sm:text-base text-gray-700">
+                  {userData.email}
+                </div>
+              </div>
+            )}
+
+            {/* Password (only when editing) */}
+            {isEditing && (
+              <div>
+                <div className="text-sm sm:text-base font-semibold text-black mb-1.5">Password</div>
+                <div className="relative w-full">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={tempPassword}
+                    onChange={handleChange}
+                    placeholder="Enter new password"
+                    className="w-full h-11 sm:h-12 px-4 pr-10 rounded-lg border border-gray-300 bg-gray-50 text-sm sm:text-base outline-none focus:bg-white focus:border-green-500 transition"
+                  />
+                  <span
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <i className="fa-solid fa-eye-slash"></i>
+                    ) : (
+                      <i className="fa-solid fa-eye"></i>
+                    )}
+                  </span>
+                </div>
+                {passwordError && (
+                  <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+                )}
+              </div>
+            )}
+
+            {/* Gender */}
+            <div>
+              <div className="text-sm sm:text-base font-semibold text-black mb-1.5">Gender</div>
+              {isEditing ? (
+                <select
+                  name="gender"
+                  value={tempData.gender}
+                  onChange={handleChange}
+                  className="w-full h-11 sm:h-12 px-4 rounded-lg border border-gray-300 bg-gray-50 text-sm sm:text-base outline-none focus:bg-white focus:border-green-500 transition"
+                >
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              ) : (
+                <div className="w-full h-11 sm:h-12 px-4 flex items-center rounded-lg border border-gray-200 bg-gray-50 text-sm sm:text-base text-gray-700 capitalize">
+                  {userData.gender}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {error && <div className="text-red-500 text-sm">{error}</div>}
+
+          {/* Action Buttons – unchanged */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleSaveClick}
+                  disabled={isLoading}
+                  className="flex-1 h-12 bg-green-500 text-white rounded-lg font-semibold text-sm sm:text-base hover:bg-green-600 disabled:opacity-50 transition"
+                >
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </button>
+                <button
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                  className="flex-1 h-12 border border-gray-300 rounded-lg text-sm sm:text-base font-medium hover:bg-gray-100 disabled:opacity-50 transition"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleEdit}
+                className="w-full h-12 bg-[#14AE5C] text-white rounded-lg font-semibold text-sm sm:text-base hover:bg-green-700 transition"
+              >
+                Edit Profile
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Password Confirmation Modal – unchanged */}
       {showConfirmModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Confirm Password</h3>
-            <p className="modal-subtitle">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md bg-white rounded-xl p-5 sm:p-6 shadow-lg">
+            <h3 className="text-lg sm:text-xl font-semibold mb-2">Confirm Password</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-4">
               Please re-enter your password to confirm
             </p>
 
-            <div className="modal-input-wrapper">
+            <div className="space-y-3">
               <div className="relative w-full">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
@@ -482,12 +468,13 @@ const EditProfile = () => {
                     setReenterPassword(e.target.value);
                     setConfirmError("");
                   }}
-                  className={`w-full h-[44px] px-4 pr-10 rounded-[8px] border border-gray-300 bg-gray-100 text-[14px] outline-none focus:bg-white focus:border-gray-400 transition ${confirmError ? "border-red-500" : ""}`}
+                  className={`w-full h-11 sm:h-12 px-4 pr-10 rounded-lg border bg-gray-50 text-sm sm:text-base outline-none focus:bg-white focus:border-green-500 transition ${
+                    confirmError ? "border-red-500" : "border-gray-300"
+                  }`}
                   placeholder="Re-enter your password"
                 />
-
                 <span
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
@@ -498,41 +485,41 @@ const EditProfile = () => {
                 </span>
               </div>
               {confirmError && (
-                <div className="modal-error">
-                  <span className="error-icon">⚠️</span>
-                  {confirmError}
-                </div>
+                <p className="text-red-500 text-xs flex items-center gap-1">
+                  <span>⚠️</span> {confirmError}
+                </p>
               )}
             </div>
 
-            <div className="modal-buttons">
+            <div className="flex gap-3 mt-5">
               <button
-                className="modal-cancel-btn"
                 onClick={() => {
                   setShowConfirmModal(false);
                   setReenterPassword("");
                   setConfirmError("");
                 }}
+                className="flex-1 h-11 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-100 transition"
               >
                 Cancel
               </button>
               <button
-                className="modal-confirm-btn"
                 onClick={handleConfirmPassword}
                 disabled={isLoading}
+                className="flex-1 h-11 bg-green-500 text-white rounded-lg text-sm font-semibold hover:bg-green-600 disabled:opacity-50 transition"
               >
                 {isLoading ? "Saving..." : "Confirm & Save"}
               </button>
             </div>
 
-            <div className="modal-footer mt-4">
-              <p>Re-enter the password you just typed above</p>
-            </div>
+            <p className="text-xs text-gray-400 mt-4 text-center">
+              Re-enter the password you just typed above
+            </p>
           </div>
         </div>
       )}
     </div>
-  );
+  </div>
+);
 };
 
 export default EditProfile;

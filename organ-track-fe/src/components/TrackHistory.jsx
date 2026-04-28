@@ -109,55 +109,63 @@ export default function TrackHistory() {
     navigate(`/trackResult/${id}`);
   };
 
-  return (
-    <div className="w-full bg-white p-1 rounded-lg shadow-md flex flex-col">
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead className="bg-[#14AE5C]">
-            <tr>
-              <th className="text-white font-bold text-[14px] px-2 py-2 text-left">
-                Track Name
-              </th>
-              <th className="text-white font-bold text-[14px] px-2 py-2 text-left">
-                Date
-              </th>
-              <th className="text-white font-bold text-[14px] px-2 py-2 text-left">
-                Actions
-              </th>
-            </tr>
-          </thead>
+return (
+  <div className="w-full bg-white rounded-lg shadow-md flex flex-col p-2 sm:p-4 lg:p-6">
+    {/* Table wrapper – horizontal scroll on small screens */}
+    <div className="overflow-x-auto -mx-2 sm:mx-0">
+      {/* min-w ensures columns don't shrink below readability; table fills container on wider screens */}
+      <table className="w-full border-collapse min-w-[500px]">
+        <thead className="bg-[#14AE5C]">
+          <tr>
+            <th className="text-white font-bold text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-3 text-left whitespace-nowrap">
+              Track Name
+            </th>
+            <th className="text-white font-bold text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-3 text-left whitespace-nowrap">
+              Date
+            </th>
+            <th className="text-white font-bold text-sm sm:text-base px-3 py-2 sm:px-4 sm:py-3 text-left whitespace-nowrap">
+              Actions
+            </th>
+          </tr>
+        </thead>
 
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={4} className="py-8 text-center">
-                  <ClipLoader color="#14AE5C" size={40} />
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan={3} className="py-8 text-center">
+                <ClipLoader color="#14AE5C" size={40} />
+              </td>
+            </tr>
+          ) : trackData.length === 0 ? (
+            <tr>
+              <td colSpan={3} className="py-8 text-center text-gray-500 text-sm sm:text-base">
+                No track history available.
+              </td>
+            </tr>
+          ) : (
+            trackData.map((item) => (
+              <tr
+                key={item.id}
+                onClick={() => handleRowClick(item.id)}
+                className="cursor-pointer hover:bg-gray-100 transition-colors"
+              >
+                <td className="px-3 py-3 sm:px-4 sm:py-3 text-sm sm:text-base whitespace-nowrap">
+                  {item.trackName}
                 </td>
-              </tr>
-            ) : trackData.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="py-8 text-center">
-                  No track history available.
+                <td className="px-3 py-3 sm:px-4 sm:py-3 text-sm sm:text-base whitespace-nowrap">
+                  {item.date}
                 </td>
-              </tr>
-            ) : (
-              trackData.map((item) => (
-                <tr
-                  key={item.id}
-                  onClick={() => handleRowClick(item.id)}
-                  className="cursor-pointer hover:bg-gray-200"
-                >
-                  <td className="px-2 py-3 text-[14px]">{item.trackName}</td>
-                  <td className="px-2 py-3 text-[14px]">{item.date}</td>
-                  <td className="px-2 py-3 flex gap-3">
+                <td className="px-3 py-3 sm:px-4 sm:py-3">
+                  <div className="flex gap-3 sm:gap-4">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRename(item.id);
                       }}
-                      className="text-[#14AE5C] hover:text-green-600"
+                      className="text-[#14AE5C] hover:text-green-600 transition-colors"
+                      aria-label="Rename"
                     >
-                      <FiEdit2 />
+                      <FiEdit2 className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
 
                     <button
@@ -165,42 +173,42 @@ export default function TrackHistory() {
                         e.stopPropagation();
                         handleDelete(item.id);
                       }}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                      aria-label="Delete"
                     >
-                      <FiTrash2 />
+                      <FiTrash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="mt-4 flex justify-between">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1 || loading}
-          className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
-        >
-          Previous
-        </button>
-
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages || loading}
-          className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
     </div>
-  );
+
+    {/* Pagination – responsive layout */}
+    <div className="mt-4 flex flex-col sm:flex-row sm:justify-between items-center gap-2 text-sm sm:text-base">
+      <button
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1 || loading}
+        className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-100 rounded-md disabled:opacity-50 hover:bg-gray-200 transition-colors w-full sm:w-auto"
+      >
+        Previous
+      </button>
+
+      <span className="text-gray-600">
+        Page {currentPage} of {totalPages}
+      </span>
+
+      <button
+        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        disabled={currentPage === totalPages || loading}
+        className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-100 rounded-md disabled:opacity-50 hover:bg-gray-200 transition-colors w-full sm:w-auto"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+);
 }

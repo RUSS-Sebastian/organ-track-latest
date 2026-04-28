@@ -3,6 +3,7 @@ import { useState } from "react";
 import ConfirmModal from "../components/ConfirmModal";
 import api from "../api/axios";
 import { useUser } from "../context/UserContext";
+
 const Settings = () => {
   const { setToken } = useUser();
   const navigate = useNavigate();
@@ -11,7 +12,6 @@ const Settings = () => {
 
   const handleNavigation = (path) => {
     if (path === "logout") {
-      // Handle logout logic here
       setIsModalOpen(true);
     } else if (path === "edit-profile") {
       navigate("/EditProfile");
@@ -23,37 +23,31 @@ const Settings = () => {
   };
 
   const handleLogout = async () => {
-    setLoading(true); // disable buttons
+    setLoading(true);
     try {
       const token = localStorage.getItem("token");
-
       await api.post(
         "/logout",
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`, // send token to backend
+            Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
-
-      localStorage.removeItem("token"); // remove token
+      localStorage.removeItem("token");
       alert("Logged out successfully");
-      setToken(null); // <-- tell provider to clear user
-      navigate("/login"); // redirect
+      setToken(null);
+      navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
-
-      // Extract message from backend
       let msg = "Logout failed. Please try again.";
       if (error.response) {
-        // Laravel usually returns error.response.data.message
         msg = error.response.data?.message || msg;
       } else if (error.message) {
         msg = error.message;
       }
-
-      alert(msg); // show exact error message
+      alert(msg);
     } finally {
       setLoading(false);
       setIsModalOpen(false);
@@ -61,16 +55,18 @@ const Settings = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto my-6 px-4">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-green-800">Settings</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-800">
+          Settings
+        </h1>
       </div>
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5 sm:gap-6">
         {/* Account */}
-        <div className="bg-white rounded-2xl shadow-sm p-2">
-          <h2 className="px-3 pb-2 text-xs font-semibold text-green-600 uppercase">
+        <div className="bg-white rounded-2xl shadow-sm p-3 sm:p-4">
+          <h2 className="px-3 pb-2 text-xs sm:text-sm font-semibold text-green-600 uppercase tracking-wide">
             Account
           </h2>
 
@@ -83,20 +79,20 @@ const Settings = () => {
             <div
               key={route}
               onClick={() => handleNavigation(route)}
-              className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-green-50 cursor-pointer transition"
+              className="flex items-center justify-between px-3 py-3 sm:py-3.5 rounded-xl hover:bg-green-50 cursor-pointer transition-colors"
             >
-              <span className="flex items-center gap-3 text-gray-700 font-medium">
-                <i className={`fa-solid ${icon} text-green-500`}></i>
+              <span className="flex items-center gap-3 text-gray-700 font-medium text-sm sm:text-base">
+                <i className={`fa-solid ${icon} text-green-500 text-lg sm:text-xl`}></i>
                 {label}
               </span>
-              <span className="text-green-400 text-lg">›</span>
+              <span className="text-green-400 text-lg sm:text-xl font-light">›</span>
             </div>
           ))}
         </div>
 
-        {/* Support */}
-        <div className="bg-white rounded-2xl shadow-sm p-2">
-          <h2 className="px-3 pb-2 text-xs font-semibold text-green-600 uppercase">
+        {/* Support & About */}
+        <div className="bg-white rounded-2xl shadow-sm p-3 sm:p-4">
+          <h2 className="px-3 pb-2 text-xs sm:text-sm font-semibold text-green-600 uppercase tracking-wide">
             Support & About
           </h2>
 
@@ -107,54 +103,54 @@ const Settings = () => {
             <div
               key={route}
               onClick={() => handleNavigation(route)}
-              className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-green-50 cursor-pointer transition"
+              className="flex items-center justify-between px-3 py-3 sm:py-3.5 rounded-xl hover:bg-green-50 cursor-pointer transition-colors"
             >
-              <span className="flex items-center gap-3 text-gray-700 font-medium">
-                <i className={`fa-solid ${icon} text-green-500`}></i>
+              <span className="flex items-center gap-3 text-gray-700 font-medium text-sm sm:text-base">
+                <i className={`fa-solid ${icon} text-green-500 text-lg sm:text-xl`}></i>
                 {label}
               </span>
-              <span className="text-green-400 text-lg">›</span>
+              <span className="text-green-400 text-lg sm:text-xl font-light">›</span>
             </div>
           ))}
         </div>
 
         {/* Actions */}
-        <div className="bg-white rounded-2xl shadow-sm p-2">
-          <h2 className="px-3 pb-2 text-xs font-semibold text-green-600 uppercase">
+        <div className="bg-white rounded-2xl shadow-sm p-3 sm:p-4">
+          <h2 className="px-3 pb-2 text-xs sm:text-sm font-semibold text-green-600 uppercase tracking-wide">
             Actions
           </h2>
 
           <div
             onClick={() => handleNavigation("report")}
-            className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-green-50 cursor-pointer transition"
+            className="flex items-center justify-between px-3 py-3 sm:py-3.5 rounded-xl hover:bg-green-50 cursor-pointer transition-colors"
           >
-            <span className="flex items-center gap-3 text-gray-700 font-medium">
-              <i className="fa-solid fa-bug text-green-500"></i>
+            <span className="flex items-center gap-3 text-gray-700 font-medium text-sm sm:text-base">
+              <i className="fa-solid fa-bug text-green-500 text-lg sm:text-xl"></i>
               Report a problem
             </span>
-            <span className="text-green-400 text-lg">›</span>
+            <span className="text-green-400 text-lg sm:text-xl font-light">›</span>
           </div>
 
           <div
             onClick={() => handleNavigation("add-account")}
-            className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-green-50 cursor-pointer transition"
+            className="flex items-center justify-between px-3 py-3 sm:py-3.5 rounded-xl hover:bg-green-50 cursor-pointer transition-colors"
           >
-            <span className="flex items-center gap-3 text-gray-700 font-medium">
-              <i className="fa-solid fa-user-plus text-green-500"></i>
+            <span className="flex items-center gap-3 text-gray-700 font-medium text-sm sm:text-base">
+              <i className="fa-solid fa-user-plus text-green-500 text-lg sm:text-xl"></i>
               Add account
             </span>
-            <span className="text-green-400 text-lg">›</span>
+            <span className="text-green-400 text-lg sm:text-xl font-light">›</span>
           </div>
 
           <div
             onClick={() => handleNavigation("logout")}
-            className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-red-50 cursor-pointer transition"
+            className="flex items-center justify-between px-3 py-3 sm:py-3.5 rounded-xl hover:bg-red-50 cursor-pointer transition-colors"
           >
-            <span className="flex items-center gap-3 text-red-500 font-medium">
-              <i className="fa-solid fa-right-from-bracket"></i>
+            <span className="flex items-center gap-3 text-red-500 font-medium text-sm sm:text-base">
+              <i className="fa-solid fa-right-from-bracket text-lg sm:text-xl"></i>
               Log out
             </span>
-            <span className="text-red-400 text-lg">›</span>
+            <span className="text-red-400 text-lg sm:text-xl font-light">›</span>
           </div>
 
           <ConfirmModal
@@ -163,7 +159,7 @@ const Settings = () => {
             message="Are you sure you want to log out?"
             onCancel={() => setIsModalOpen(false)}
             onConfirm={handleLogout}
-            loading={loading} // pass loading state to modal
+            loading={loading}
           />
         </div>
       </div>

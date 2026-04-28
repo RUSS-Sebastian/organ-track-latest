@@ -12,8 +12,8 @@ export default function BottomNav() {
   const location = useLocation();
 
   return (
-    <div className="fixed bottom-0 left-0 w-full flex justify-center bg-white">
-      <div className="w-full max-w-[402px] flex justify-around items-center h-14 sm:h-16 px-1 sm:px-2">
+    <div className="fixed bottom-0 left-0 w-full flex justify-center bg-white z-40">
+      <div className="w-full flex justify-around items-center h-14 sm:h-16 lg:h-18 px-4 sm:px-6 lg:px-8">
         {navItems.map((item, index) => {
           const Icon = item.icon;
 
@@ -25,19 +25,16 @@ export default function BottomNav() {
             >
               {() => {
                 const path = location.pathname;
-                const organId = path.split("/")[2]; // Heart or daily
+                const organId = path.split("/")[2];
 
                 let isActive = false;
 
-                // TRACK ACTIVE
                 if (item.to === "/track") {
                   isActive =
                     path.startsWith("/track") ||
                     (path.startsWith("/questions") && organId !== "daily") ||
                     (path.startsWith("/thanks") && organId !== "daily");
-                }
-                // CHECK-IN ACTIVE
-                else if (item.to === "/checkin") {
+                } else if (item.to === "/checkin") {
                   isActive =
                     path.startsWith("/checkin") ||
                     (path.startsWith("/questions") && organId === "daily") ||
@@ -48,26 +45,32 @@ export default function BottomNav() {
                     path.startsWith("/EditProfile");
                 } else if (item.to === "/") {
                   isActive = path.startsWith("/each-organ") || path === "/";
-                }
-                // OTHER ROUTES
-                else {
+                } else {
                   isActive = path === item.to;
                 }
 
                 return (
                   <>
                     {isActive && (
-                      <div className="absolute top-0 w-full h-[3px] bg-[#539DF3]" />
+                      <div
+                        className={`absolute top-0 h-[3px] sm:h-[4px] bg-[#539DF3] ${
+                          index === 0
+                            ? "-ml-4 sm:-ml-6 lg:-ml-8 w-[calc(100%+1rem)] sm:w-[calc(100%+1.5rem)] lg:w-[calc(100%+2rem)] left-0"
+                            : index === navItems.length - 1
+                            ? "-mr-4 sm:-mr-6 lg:-mr-8 w-[calc(100%+1rem)] sm:w-[calc(100%+1.5rem)] lg:w-[calc(100%+2rem)] right-0"
+                            : "w-full left-0 right-0"
+                        }`}
+                      />
                     )}
 
                     <Icon
-                      className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                      className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${
                         isActive ? "text-[#539DF3]" : "text-gray-700"
                       }`}
                     />
 
                     <span
-                      className={`text-[10px] sm:text-xs mt-0.5 sm:mt-1 ${
+                      className={`text-[10px] sm:text-xs lg:text-sm mt-0.5 sm:mt-1 ${
                         isActive ? "text-[#539DF3]" : "text-gray-700"
                       }`}
                     >

@@ -28,126 +28,87 @@ export default function TrackSyms() {
   };
 
   return (
-    <div className="min-h-[982px] w-full flex justify-center bg-white">
-      {/* Mobile container */}
-      <div className="w-full max-w-[402px] px-1 pt-6 pb-10">
-        {/* Header */}
-        <h1
-          className="
-          text-[#14AE5C]
-          font-bold
-          text-[24px]
-          font-['Roboto']
-        "
-        >
-          Symptom Track
-        </h1>
+  <div className="min-h-screen w-full bg-white flex flex-col">
+    {/* Content container – fluid width, no max‑w */}
+    <div className="w-full px-4 sm:px-6 lg:px-8 pt-6 pb-10">
+      {/* Header */}
+      <h1 className="text-[#14AE5C] font-bold text-2xl sm:text-3xl lg:text-4xl font-['Roboto']">
+        Symptom Track
+      </h1>
 
-        {/* Subtitle */}
-        <p
-          className="
-          mt-1
-          text-black
-          text-[14px]
-          font-medium
-          font-['Montserrat']
-        "
-        >
-          Don’t feel well today?
-        </p>
+      {/* Subtitle */}
+      <p className="mt-1 text-black text-sm sm:text-base lg:text-lg font-medium font-['Montserrat']">
+        Don’t feel well today?
+      </p>
 
-        {/* Bottom Helper Text */}
-        <p
-          className="
-          mt-1
-          text-black
-          text-[14px]
-          font-medium
-          font-['Montserrat']
-        "
-        >
-          Select the organ you think that is related to and answer the questions
-        </p>
+      {/* Bottom Helper Text */}
+      <p className="mt-1 text-black text-sm sm:text-base lg:text-lg font-medium font-['Montserrat']">
+        Select the organ you think that is related to and answer the questions
+      </p>
 
-        {/* Button */}
-        <button
-          className="
-            mt-4
-            w-[167px]
-            h-[40px]
-            bg-[#14AE5C]
-            text-white
-            rounded-[12px]
-            font-semibold
-            text-[14px]
-            font-['Montserrat']
-          "
-          onClick={() => setShowOverlay(true)}
-        >
-          Answer Now
-        </button>
+      {/* Button – full width on mobile, auto on larger */}
+      <button
+        className="mt-4 px-6 py-3 bg-[#14AE5C] text-white rounded-xl font-semibold text-sm sm:text-base w-full sm:w-auto transition-all hover:bg-green-700"
+        onClick={() => setShowOverlay(true)}
+      >
+        Answer Now
+      </button>
 
-        <div className="overflow-x-auto">
-          {drafts.length === 0 ? (
-            // ✅ EMPTY STATE
-            <div className="flex flex-col items-center justify-center py-16 text-left text-gray-500">
-              <p className="text-lg font-medium">No in-progress drafts</p>
-              <p className="text-sm mt-1">
-                Start a check-in and it will appear here
-              </p>
-            </div>
-          ) : (
-            // ✅ NORMAL DRAFT LIST
-            <div className="flex gap-4 p-4 min-w-max">
-              {drafts.map((draft) => (
-                <div
-                  key={draft.organId}
-                  className="bg-white rounded-xl shadow p-4 w-40 flex-shrink-0"
-                >
-                  <h3 className="font-semibold mb-2">{draft.organName}</h3>
+      {/* Drafts section */}
+      <div className="mt-8">
+        {drafts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center text-gray-500">
+            <p className="text-lg sm:text-xl font-medium">No in-progress drafts</p>
+            <p className="text-sm sm:text-base mt-1">
+              Start a check-in and it will appear here
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {drafts.map((draft) => (
+              <div
+                key={draft.organId}
+                className="bg-white rounded-xl shadow p-4 sm:p-5 flex flex-col"
+              >
+                <h3 className="font-semibold text-base sm:text-lg mb-3">
+                  {draft.organName}
+                </h3>
 
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => handleResume(draft.organId)}
-                      className="bg-[#14AE5C] text-white rounded-md py-1 text-sm"
-                    >
-                      Resume
-                    </button>
+                <div className="flex flex-col gap-2 mt-auto">
+                  <button
+                    onClick={() => handleResume(draft.organId)}
+                    className="bg-[#14AE5C] text-white rounded-md py-2 text-sm sm:text-base"
+                  >
+                    Resume
+                  </button>
 
-                    <button
-                      onClick={() => handleDelete(draft.organId)}
-                      className="border rounded-md py-1 text-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => handleDelete(draft.organId)}
+                    className="border border-gray-300 rounded-md py-2 text-sm sm:text-base"
+                  >
+                    Delete
+                  </button>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <h2
-          className="
-            mt-6
-            text-[#14AE5C]
-            font-bold
-            text-[18px]
-            font-['Montserrat']
-            text-left
-          "
-        >
-          Track History
-        </h2>
-
-        <div className="w-full max-w-[402px] rounded-lg ">
-          <TrackHistory />
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {showOverlay && (
-        <OrganSelectOverlay onClose={() => setShowOverlay(false)} />
-      )}
+      {/* Track History title */}
+      <h2 className="mt-8 text-[#14AE5C] font-bold text-xl sm:text-2xl lg:text-3xl font-['Montserrat'] text-left">
+        Track History
+      </h2>
+
+      {/* Track History content – no width clamp */}
+      <div className="w-full mt-2">
+        <TrackHistory />
+      </div>
     </div>
-  );
+
+    {showOverlay && (
+      <OrganSelectOverlay onClose={() => setShowOverlay(false)} />
+    )}
+  </div>
+);
 }

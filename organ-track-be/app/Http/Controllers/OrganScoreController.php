@@ -51,8 +51,27 @@ public function getLatestOrganStatus()
 
     if (!$latestReport) {
         return response()->json([
-            'message' => 'No reports found'
-        ], 404);
+            "userId" => $userId,
+            "gender" => null,
+            "organHealth" => [
+                "brain" => null,
+                "lungs" => null,
+                "stomach" => null,
+                "kidney" => null,
+                "heart" => null,
+                "liver" => null,
+                "muscles" => null,
+                "intestine" => null,
+                "gallBladder" => null,
+                "pancreas" => null,
+                "skin" => null,
+                "bladder" => null,
+                "bloodVessels" => null,
+                "bone" => null,
+                "maleOrgan" => null,
+                "femaleOrgan" => null,
+            ]
+        ]);
     }
 
     $organHealth = [
