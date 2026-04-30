@@ -1,12 +1,23 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, CheckCircle, Activity, Settings } from "lucide-react";
+import { useUser } from "../context/UserContext";
+
+const translations = {
+  Home: { en: "Home", mm: "ပင်မစာမျက်နှာ" },
+  "Check-in": { en: "Check-in", mm: "စစ်ဆေးမှု" },
+  "Track-Syms": { en: "Track-Syms", mm: "လက္ခဏာမှတ်တမ်း" },
+  Settings: { en: "Settings", mm: "ဆက်တင်များ" },
+};
 
 export default function BottomNav() {
+  const { user } = useUser();
+  const isBurmese = user?.language_preference === "Bur";
+
   const navItems = [
-    { to: "/", label: "Home", icon: Home },
-    { to: "/checkin", label: "Check-in", icon: CheckCircle },
-    { to: "/track", label: "Track-Syms", icon: Activity },
-    { to: "/settings", label: "Settings", icon: Settings },
+    { to: "/", label: translations.Home, icon: Home },
+    { to: "/checkin", label: translations["Check-in"], icon: CheckCircle },
+    { to: "/track", label: translations["Track-Syms"], icon: Activity },
+    { to: "/settings", label: translations.Settings, icon: Settings },
   ];
 
   const location = useLocation();
@@ -16,6 +27,7 @@ export default function BottomNav() {
       <div className="w-full flex justify-around items-center h-14 sm:h-16 lg:h-18 px-4 sm:px-6 lg:px-8">
         {navItems.map((item, index) => {
           const Icon = item.icon;
+          const displayLabel = isBurmese ? item.label.mm : item.label.en;
 
           return (
             <NavLink
@@ -57,8 +69,8 @@ export default function BottomNav() {
                           index === 0
                             ? "-ml-4 sm:-ml-6 lg:-ml-8 w-[calc(100%+1rem)] sm:w-[calc(100%+1.5rem)] lg:w-[calc(100%+2rem)] left-0"
                             : index === navItems.length - 1
-                            ? "-mr-4 sm:-mr-6 lg:-mr-8 w-[calc(100%+1rem)] sm:w-[calc(100%+1.5rem)] lg:w-[calc(100%+2rem)] right-0"
-                            : "w-full left-0 right-0"
+                              ? "-mr-4 sm:-mr-6 lg:-mr-8 w-[calc(100%+1rem)] sm:w-[calc(100%+1.5rem)] lg:w-[calc(100%+2rem)] right-0"
+                              : "w-full left-0 right-0"
                         }`}
                       />
                     )}
@@ -70,11 +82,15 @@ export default function BottomNav() {
                     />
 
                     <span
-                      className={`text-[10px] sm:text-xs lg:text-sm mt-0.5 sm:mt-1 ${
+                      className={`text-center whitespace-nowrap ${
+                        isBurmese
+                          ? "text-[8px] sm:text-[10px] lg:text-sm"
+                          : "text-[10px] sm:text-xs lg:text-sm"
+                      } mt-0.5 sm:mt-1 ${
                         isActive ? "text-[#539DF3]" : "text-gray-700"
                       }`}
                     >
-                      {item.label}
+                      {displayLabel}
                     </span>
                   </>
                 );

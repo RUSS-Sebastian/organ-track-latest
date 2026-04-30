@@ -2,10 +2,58 @@ import { useState, useEffect } from "react";
 import axios from "../api/axios";
 const ENABLE_TEST_MODE = false;
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+
+// --- Translations ---
+const translations = {
+  header: {
+    en: "Daily Habit Check-In",
+    mm: "နေ့စဉ်အလေ့အထ စစ်ဆေးမှု",
+  },
+  hours: { en: "Hours", mm: "နာရီ" },
+  minutes: { en: "Minutes", mm: "မိနစ်" },
+  seconds: { en: "Seconds", mm: "စက္ကန့်" },
+  testCountdown: {
+    en: "⏱️ Test countdown in progress",
+    mm: "⏱️ စမ်းသပ်မှု နာရီပြောင်းလဲဆဲ",
+  },
+  timeRemaining: {
+    en: "Time remaining until next check-in",
+    mm: "နောက်တစ်ကြိမ် စစ်ဆေးရန် ကျန်နေသည့် အချိန်",
+  },
+  waitMessage: (h, m, s, isTest) => {
+    const en = `⏳ Please wait ${h}h ${m}m ${s}s to enter the next Check-in${
+      isTest ? "\n(Test mode: using demo timer)" : ""
+    }`;
+    const mm = `⏳ နောက်တစ်ကြိမ် စစ်ဆေးရန် ${h}နာရီ ${m}မိနစ် ${s}စက္ကန့် စောင့်ပါ${
+      isTest ? "\n(စမ်းသပ်မုဒ်)" : ""
+    }`;
+    return { en, mm };
+  },
+  clickToAnswer: {
+    en: "✓ Click here to answer the questions",
+    mm: "✓ မေးခွန်းများဖြေဆိုရန် ဤနေရာကိုနှိပ်ပါ",
+  },
+  testModeOn: { en: "Test Mode ON", mm: "စမ်းသပ်မုဒ်ဖွင့်" },
+  testModeOff: { en: "Test Mode", mm: "စမ်းသပ်မုဒ်" },
+  testPanel: {
+    quickPresets: { en: "Quick Presets", mm: "အမြန်ရွေးချယ်မှုများ" },
+    almostReady: { en: "Almost Ready", mm: "ရောက်တော့မည်" },
+    readyNow: { en: "Ready Now", mm: "အဆင်သင့်ဖြစ်ပြီ" },
+    mediumWait: { en: "Medium Wait", mm: "အလယ်အလတ်စောင့်" },
+    hours: { en: "Hours", mm: "နာရီ" },
+    minutes: { en: "Minutes", mm: "မိနစ်" },
+    seconds: { en: "Seconds", mm: "စက္ကန့်" },
+    button: (text) => text, // unchanged, or translate if needed
+  },
+};
 
 const DailyHabitCheckin = () => {
-  const todayLocal = new Date(); // device local datetime
+  const todayLocal = new Date();
   const navigate = useNavigate();
+  const { user } = useUser(); // ⬅️ added
+  const isBurmese = user?.language_preference === "Bur"; // ⬅️ added
+
   const yyyy = todayLocal.getFullYear();
   const mm = String(todayLocal.getMonth() + 1).padStart(2, "0");
   const dd = String(todayLocal.getDate()).padStart(2, "0");
@@ -21,7 +69,7 @@ const DailyHabitCheckin = () => {
   const [testTime, setTestTime] = useState({
     hours: 0,
     minutes: 0,
-    seconds: 10, // Default test time: 10 seconds
+    seconds: 10,
   });
   const [showTestControls, setShowTestControls] = useState(false);
   const [answeredToday, setAnsweredToday] = useState(null);
@@ -227,159 +275,285 @@ const DailyHabitCheckin = () => {
     return num.toString().padStart(2, "0");
   };
 
-return (
-  <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden px-3 sm:px-6 lg:px-8 py-8">
-    {/* Test Mode Toggle Button – unchanged */}
-    {ENABLE_TEST_MODE && (
-      <button
-        onClick={toggleTestMode}
-        className="absolute top-4 right-4 z-50 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-green-200 flex items-center gap-2 hover:bg-white transition-all duration-300"
-      >
-        <span className={`text-sm font-medium ${testMode ? "text-green-600" : "text-gray-500"}`}>
-          {testMode ? "Test Mode ON" : "Test Mode"}
-        </span>
-      </button>
-    )}
+  const t = (en, mm) => (isBurmese ? mm : en);
 
-    {/* Test Controls Panel – unchanged */}
-    {ENABLE_TEST_MODE && showTestControls && (
-      <div className="absolute top-20 right-4 z-50 w-[calc(100%-2rem)] sm:w-80 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-green-200 p-4 animate-slideDown">
-        {/* ... same test panel content ... */}
-      </div>
-    )}
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden px-3 sm:px-6 lg:px-8 py-8">
+      {/* Test Mode Toggle Button */}
+      {ENABLE_TEST_MODE && (
+        <button
+          onClick={toggleTestMode}
+          className="absolute top-4 right-4 z-50 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg border border-green-200 flex items-center gap-2 hover:bg-white transition-all duration-300"
+        >
+          <span
+            className={`text-sm font-medium ${testMode ? "text-green-600" : "text-gray-500"}`}
+          >
+            {testMode
+              ? t(translations.testModeOn.en, translations.testModeOn.mm)
+              : t(translations.testModeOff.en, translations.testModeOff.mm)}
+          </span>
+        </button>
+      )}
 
-    {/* Animated Background – unchanged */}
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-      <div
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: `url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')`,
-          backgroundRepeat: "repeat",
-        }}
-      ></div>
-    </div>
-
-    {/* Main Card – now edge‑to‑edge, no width cap */}
-    <div className="w-full relative z-10">
-      <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-3 sm:p-6 lg:p-8 border border-white/50 overflow-hidden shadow-xl">
-        {/* Top Decorative Gradient */}
-        <div className="absolute top-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-b from-green-100/30 to-transparent"></div>
-
-        <div className="relative z-10 mt-2 sm:mt-4">
-          {/* Header */}
-          <div className="text-center mb-8 sm:mb-10 lg:mb-12">
-            <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
-              Daily Habit Check-In
-            </h1>
-            <p className="text-gray-500 flex items-center justify-center gap-2">
-              <span className="w-1 h-1 bg-green-400 rounded-full"></span>
-              <span className="w-1 h-1 bg-green-400 rounded-full"></span>
-            </p>
-          </div>
-
-          {/* Countdown Timer */}
-          <div className="mb-8">
-            <div className="flex justify-center items-center gap-2 sm:gap-4 lg:gap-6 mb-6">
-              {/* Hours */}
-              <div className="text-center">
-                <div className="text-4xl sm:text-7xl lg:text-9xl font-bold bg-gradient-to-b from-green-600 to-emerald-600 bg-clip-text text-transparent tabular-nums">
-                  {formatNumber(timeLeft.hours)}
-                </div>
-                <div className="text-xs sm:text-sm uppercase tracking-wider text-gray-400 mt-2">Hours</div>
-              </div>
-
-              <span className="text-2xl sm:text-5xl lg:text-7xl font-light text-green-300/50">:</span>
-
-              {/* Minutes */}
-              <div className="text-center">
-                <div className="text-4xl sm:text-7xl lg:text-9xl font-bold bg-gradient-to-b from-emerald-600 to-teal-600 bg-clip-text text-transparent tabular-nums">
-                  {formatNumber(timeLeft.minutes)}
-                </div>
-                <div className="text-xs sm:text-sm uppercase tracking-wider text-gray-400 mt-2">Minutes</div>
-              </div>
-
-              <span className="text-2xl sm:text-5xl lg:text-7xl font-light text-green-300/50">:</span>
-
-              {/* Seconds */}
-              <div className="text-center">
-                <div className="text-4xl sm:text-7xl lg:text-9xl font-bold bg-gradient-to-b from-teal-600 to-green-600 bg-clip-text text-transparent tabular-nums">
-                  {formatNumber(timeLeft.seconds)}
-                </div>
-                <div className="text-xs sm:text-sm uppercase tracking-wider text-gray-400 mt-2">Seconds</div>
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="relative h-2 sm:h-3 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 rounded-full transition-all duration-1000"
-                style={{
-                  width: testMode
-                    ? `${((testTime.hours * 3600 + testTime.minutes * 60 + testTime.seconds) / (24 * 3600)) * 100}%`
-                    : `${((24 - timeLeft.hours) / 24) * 100}%`,
-                  opacity:
-                    timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0
-                      ? 1
-                      : 0.8,
-                }}
-              ></div>
-            </div>
-          </div>
-
-          {/* Message Section */}
-          <div className="text-center">
-            {!canAnswer ? (
-              <div className="space-y-3">
-                <p className="text-sm sm:text-base text-gray-400">
-                  {testMode ? "⏱️ Test countdown in progress" : "Time remaining until next check-in"}
-                </p>
-                <div className="bg-green-50/50 backdrop-blur-sm rounded-xl p-3 sm:p-5">
-                  <p className="text-sm sm:text-base text-green-700">
-                    ⏳ Please wait {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s to enter the next Check-in
-                    {testMode && (
-                      <span className="block text-xs text-purple-600 mt-1">
-                        (Test mode: using demo timer)
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div
-                onClick={goToTrackPage}
-                className="space-y-3 cursor-pointer transform transition-all duration-300 hover:scale-105"
+      {/* Test Controls Panel */}
+      {ENABLE_TEST_MODE && showTestControls && (
+        <div className="absolute top-20 right-4 z-50 w-[calc(100%-2rem)] sm:w-80 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-green-200 p-4 animate-slideDown">
+          <div className="flex flex-col gap-3">
+            <h3 className="font-semibold text-green-800">
+              {t(
+                translations.testPanel.quickPresets.en,
+                translations.testPanel.quickPresets.mm,
+              )}
+            </h3>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setTestPreset("almost")}
+                className="flex-1 px-3 py-2 bg-green-100 text-green-700 rounded-xl text-xs font-medium hover:bg-green-200"
               >
-                <div className="bg-green-50/50 backdrop-blur-sm rounded-xl p-3 sm:p-5 hover:bg-green-100/50 hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-green-300">
-                  <p className="text-sm sm:text-base text-green-700 font-medium">
-                    ✓ Click here to answer the questions
-                  </p>
+                {t(
+                  translations.testPanel.almostReady.en,
+                  translations.testPanel.almostReady.mm,
+                )}
+              </button>
+              <button
+                onClick={() => setTestPreset("ready")}
+                className="flex-1 px-3 py-2 bg-green-100 text-green-700 rounded-xl text-xs font-medium hover:bg-green-200"
+              >
+                {t(
+                  translations.testPanel.readyNow.en,
+                  translations.testPanel.readyNow.mm,
+                )}
+              </button>
+              <button
+                onClick={() => setTestPreset("medium")}
+                className="flex-1 px-3 py-2 bg-green-100 text-green-700 rounded-xl text-xs font-medium hover:bg-green-200"
+              >
+                {t(
+                  translations.testPanel.mediumWait.en,
+                  translations.testPanel.mediumWait.mm,
+                )}
+              </button>
+            </div>
+            <div className="flex items-center justify-between gap-1 text-xs mt-2">
+              <span>
+                {t(
+                  translations.testPanel.hours.en,
+                  translations.testPanel.hours.mm,
+                )}
+              </span>
+              <span>
+                {t(
+                  translations.testPanel.minutes.en,
+                  translations.testPanel.minutes.mm,
+                )}
+              </span>
+              <span>
+                {t(
+                  translations.testPanel.seconds.en,
+                  translations.testPanel.seconds.mm,
+                )}
+              </span>
+            </div>
+            <div className="flex gap-1">
+              <button
+                onClick={() => adjustTestTime("hours", -1)}
+                className="flex-1 py-1 bg-gray-100 rounded text-xs"
+              >
+                -1h
+              </button>
+              <button
+                onClick={() => adjustTestTime("hours", 1)}
+                className="flex-1 py-1 bg-gray-100 rounded text-xs"
+              >
+                +1h
+              </button>
+              <button
+                onClick={() => adjustTestTime("minutes", -5)}
+                className="flex-1 py-1 bg-gray-100 rounded text-xs"
+              >
+                -5m
+              </button>
+              <button
+                onClick={() => adjustTestTime("minutes", 5)}
+                className="flex-1 py-1 bg-gray-100 rounded text-xs"
+              >
+                +5m
+              </button>
+              <button
+                onClick={() => adjustTestTime("seconds", -5)}
+                className="flex-1 py-1 bg-gray-100 rounded text-xs"
+              >
+                -5s
+              </button>
+              <button
+                onClick={() => adjustTestTime("seconds", 5)}
+                className="flex-1 py-1 bg-gray-100 rounded text-xs"
+              >
+                +5s
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Animated Background – unchanged */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')`,
+            backgroundRepeat: "repeat",
+          }}
+        ></div>
+      </div>
+
+      {/* Main Card */}
+      <div className="w-full relative z-10">
+        <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-3 sm:p-6 lg:p-8 border border-white/50 overflow-hidden shadow-xl">
+          <div className="absolute top-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-b from-green-100/30 to-transparent"></div>
+          <div className="relative z-10 mt-2 sm:mt-4">
+            {/* Header */}
+            <div className="text-center mb-8 sm:mb-10 lg:mb-12">
+              <h1
+                className={`
+                text-xl sm:text-3xl lg:text-5xl font-bold
+                bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent
+                mb-2
+                ${isBurmese ? "leading-relaxed py-1" : ""}
+              `}
+              >
+                {t(translations.header.en, translations.header.mm)}
+              </h1>
+              <p className="text-gray-500 flex items-center justify-center gap-2">
+                <span className="w-1 h-1 bg-green-400 rounded-full"></span>
+                <span className="w-1 h-1 bg-green-400 rounded-full"></span>
+              </p>
+            </div>
+
+            {/* Countdown Timer */}
+            <div className="mb-8">
+              <div className="flex justify-center items-center gap-2 sm:gap-4 lg:gap-6 mb-6">
+                {/* Hours */}
+                <div className="text-center">
+                  <div className="text-4xl sm:text-7xl lg:text-9xl font-bold bg-gradient-to-b from-green-600 to-emerald-600 bg-clip-text text-transparent tabular-nums">
+                    {formatNumber(timeLeft.hours)}
+                  </div>
+                  <div className="text-xs sm:text-sm uppercase tracking-wider text-gray-600 mt-2">
+                    {t(translations.hours.en, translations.hours.mm)}
+                  </div>
+                </div>
+                <span className="text-2xl sm:text-5xl lg:text-7xl font-light text-green-300/50">
+                  :
+                </span>
+                {/* Minutes */}
+                <div className="text-center">
+                  <div className="text-4xl sm:text-7xl lg:text-9xl font-bold bg-gradient-to-b from-emerald-600 to-teal-600 bg-clip-text text-transparent tabular-nums">
+                    {formatNumber(timeLeft.minutes)}
+                  </div>
+                  <div className="text-xs sm:text-sm uppercase tracking-wider text-gray-600 mt-2">
+                    {t(translations.minutes.en, translations.minutes.mm)}
+                  </div>
+                </div>
+                <span className="text-2xl sm:text-5xl lg:text-7xl font-light text-green-300/50">
+                  :
+                </span>
+                {/* Seconds */}
+                <div className="text-center">
+                  <div className="text-4xl sm:text-7xl lg:text-9xl font-bold bg-gradient-to-b from-teal-600 to-green-600 bg-clip-text text-transparent tabular-nums">
+                    {formatNumber(timeLeft.seconds)}
+                  </div>
+                  <div className="text-xs sm:text-sm uppercase tracking-wider text-gray-600 mt-2">
+                    {t(translations.seconds.en, translations.seconds.mm)}
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
+              {/* Progress Bar (unchanged) */}
+              <div className="relative h-2 sm:h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 rounded-full transition-all duration-1000"
+                  style={{
+                    width: testMode
+                      ? `${((testTime.hours * 3600 + testTime.minutes * 60 + testTime.seconds) / (24 * 3600)) * 100}%`
+                      : `${((24 - timeLeft.hours) / 24) * 100}%`,
+                    opacity:
+                      timeLeft.hours === 0 &&
+                      timeLeft.minutes === 0 &&
+                      timeLeft.seconds === 0
+                        ? 1
+                        : 0.8,
+                  }}
+                ></div>
+              </div>
+            </div>
 
-          {/* Decorative Footer */}
-          <div className="mt-10 sm:mt-12 flex justify-center gap-2">
-            <div className="w-1 h-1 bg-green-200 rounded-full"></div>
-            <div className="w-1 h-1 bg-green-300 rounded-full"></div>
-            <div className="w-1 h-1 bg-green-400 rounded-full"></div>
-            <div className="w-1 h-1 bg-green-500 rounded-full"></div>
-            <div className="w-1 h-1 bg-green-600 rounded-full"></div>
-            <div className="w-1 h-1 bg-green-500 rounded-full"></div>
-            <div className="w-1 h-1 bg-green-400 rounded-full"></div>
-            <div className="w-1 h-1 bg-green-300 rounded-full"></div>
-            <div className="w-1 h-1 bg-green-200 rounded-full"></div>
+            {/* Message Section */}
+            <div className="text-center">
+              {!canAnswer ? (
+                <div className="space-y-3">
+                  <p className="text-sm sm:text-base text-gray-400">
+                    {testMode
+                      ? t(
+                          translations.testCountdown.en,
+                          translations.testCountdown.mm,
+                        )
+                      : t(
+                          translations.timeRemaining.en,
+                          translations.timeRemaining.mm,
+                        )}
+                  </p>
+                  <div className="bg-green-50/50 backdrop-blur-sm rounded-xl p-3 sm:p-5">
+                    <p className="text-sm sm:text-base text-green-700 whitespace-pre-line">
+                      {(() => {
+                        const msg = translations.waitMessage(
+                          timeLeft.hours,
+                          timeLeft.minutes,
+                          timeLeft.seconds,
+                          testMode,
+                        );
+                        return isBurmese ? msg.mm : msg.en;
+                      })()}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={goToTrackPage}
+                  className="space-y-3 cursor-pointer transform transition-all duration-300 hover:scale-105"
+                >
+                  <div className="bg-green-50/50 backdrop-blur-sm rounded-xl p-3 sm:p-5 hover:bg-green-100/50 hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-green-300">
+                    <p className="text-sm sm:text-base text-green-700 font-medium">
+                      {t(
+                        translations.clickToAnswer.en,
+                        translations.clickToAnswer.mm,
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Decorative Footer */}
+            <div className="mt-10 sm:mt-12 flex justify-center gap-2">
+              <div className="w-1 h-1 bg-green-200 rounded-full"></div>
+              <div className="w-1 h-1 bg-green-300 rounded-full"></div>
+              <div className="w-1 h-1 bg-green-400 rounded-full"></div>
+              <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+              <div className="w-1 h-1 bg-green-600 rounded-full"></div>
+              <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+              <div className="w-1 h-1 bg-green-400 rounded-full"></div>
+              <div className="w-1 h-1 bg-green-300 rounded-full"></div>
+              <div className="w-1 h-1 bg-green-200 rounded-full"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    {/* Animation Keyframes – unchanged */}
-    <style>
-      {`
+      {/* Animation Keyframes – unchanged */}
+      <style>
+        {`
         @keyframes blob {
           0% { transform: translate(0px, 0px) scale(1); }
           33% { transform: translate(30px, -50px) scale(1.1); }
@@ -395,9 +569,9 @@ return (
         .animation-delay-2000 { animation-delay: 2000ms; }
         .animation-delay-4000 { animation-delay: 4000ms; }
       `}
-    </style>
-  </div>
-);
+      </style>
+    </div>
+  );
 };
 
 export default DailyHabitCheckin;

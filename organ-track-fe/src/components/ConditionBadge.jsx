@@ -1,4 +1,4 @@
-export default function ConditionBadge({ status }) {
+export default function ConditionBadge({ status, displayLabel }) {
   const getColor = () => {
     switch (status) {
       case "Good":
@@ -20,7 +20,7 @@ export default function ConditionBadge({ status }) {
       font-semibold text-sm md:text-base 
       ${getColor()}`}
     >
-      {status}
+      {displayLabel || status}
     </div>
   );
 }

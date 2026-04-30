@@ -14,17 +14,18 @@ class MeController extends Controller
      * GET /api/me
      * Returns current user info (id, name, email, gender)
      */
-    public function me(Request $request)
-    {
-        $user = $request->user();
+public function me(Request $request)
+{
+    $user = $request->user();
 
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'gender' => $user->gender,
-        ]);
-    }
+    return response()->json([
+        'id'                  => $user->id,
+        'name'                => $user->name,
+        'email'               => $user->email,
+        'gender'              => $user->gender,
+        'language_preference' => $user->language_preference,
+    ]);
+}
 
     /**
      * GET /api/me/organs
