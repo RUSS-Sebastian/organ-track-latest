@@ -805,7 +805,7 @@ class AnswerController extends Controller
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json',
             ])->post('https://openrouter.ai/api/v1/chat/completions', [
-                'model' => 'arcee-ai/trinity-large-preview:free',
+                'model' => "tencent/hy3-preview:free",
                 'messages' => [
                     [
                         'role' => 'user',

@@ -14,18 +14,35 @@ class MeController extends Controller
      * GET /api/me
      * Returns current user info (id, name, email, gender)
      */
-public function me(Request $request)
-{
-    $user = $request->user();
+    public function me(Request $request)
+    {
+        $user = $request->user();
 
-    return response()->json([
-        'id'                  => $user->id,
-        'name'                => $user->name,
-        'email'               => $user->email,
-        'gender'              => $user->gender,
-        'language_preference' => $user->language_preference,
-    ]);
-}
+        return response()->json([
+            'id'                  => $user->id,
+            'name'                => $user->name,
+            'email'               => $user->email,
+            'gender'              => $user->gender,
+            'language_preference' => $user->language_preference,
+        ]);
+    }
+
+    public function updateLanguage(Request $request)
+    {
+        $user = $request->user(); // authenticated user
+
+        $validated = $request->validate([
+            'language_preference' => 'required|in:Eng,Bur',
+        ]);
+
+        $user->language_preference = $validated['language_preference'];
+        $user->save();
+
+        return response()->json([
+            'message' => 'Language preference updated successfully.',
+            'language_preference' => $user->language_preference,
+        ]);
+    }
 
     /**
      * GET /api/me/organs

@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/me/organs', [MeController::class, 'organs']);
     Route::get('/me', [MeController::class, 'me']);
+    Route::put('/user/language', [MeController::class, 'updateLanguage']);
 
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);

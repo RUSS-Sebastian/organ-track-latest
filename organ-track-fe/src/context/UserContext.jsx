@@ -1,15 +1,22 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import axios from "../api/axios";
 import ClipLoader from "react-spinners/ClipLoader";
-// create context
+
 const UserContext = createContext();
 
-// provider wrapper
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // store real user data
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [refreshKey, setRefreshKey] = useState(0); // ← new counter
 
+  // Re-fetch whenever token or refreshKey changes
   useEffect(() => {
     const fetchUser = async () => {
       if (!token) {
@@ -17,7 +24,6 @@ export const UserProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-
       try {
         setLoading(true);
         const response = await axios.get("/me", {
@@ -33,9 +39,13 @@ export const UserProvider = ({ children }) => {
     };
 
     fetchUser();
-  }, [token]);
+  }, [token, refreshKey]); // ← refreshKey added here
 
-  // ✅ display cool spinner while loading
+  // Function to manually force a re‑fetch of user data
+  const refreshUser = useCallback(() => {
+    setRefreshKey((prev) => prev + 1);
+  }, []);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -45,11 +55,10 @@ export const UserProvider = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ user, setToken }}>
+    <UserContext.Provider value={{ user, setToken, refreshUser }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-// custom hook
 export const useUser = () => useContext(UserContext);

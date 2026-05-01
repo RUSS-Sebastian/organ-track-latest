@@ -59,12 +59,7 @@ export default function Login() {
       newErrors.email = "Invalid email format";
     }
 
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
-    if (formData.password && !passwordRegex.test(formData.password)) {
-      newErrors.password =
-        "Password must be 6+ chars, include uppercase, lowercase, number & special char";
-    }
+    // Password validation (regex) removed — backend will handle any strength rules
 
     setErrors(newErrors);
     setApiError("");
@@ -153,6 +148,11 @@ export default function Login() {
                 onClick={() => setShowPassword(!showPassword)}
               ></i>
             </div>
+            {errors.password && (
+              <p className="text-red-500 text-sm -mt-6 mb-2">
+                {errors.password}
+              </p>
+            )}
 
             <button
               type="submit"
