@@ -136,7 +136,7 @@ class HealthAnalysisController extends Controller
                 'Content-Type' => 'application/json',
             ])
             ->post('https://openrouter.ai/api/v1/chat/completions', [
-                'model' => 'stepfun/step-3.5-flash:free',
+                'model' => 'tencent/hy3:free',
                 'messages' => [
                     [
                         'role' => 'user',

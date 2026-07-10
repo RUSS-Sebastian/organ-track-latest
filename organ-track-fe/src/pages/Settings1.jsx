@@ -94,7 +94,6 @@ const Settings = () => {
       );
       localStorage.removeItem("token");
       alert(t(translations.logoutSuccess.en, translations.logoutSuccess.mm));
-      setToken(null);
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);

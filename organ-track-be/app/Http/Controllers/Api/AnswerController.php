@@ -539,7 +539,7 @@ class AnswerController extends Controller
                     'Content-Type' => 'application/json',
                 ])
                 ->post('https://openrouter.ai/api/v1/chat/completions', [
-                    'model' => 'stepfun/step-3.5-flash:free',
+                    'model' => 'tencent/hy3:free',
                     'response_format' => ['type' => 'json_object'],
                     'messages' => [
                         [
@@ -805,7 +805,7 @@ class AnswerController extends Controller
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json',
         ])->post('https://openrouter.ai/api/v1/chat/completions', [
-            'model' => "openrouter/owl-alpha",
+            'model' => "tencent/hy3:free",
             'messages' => [
                 [
                     'role' => 'user',
