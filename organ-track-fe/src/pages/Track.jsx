@@ -84,29 +84,38 @@ export default function TrackAnalysisPage() {
   }
   const config = riskConfig[data.riskLevel];
   return (
-    <div className="min-h-[874px] w-full flex justify-center bg-white">
-      <div className="w-full max-w-[402px] px-4 pt-6 pb-10">
+    <div className="w-full bg-white">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 pt-6 pb-10 lg:pt-8 lg:pb-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <button className="text-xl text-gray-700" onClick={handleBack}>
+          <button
+            className="text-xl lg:text-2xl text-gray-700"
+            onClick={handleBack}
+          >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
-          <h1 className="text-green-600 font-semibold text-lg">{data.title}</h1>
-          <span className="text-xs text-gray-500">{data.date}</span>
+          <h1 className="text-green-600 font-semibold text-lg lg:text-xl">
+            {data.title}
+          </h1>
+          <span className="text-xs lg:text-sm text-gray-500">{data.date}</span>
         </div>
 
         {/* Analysis Card */}
-        <div className="bg-green-100 border border-green-300 rounded-2xl p-4 mb-4">
+        <div className="bg-green-100 border border-green-300 rounded-2xl p-4 lg:p-6 mb-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-green-200 flex items-center justify-center">
               <FontAwesomeIcon
                 icon={faChartSimple}
-                className="text-green-700"
+                className="text-green-700 lg:text-lg"
               />
             </div>
             <div>
-              <h2 className="font-semibold text-gray-800">Analysis Result</h2>
-              <p className="text-xs text-gray-500">Based on your responses</p>
+              <h2 className="font-semibold text-gray-800 lg:text-lg">
+                Analysis Result
+              </h2>
+              <p className="text-xs lg:text-sm text-gray-500">
+                Based on your responses
+              </p>
             </div>
           </div>
 
@@ -115,12 +124,19 @@ export default function TrackAnalysisPage() {
             className={`border rounded-xl p-4 mb-4 flex justify-between items-center ${config.container}`}
           >
             <div className="flex items-center gap-3">
-              <div className={`${config.badge} text-white p-2 rounded-full`}>
-                <FontAwesomeIcon icon={faTriangleExclamation} />
+              <div
+                className={`${config.badge} text-white p-2 lg:p-3 rounded-full`}
+              >
+                <FontAwesomeIcon
+                  icon={faTriangleExclamation}
+                  className="lg:text-lg"
+                />
               </div>
               <div>
-                <p className="text-sm text-gray-700">Risk Assessment</p>
-                <p className={`font-semibold ${config.text}`}>
+                <p className="text-sm lg:text-base text-gray-700">
+                  Risk Assessment
+                </p>
+                <p className={`font-semibold lg:text-lg ${config.text}`}>
                   {data.riskLevel}
                 </p>
               </div>
@@ -131,7 +147,7 @@ export default function TrackAnalysisPage() {
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className={`w-2 h-6 rounded-full ${
+                  className={`w-2 h-6 lg:w-3 lg:h-8 rounded-full ${
                     i <
                     (data.riskLevel === "Good"
                       ? 1
@@ -146,17 +162,19 @@ export default function TrackAnalysisPage() {
             </div>
           </div>
 
-          <p className="text-xs text-gray-600 mb-4">{config.message}</p>
+          <p className="text-xs lg:text-sm text-gray-600 mb-4">
+            {config.message}
+          </p>
 
           {/* Indicators */}
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">
+          <h3 className="text-sm lg:text-base font-semibold text-gray-700 mb-2">
             Possible Indicators
           </h3>
           <div className="space-y-2">
             {data.indicators.map((item, i) => (
               <div
                 key={i}
-                className="bg-gray-200 text-gray-700 rounded-xl px-4 py-3 text-sm"
+                className="bg-gray-200 text-gray-700 rounded-xl px-4 py-3 text-sm lg:text-base"
               >
                 {item}
               </div>
@@ -165,8 +183,8 @@ export default function TrackAnalysisPage() {
         </div>
 
         {/* Immediate Recommendations */}
-        <div className="bg-gray-100 rounded-2xl p-4 mb-4 border">
-          <h3 className="font-semibold text-gray-800 mb-3">
+        <div className="bg-gray-100 rounded-2xl p-4 lg:p-6 mb-4 border">
+          <h3 className="font-semibold text-gray-800 mb-3 lg:text-lg">
             Immediate Recommendations
           </h3>
           <div className="space-y-3">
@@ -177,9 +195,13 @@ export default function TrackAnalysisPage() {
         </div>
 
         {/* Lifestyle */}
-        <div className="bg-green-200 rounded-2xl p-4 mb-4">
-          <h3 className="font-semibold text-gray-800">Lifestyle Adjustments</h3>
-          <p className="text-xs text-gray-600 mb-3">Long-term healthy habits</p>
+        <div className="bg-green-200 rounded-2xl p-4 lg:p-6 mb-4">
+          <h3 className="font-semibold text-gray-800 lg:text-lg">
+            Lifestyle Adjustments
+          </h3>
+          <p className="text-xs lg:text-sm text-gray-600 mb-3">
+            Long-term healthy habits
+          </p>
           <div className="space-y-3">
             {data.lifestyleAdjustments.map((item, i) => (
               <CheckItem key={i} text={item} />
@@ -189,37 +211,35 @@ export default function TrackAnalysisPage() {
 
         {/* Seek medical */}
         <div className="rounded-2xl overflow-hidden border mb-4">
-          <div className="bg-red-600 text-white text-center py-6 px-4">
-            <div className="w-14 h-14 bg-white/90 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+          <div className="bg-red-600 text-white text-center py-6 px-4 lg:py-8 lg:px-6">
+            <div className="w-14 h-14 lg:w-16 lg:h-16 bg-white/90 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl lg:text-2xl">
               <FontAwesomeIcon icon={faTriangleExclamation} />
             </div>
-            <h3 className="font-semibold text-lg">
+            <h3 className="font-semibold text-lg lg:text-xl">
               Seek Medical Help If You Experience
             </h3>
           </div>
 
-          <div className="p-4 space-y-3 bg-gray-100">
+          <div className="p-4 lg:p-6 space-y-3 bg-gray-100">
             {data.seekMedical.map((item, i) => (
               <div
                 key={i}
-                className="bg-gray-200 text-red-600 rounded-xl px-4 py-3 text-sm font-medium"
+                className="bg-gray-200 text-red-600 rounded-xl px-4 py-3 text-sm lg:text-base font-medium"
               >
                 {item}
               </div>
             ))}
 
             {/* Static notice */}
-            <div className="bg-indigo-900 text-white rounded-xl p-4 mt-4">
-              <div className="font-semibold mb-1">
-                <div className="flex items-center gap-2 font-semibold mb-1">
-                  <FontAwesomeIcon
-                    icon={faShieldHalved}
-                    className="text-green-400"
-                  />
-                  IMPORTANT NOTICE
-                </div>
+            <div className="bg-indigo-900 text-white rounded-xl p-4 lg:p-5 mt-4">
+              <div className="flex items-center gap-2 font-semibold mb-1">
+                <FontAwesomeIcon
+                  icon={faShieldHalved}
+                  className="text-green-400 lg:text-lg"
+                />
+                IMPORTANT NOTICE
               </div>
-              <p className="text-sm text-white/90">
+              <p className="text-sm lg:text-base text-white/90">
                 If any of these occur, please consult a healthcare professional
                 immediately.
               </p>

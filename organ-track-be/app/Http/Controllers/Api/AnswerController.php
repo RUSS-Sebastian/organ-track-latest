@@ -792,76 +792,76 @@ class AnswerController extends Controller
      * Call OpenRouter API
      */
     private function callOpenRouter($prompt)
-    {
-        try {
-            $apiKey = env('OPENROUTER_API_KEY');
-            
-            if (empty($apiKey)) {
-                Log::error('OpenRouter API key is missing');
-                return [];
-            }
-            
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://openrouter.ai/api/v1/chat/completions', [
-                'model' => "tencent/hy3-preview:free",
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => $prompt
-                    ]
+{
+    try {
+        $apiKey = env('OPENROUTER_API_KEY');
+        
+        if (empty($apiKey)) {
+            Log::error('OpenRouter API key is missing');
+            return [];
+        }
+        
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type' => 'application/json',
+        ])->post('https://openrouter.ai/api/v1/chat/completions', [
+            'model' => "openrouter/owl-alpha",
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => $prompt
                 ]
-            ]);
+            ]
+        ]);
 
-            // Check if response is valid
-            if (!$response instanceof \Illuminate\Http\Client\Response) {
-                Log::error('Invalid response object');
-                return [];
-            }
+        // Check if response is valid
+        if (!$response instanceof \Illuminate\Http\Client\Response) {
+            Log::error('Invalid response object');
+            return [];
+        }
 
-            if ($response->failed()) {
-                Log::error('OpenRouter API request failed', [
-                    'status' => method_exists($response, 'status') ? $response->status() : 'unknown',
-                    'body' => method_exists($response, 'body') ? $response->body() : 'unknown',
-                ]);
-                return [];
-            }
-
-            $data = method_exists($response, 'json') ? $response->json() : null;
-            
-            if (!$data) {
-                Log::error('Failed to parse response JSON');
-                return [];
-            }
-
-            if (!isset($data['choices'][0]['message']['content'])) {
-                Log::error('OpenRouter response missing content', ['response' => $data]);
-                return [];
-            }
-
-            $raw = $data['choices'][0]['message']['content'];
-
-            // Remove markdown if AI adds it
-            $raw = preg_replace('/```json|```/', '', $raw);
-            $raw = trim($raw);
-
-            $decoded = json_decode($raw, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                Log::error('Invalid JSON from OpenRouter', ['raw' => $raw]);
-                return [];
-            }
-
-            return $decoded;
-
-        } catch (\Exception $e) {
-            Log::error('OpenRouter API exception', [
-                'error' => $e->getMessage()
+        if ($response->failed()) {
+            Log::error('OpenRouter API request failed', [
+                'status' => method_exists($response, 'status') ? $response->status() : 'unknown',
+                'body' => method_exists($response, 'body') ? $response->body() : 'unknown',
             ]);
             return [];
         }
+
+        $data = method_exists($response, 'json') ? $response->json() : null;
+        
+        if (!$data) {
+            Log::error('Failed to parse response JSON');
+            return [];
+        }
+
+        if (!isset($data['choices'][0]['message']['content'])) {
+            Log::error('OpenRouter response missing content', ['response' => $data]);
+            return [];
+        }
+
+        $raw = $data['choices'][0]['message']['content'];
+
+        // Remove markdown if AI adds it
+        $raw = preg_replace('/```json|```/', '', $raw);
+        $raw = trim($raw);
+
+        $decoded = json_decode($raw, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::error('Invalid JSON from OpenRouter', ['raw' => $raw]);
+            return [];
+        }
+
+        return $decoded;
+
+    } catch (\Exception $e) {
+        Log::error('OpenRouter API exception', [
+            'error' => $e->getMessage()
+        ]);
+        return [];
     }
+}
 
     public function getReportById($reportId)
     {
