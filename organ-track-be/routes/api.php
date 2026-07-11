@@ -37,6 +37,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/ai-report/{report}', [AnswerController::class, 'getReportById']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/submit-daily', [AnswerController::class, 'submitDaily']);
+    Route::get('/report-status/{id}', [AnswerController::class, 'reportStatus']);
+    Route::post('/retry-report/{id}', [AnswerController::class, 'retryReport']);
     Route::get('/latest-organ-status', [OrganScoreController::class, 'getLatestOrganStatus']);
     Route::get('/organ-report/{organId}',[OrganReportController::class, 'show']);
     Route::get('/organ-report-specific/{organId}',[OrganReportController::class, 'showspecific']);

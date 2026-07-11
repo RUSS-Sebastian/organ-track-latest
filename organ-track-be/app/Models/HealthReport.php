@@ -6,10 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class HealthReport extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'report_date'
-    ];
+    
+    protected $fillable = ['user_id', 'report_date', 'status', 'job_params'];
 
     public function organs()
     {
