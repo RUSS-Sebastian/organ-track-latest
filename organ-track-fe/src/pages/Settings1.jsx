@@ -93,6 +93,8 @@ const Settings = () => {
         },
       );
       localStorage.removeItem("token");
+      localStorage.removeItem("pendingReportId");
+
       alert(t(translations.logoutSuccess.en, translations.logoutSuccess.mm));
       navigate("/login");
     } catch (error) {

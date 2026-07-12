@@ -19,10 +19,12 @@ import PrivateRoute from "./components/PrivateRoute";
 import AiTest from "./pages/AiTest";
 import TrackAnalysisPage from "./pages/Track";
 import ReportDetails from "./pages/ReportDetails";
+import ReportBubble from "./components/ReportBubble";
 
 function App() {
   return (
     <BrowserRouter>
+      <ReportBubble />
       <Routes>
         {/* Pages WITHOUT Navbar */}
         <Route path="/login" element={<Login />} />

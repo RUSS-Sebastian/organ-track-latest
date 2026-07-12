@@ -3,6 +3,7 @@ import { useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import api from "../api/axios";
 import { useUser } from "../context/UserContext";
+import { validatePendingReport } from "../utils/reportUtils";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -78,6 +79,14 @@ export default function Login() {
 
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
+        const pendingId = localStorage.getItem("pendingReportId");
+        if (pendingId) {
+          const isValid = await validatePendingReport(pendingId);
+          if (!isValid) {
+            localStorage.removeItem("pendingReportId");
+          }
+          // If valid, leave it so ReportBubble can pick it up when it mounts
+        }
 
         navigate("/");
       } catch (err) {

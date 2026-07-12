@@ -208,15 +208,22 @@ export default function Questions() {
             },
           },
         );
+
+        const { health_report_id } = response.data;
+        // Store the report ID for the bubble
+        localStorage.setItem("pendingReportId", health_report_id);
+        window.dispatchEvent(new Event("pendingReportChanged"));
+        // Clear any draft
         const draftKey = getDraftKey(organId);
         if (draftKey) localStorage.removeItem(draftKey);
+
         alert(
           t(
             translations.submittedSuccessfully.en,
             translations.submittedSuccessfully.mm,
           ),
         );
-        navigate("/");
+        navigate("/"); // go to home
       } catch (err) {
         console.error("Submission failed:", err);
         setSubmitting(false);
