@@ -231,23 +231,27 @@ function EachOrgan() {
   });*/
 
   return (
-    <div className="min-h-[982px] w-full flex justify-center bg-white">
-      <div className="w-full max-w-[402px] px-2 pt-6 pb-10">
+    // Outer wrapper: full width, minimum 320px, no height restriction
+    <div className="min-w-[320px] w-full bg-white">
+      {/* Inner container: full width, responsive padding */}
+      <div className="w-full px-4 sm:px-6 lg:px-12 xl:px-20 pt-6 pb-10">
         {/* TITLE */}
-        <div className="flex items-center justify-center relative mb-4">
+        <div className="flex items-center justify-center relative mb-6">
           <button
             onClick={() => navigate("/")}
             className="absolute left-0 text-lg px-2 py-1 rounded-full hover:bg-gray-100"
           >
             ←
           </button>
-
-          <h1 className="text-xl font-semibold">Your {organName}</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold">
+            Your {organName}
+          </h1>
         </div>
 
-        {/* ORGAN IMAGE */}
-        <div className="flex justify-center mb-4">
-          <div className="w-full h-32 rounded-3xl bg-white shadow-md flex items-center justify-center">
+        {/* ORGAN IMAGE + SCORE CARD – side by side on medium+ screens */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          {/* Organ Image */}
+          <div className="w-full md:w-1/3 lg:w-1/4 rounded-3xl bg-white shadow-md flex items-center justify-center h-32 md:h-40">
             {organImage && (
               <img
                 src={organImage}
@@ -256,38 +260,37 @@ function EachOrgan() {
               />
             )}
           </div>
-        </div>
 
-        {/* SCORE CARD */}
-        <div className="bg-[#0A3B5C] rounded-2xl p-5 text-white flex justify-between items-center mb-6 shadow-lg">
-          <div>
-            <p className="text-lg font-semibold mb-2">{organName} Condition</p>
+          {/* Score Card */}
+          <div className="flex-1 bg-[#0A3B5C] rounded-2xl p-5 text-white flex flex-col sm:flex-row justify-between items-center shadow-lg gap-4">
+            <div>
+              <p className="text-lg font-semibold mb-2">
+                {organName} Condition
+              </p>
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-semibold ${scoreConfig.badgeClasses}`}
+              >
+                {scoreConfig.label}
+              </span>
+            </div>
 
-            <span
-              className={`px-3 py-1 rounded-full text-sm font-semibold ${scoreConfig.badgeClasses}`}
-            >
-              {scoreConfig.label}
-            </span>
-          </div>
-
-          <div className="relative flex items-center justify-center w-24 h-24">
-            <div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: `conic-gradient(${scoreConfig.ringColor} ${progressAngle}deg, rgba(15,23,42,0.75) 0deg)`,
-              }}
-            />
-
-            <div className="relative flex flex-col items-center justify-center w-20 h-20 rounded-full bg-[#0A3B5C] border border-slate-700">
-              <span className="text-[12px] uppercase">Score</span>
-
-              <p className="text-2xl font-bold">{scoreConfig.score}</p>
+            <div className="relative flex items-center justify-center w-24 h-24 shrink-0">
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: `conic-gradient(${scoreConfig.ringColor} ${progressAngle}deg, rgba(15,23,42,0.75) 0deg)`,
+                }}
+              />
+              <div className="relative flex flex-col items-center justify-center w-20 h-20 rounded-full bg-[#0A3B5C] border border-slate-700">
+                <span className="text-[12px] uppercase">Score</span>
+                <p className="text-2xl font-bold">{scoreConfig.score}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Analysis Header */}
-        <div className="flex items-center justify-between mb-3">
+        {/* RANGE NAVIGATION */}
+        <div className="flex items-center justify-between mb-3 max-w-4xl mx-auto">
           <button
             type="button"
             onClick={handlePrevRange}
@@ -295,11 +298,9 @@ function EachOrgan() {
           >
             ←
           </button>
-
           <p className="text-[14px] font-medium text-gray-700">
             {rangeLabelMap[activeRange]}
           </p>
-
           <button
             type="button"
             onClick={handleNextRange}
@@ -309,7 +310,7 @@ function EachOrgan() {
           </button>
         </div>
 
-        {/* Range Pills */}
+        {/* RANGE PILLS */}
         <div className="flex justify-center gap-2 mb-4">
           {rangeOrder.map((rangeKey) => (
             <button
@@ -328,10 +329,9 @@ function EachOrgan() {
           ))}
         </div>
 
-        {/* Chart */}
-        {/* Chart */}
+        {/* CHART – responsive height */}
         <div className="bg-white rounded-2xl p-4 mb-6 shadow-md border border-gray-100">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
             <p className="text-[14px] font-medium text-gray-800">Organ Score</p>
             <div className="flex gap-2 items-center text-[12px]">
               <div className="flex items-center gap-1">
@@ -347,7 +347,7 @@ function EachOrgan() {
             </div>
           </div>
 
-          <div className="h-[160px] bg-gradient-to-b from-[#F6F7FB] to-[#E7ECFB] rounded-xl border border-gray-100 px-3 pt-4 pb-3">
+          <div className="h-40 sm:h-48 md:h-56 bg-gradient-to-b from-[#F6F7FB] to-[#E7ECFB] rounded-xl border border-gray-100 px-3 pt-4 pb-3">
             <svg viewBox="0 0 240 120" className="w-full h-full">
               {/* Horizontal grid lines */}
               <g stroke="#E5E7EB" strokeWidth="1">
@@ -361,7 +361,6 @@ function EachOrgan() {
                   />
                 ))}
               </g>
-
               {/* Y-axis labels */}
               {yTicks.map((val) => (
                 <text
@@ -374,7 +373,6 @@ function EachOrgan() {
                   {val}
                 </text>
               ))}
-
               {/* Previous line */}
               {previousPoints && (
                 <polyline
@@ -384,7 +382,6 @@ function EachOrgan() {
                   strokeWidth="2"
                 />
               )}
-
               {/* Current line */}
               <polyline
                 points={currentPoints}
@@ -392,13 +389,11 @@ function EachOrgan() {
                 stroke="#22C55E"
                 strokeWidth="3"
               />
-
-              {/* Circles */}
+              {/* Data points */}
               {currentPoints.split(" ").map((pt, idx) => {
                 const [x, y] = pt.split(",").map(Number);
                 return <circle key={idx} cx={x} cy={y} r={3} fill="#22C55E" />;
               })}
-
               {/* X-axis labels */}
               {xLabels.map((label, idx) => {
                 const x = 10 + (220 * idx) / (xLabels.length - 1 || 1);
@@ -419,12 +414,13 @@ function EachOrgan() {
           </div>
         </div>
 
+        {/* DATE PICKER TRIGGER */}
         <div className="flex justify-center mb-4">
           <button
             onClick={() => setCalendarOpen(!calendarOpen)}
             className="px-3 py-1 rounded-full border bg-gray-100 hover:bg-gray-200"
           >
-            {formatDate(selectedDate)} {/* Safe formatting for display */}
+            {formatDate(selectedDate)}
           </button>
         </div>
 
@@ -437,8 +433,8 @@ function EachOrgan() {
                 setCalendarOpen(false);
               }}
               inline
-              maxDate={new Date()} // disable future
-              minDate={subYears(new Date(), 5)} // optional: last 5 years
+              maxDate={new Date()}
+              minDate={subYears(new Date(), 5)}
               showMonthDropdown
               showYearDropdown
               dropdownMode="select"
@@ -447,64 +443,65 @@ function EachOrgan() {
         )}
 
         {/* SUMMARY */}
-        <div className="text-center mb-6">
-          <h3 className="font-semibold text-lg mb-2 text-gray-900">
+        <div className="text-center mb-6 max-w-4xl mx-auto">
+          <h3 className="font-semibold text-lg sm:text-xl mb-2 text-gray-900">
             {organData.summaryTitle}
           </h3>
-
-          <p className="text-[14px] text-gray-600 leading-relaxed">
+          <p className="text-[14px] sm:text-base text-gray-600 leading-relaxed">
             {organData.summary}
           </p>
         </div>
 
-        {/* POSITIVE HABITS */}
-        <div className="bg-[#E5F9ED] rounded-2xl p-4 mb-4 shadow-sm">
-          <h4 className="font-semibold text-[15px] mb-2">
-            Positive habit effects on your {organData.organ}
-          </h4>
+        {/* HABITS – two columns on larger screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* Positive Habits */}
+          <div className="bg-[#E5F9ED] rounded-2xl p-4 shadow-sm">
+            <h4 className="font-semibold text-[15px] mb-2">
+              Positive habit effects on your {organData.organ}
+            </h4>
+            <ul className="text-[14px] text-gray-700 list-disc pl-5 space-y-1">
+              {organData.positiveHabits.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+          </div>
 
-          <ul className="text-[14px] text-gray-700 list-disc pl-5 space-y-1">
-            {organData.positiveHabits.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
+          {/* Negative Habits */}
+          <div className="bg-[#FFE5E5] rounded-2xl p-4 shadow-sm">
+            <h4 className="font-semibold text-[15px] mb-2">
+              Negative habit effects on your {organData.organ}
+            </h4>
+            <ul className="text-[14px] text-gray-700 list-disc pl-5 space-y-1">
+              {organData.negativeHabits.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        {/* NEGATIVE HABITS */}
-        <div className="bg-[#FFE5E5] rounded-2xl p-4 mb-4 shadow-sm">
-          <h4 className="font-semibold text-[15px] mb-2">
-            Negative habit effects on your {organData.organ}
-          </h4>
+        {/* CONDITIONS & RECOMMENDATIONS – two columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* Conditions */}
+          <div className="bg-gray-100 rounded-2xl p-4 shadow-sm">
+            <h4 className="font-semibold text-[15px] mb-3">
+              Identified Conditions
+            </h4>
+            <ul className="text-[14px] text-gray-700 space-y-2">
+              {organData.conditions.map((item, i) => (
+                <li key={i}>• {item}</li>
+              ))}
+            </ul>
+          </div>
 
-          <ul className="text-[14px] text-gray-700 list-disc pl-5 space-y-1">
-            {organData.negativeHabits.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
-        </div>
-
-        {/* CONDITIONS */}
-        <div className="bg-gray-100 rounded-2xl p-4 mb-4 shadow-sm">
-          <h4 className="font-semibold text-[15px] mb-3">
-            Identified Conditions
-          </h4>
-
-          <ul className="text-[14px] text-gray-700 space-y-2">
-            {organData.conditions.map((item, i) => (
-              <li key={i}>• {item}</li>
-            ))}
-          </ul>
-        </div>
-
-        {/* RECOMMENDATIONS */}
-        <div className="bg-[#22C55E] rounded-2xl p-4 shadow-md">
-          <h4 className="font-semibold text-[15px] mb-3">Recommendations</h4>
-
-          <ul className="text-[14px] text-gray-800 list-disc pl-5 space-y-1">
-            {organData.recommendations.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
+          {/* Recommendations */}
+          <div className="bg-[#22C55E] rounded-2xl p-4 shadow-md">
+            <h4 className="font-semibold text-[15px] mb-3">Recommendations</h4>
+            <ul className="text-[14px] text-gray-800 list-disc pl-5 space-y-1">
+              {organData.recommendations.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
