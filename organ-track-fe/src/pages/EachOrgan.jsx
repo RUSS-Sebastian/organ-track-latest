@@ -2,9 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import organImages from "../data/organImages";
 import axios from "../api/axios";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { subYears, isAfter } from "date-fns";
+import DatePickerPopover from "../components/DatePickerPopover";
 
 function EachOrgan() {
   const navigate = useNavigate();
@@ -15,7 +13,7 @@ function EachOrgan() {
   const [loading, setLoading] = useState(true);
   const [activeRange, setActiveRange] = useState("week");
   const [selectedDate, setSelectedDate] = useState(new Date()); // Today by default
-  const [calendarOpen, setCalendarOpen] = useState(false); // toggle calendar popup
+
   const [chartData, setChartData] = useState({ current: {}, previous: {} });
   // UseMemo for scoreConfig safely
   const scoreConfig = useMemo(() => {
@@ -414,33 +412,16 @@ function EachOrgan() {
           </div>
         </div>
 
-        {/* DATE PICKER TRIGGER */}
+        {/* Date picker – placed after the chart, before the summary */}
         <div className="flex justify-center mb-4">
-          <button
-            onClick={() => setCalendarOpen(!calendarOpen)}
-            className="px-3 py-1 rounded-full border bg-gray-100 hover:bg-gray-200"
-          >
-            {formatDate(selectedDate)}
-          </button>
+          <DatePickerPopover
+            selected={selectedDate}
+            onChange={(date) => {
+              setSelectedDate(date);
+              // The useEffect will automatically fetch organ data for the new date
+            }}
+          />
         </div>
-
-        {calendarOpen && (
-          <div className="flex justify-center mb-4 z-50">
-            <DatePicker
-              selected={selectedDate}
-              onChange={(date) => {
-                setSelectedDate(date);
-                setCalendarOpen(false);
-              }}
-              inline
-              maxDate={new Date()}
-              minDate={subYears(new Date(), 5)}
-              showMonthDropdown
-              showYearDropdown
-              dropdownMode="select"
-            />
-          </div>
-        )}
 
         {/* SUMMARY */}
         <div className="text-center mb-6 max-w-4xl mx-auto">

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\HealthReport;
 use App\Models\HealthReportOrgan;
+use App\Models\Organ;
+use App\Models\OrganScoreHistory;
 
 class OrganReportController extends Controller
 {
@@ -58,62 +60,65 @@ class OrganReportController extends Controller
     public function showspecific(Request $request, $organId)
     {
         $user = Auth::user();
-        $date = $request->query('date'); // expected format: YYYY-MM-DD
+        $date = $request->query('date');
 
-        // Try to get health report
+        // 1. Try to find the health report for the given date
         $healthReportQuery = HealthReport::where('user_id', $user->id);
-
         if ($date) {
             $healthReportQuery->whereDate('report_date', $date);
         }
-
         $healthReport = $healthReportQuery->latest()->first();
 
-        // Default empty organ data
-        $emptyData = [
-            'organ' => 'unknown',
-            'score' => 0,
-            'summaryTitle' => 'Summary of Organ',
-            'summary' => '',
+        // 2. Fetch the organ's real name from the organs table
+        $organ = Organ::find($organId);
+        $organName = $organ ? $organ->name : 'Unknown';
+
+        // 3. Get the latest score for this organ (from any report)
+        $latestScore = OrganScoreHistory::where('user_id', $user->id)
+            ->where('organ_id', $organId)
+            ->latest('report_date')
+            ->value('score') ?? 0; // default 0 if never scored
+
+        // 4. If a health report exists for that date, try to get the specific organ data
+        if ($healthReport) {
+            $aiReport = HealthReportOrgan::where('health_report_id', $healthReport->id)
+                ->where('organ_id', $organId)
+                ->first();
+
+            if ($aiReport) {
+                // Exact data for the requested date
+                $aiData = is_array($aiReport->ai_response)
+                    ? $aiReport->ai_response
+                    : json_decode($aiReport->ai_response, true);
+
+                return response()->json([
+                    'organ' => strtolower($aiData['name'] ?? $organName),
+                    'score' => $aiData['score'] ?? $latestScore,
+                    'summaryTitle' => 'Summary of ' . ($aiData['name'] ?? $organName) . ' on ' . $healthReport->report_date,
+                    'summary' => $aiData['summary'] ?? '',
+                    'positiveHabits' => $aiData['positive_effects'] ?? [],
+                    'negativeHabits' => $aiData['negative_effects'] ?? [],
+                    'conditions' => $aiData['identified_conditions'] ?? [],
+                    'recommendations' => $aiData['recommendations'] ?? [],
+                    'report_date' => $healthReport->report_date,
+                    'is_fallback' => false,
+                ]);
+            }
+            // If organ data is missing in this report, fall through to fallback
+        }
+
+        // 5. Fallback: no report for that date, or organ missing
+        return response()->json([
+            'organ' => strtolower($organName),
+            'score' => $latestScore,
+            'summaryTitle' => 'Summary of ' . $organName . ' (latest data)',
+            'summary' => 'No detailed report available for this date.',
             'positiveHabits' => [],
             'negativeHabits' => [],
             'conditions' => [],
             'recommendations' => [],
-            'report_date' => $date ?? null,
-        ];
-
-        if (!$healthReport) {
-            // Return empty organ structure for missing date
-            return response()->json($emptyData);
-        }
-
-        // Fetch organ data
-        $aiReport = HealthReportOrgan::where('health_report_id', $healthReport->id)
-            ->where('organ_id', $organId)
-            ->first();
-
-        if (!$aiReport) {
-            // If health report exists but organ missing, return empty organ structure
-            $emptyData['report_date'] = $healthReport->report_date;
-            return response()->json($emptyData);
-        }
-
-        $aiData = is_array($aiReport->ai_response)
-            ? $aiReport->ai_response
-            : json_decode($aiReport->ai_response, true);
-
-        $organData = [
-            'organ' => strtolower($aiData['name'] ?? 'unknown'),
-            'score' => $aiData['score'] ?? 0,
-            'summaryTitle' => 'Summary of ' . ($aiData['name'] ?? 'Organ') . ' on ' . $healthReport->report_date,
-            'summary' => $aiData['summary'] ?? '',
-            'positiveHabits' => $aiData['positive_effects'] ?? [],
-            'negativeHabits' => $aiData['negative_effects'] ?? [],
-            'conditions' => $aiData['identified_conditions'] ?? [],
-            'recommendations' => $aiData['recommendations'] ?? [],
-            'report_date' => $healthReport->report_date
-        ];
-
-        return response()->json($organData);
+            'report_date' => $date ?? now()->format('Y-m-d'),
+            'is_fallback' => true,            // frontend can use this flag
+        ]);
     }
 }
